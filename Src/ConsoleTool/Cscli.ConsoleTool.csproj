@@ -15,13 +15,26 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>cscli</PackageId>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <NrtRevisionFormat>{semvertag:main:+chash}{!:-mod}</NrtRevisionFormat>
+    <NrtResolveSimpleAttributes>true</NrtResolveSimpleAttributes>
+    <NrtResolveInformationalAttribute>true</NrtResolveInformationalAttribute>
+    <NrtResolveCopyright>true</NrtResolveCopyright>
+    <NrtTagMatch>v[0-9]*</NrtTagMatch>
+    <NrtRemoveTagV>true</NrtRemoveTagV>
+    <NrtRequiredVcs>git</NrtRequiredVcs>
+    <NrtShowRevision>true</NrtShowRevision>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CardanoSharp.Wallet" Version="0.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="5.0.0" />
+    <PackageReference Include="Unclassified.NetRevisionTask" Version="0.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

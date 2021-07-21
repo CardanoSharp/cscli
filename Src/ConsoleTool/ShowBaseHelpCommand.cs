@@ -11,8 +11,8 @@ namespace Cscli.ConsoleTool
             CancellationToken ct)
         {
             var versionString = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                .InformationalVersion;
+                .GetCustomAttribute<AssemblyFileVersionAttribute>()
+                .Version;
 
             var helpText = $@"cscli v{versionString}
 A .NET Cross Platform Tool for integrating with Cardano wallet data structures
