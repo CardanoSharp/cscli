@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Cscli.ConsoleTool": {
+      "commandName": "Project"
+    }
+  }
+}
