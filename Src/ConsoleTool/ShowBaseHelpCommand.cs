@@ -13,7 +13,6 @@ namespace Cscli.ConsoleTool
             var versionString = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
                 .GetCustomAttribute<AssemblyFileVersionAttribute>()
                 .Version;
-
             var helpText = $@"cscli v{versionString}
 A .NET Cross Platform Tool for integrating with Cardano wallet data structures
 
@@ -29,7 +28,6 @@ Available commands:
     wallethd key stake derive --mnemonic MNEMONIC --account-index ACCT_IX --verification-key-file VKEY --signing-key-file SKEY
     wallethd address payment derive --mnemonic MNEMONIC --account-index ACCT_IX
     wallethd address stake derive --mnemonic MNEMONIC --account-index ACCT_IX";
-
             return ValueTask.FromResult(CommandResult.Success(helpText));
         }
     }

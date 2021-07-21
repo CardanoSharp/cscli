@@ -16,13 +16,13 @@ namespace Cscli.ConsoleTool
                 return new ShowVersionCommand();
             }
 
-            var concatArgs = string.Join(' ', args);
-            if (concatArgs.StartsWith("wallethd mnemonic gen"))
+            var flattenedArgs = string.Join(' ', args);
+            if (flattenedArgs.StartsWith("wallethd mnemonic gen"))
             {
                 return BuildCommand<GenerateMnemonicCommand>(args);
             }
 
-            return new ShowInvalidArgumentCommand(concatArgs);
+            return new ShowInvalidArgumentCommand(flattenedArgs);
         }
 
         private static ICommand BuildCommand<T>(string[] args) 

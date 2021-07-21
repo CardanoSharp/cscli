@@ -48,12 +48,18 @@ namespace Cscli.ConsoleTool.UnitTests
         }
 
         [Theory]
-        [InlineData("wallethd", "mnemonic", "gen")]
-        [InlineData("wallethd", "mnemonic", "gen", "--size", "10", "--language", "English")]
-        public void ParseArgs_Correctly_To_GenerateMnemonicCommand_When_Options_Are_Valid(params string[] args)
+        [InlineData("wallethd mnemonic gen", GenerateMnemonicCommand.DefaultSize, GenerateMnemonicCommand.DefaultLanguage)]
+        [InlineData("wallethd mnemonic gen --language Spanish", GenerateMnemonicCommand.DefaultSize, "Spanish")]
+        [InlineData("wallethd mnemonic gen --size 15", 15, GenerateMnemonicCommand.DefaultLanguage)]
+        [InlineData("wallethd mnemonic gen --size 21 --language English", 21, "English")]
+        [InlineData("wallethd mnemonic gen --size 21 --language Spanish", 21, "Spanish")]
+        public void ParseArgs_Correctly_To_GenerateMnemonicCommand_When_Options_Are_Valid(
+            string flatArgs, int expectedSize, string expectedLanguage)
         {
-            var command = CommandParser.ParseArgsToCommand(args);
+            var command = CommandParser.ParseArgsToCommand(flatArgs.Split(' '));
             command.Should().BeOfType<GenerateMnemonicCommand>();
+            ((GenerateMnemonicCommand)command).Size.Should().Be(expectedSize);
+            ((GenerateMnemonicCommand)command).Language.Should().Be(expectedLanguage);
         }
     }
 }

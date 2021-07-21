@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "--version"
+      "commandLineArgs": "wallethd mnemonic gen --size 21 --language English"
     }
   }
 }

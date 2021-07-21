@@ -21,12 +21,38 @@ namespace Cscli.ConsoleTool.UnitTests
         }
 
         [Theory]
-        [InlineData(9, "English")]
+        //[InlineData(9, "English")]
         [InlineData(12, "English")]
         [InlineData(15, "English")]
         [InlineData(18, "English")]
         [InlineData(21, "English")]
         [InlineData(24, "English")]
+        #region Non-English 
+        //[InlineData(9, "Spanish")]
+        [InlineData(12, "Spanish")]
+        [InlineData(15, "Spanish")]
+        [InlineData(18, "Spanish")]
+        [InlineData(21, "Spanish")]
+        [InlineData(24, "Spanish")]
+        //[InlineData(9, "Portuguese")]
+        [InlineData(12, "Portuguese")]
+        [InlineData(15, "Portuguese")]
+        [InlineData(18, "Portuguese")]
+        [InlineData(21, "Portuguese")]
+        [InlineData(24, "Portuguese")]
+        //[InlineData(9, "Japanese")]
+        [InlineData(12, "Japanese")]
+        [InlineData(15, "Japanese")]
+        [InlineData(18, "Japanese")]
+        [InlineData(21, "Japanese")]
+        [InlineData(24, "Japanese")]
+        //[InlineData(9, "ChineseTraditional")]
+        [InlineData(12, "ChineseTraditional")]
+        [InlineData(15, "ChineseTraditional")]
+        [InlineData(18, "ChineseTraditional")]
+        [InlineData(21, "ChineseTraditional")]
+        [InlineData(24, "ChineseTraditional")]
+        #endregion
         public async Task Execute_Successfully_With_Mnemonics_When_Properties_Are_Valid(int size, string language)
         {
             var command = new GenerateMnemonicCommand()
@@ -42,6 +68,8 @@ namespace Cscli.ConsoleTool.UnitTests
         }
 
         [Theory]
+        [InlineData(-1, "")]
+        [InlineData(0, null)]
         [InlineData(0, "English")]
         [InlineData(1, "English")]
         [InlineData(8, "English")]
