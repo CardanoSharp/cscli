@@ -1,4 +1,6 @@
-﻿namespace Cscli.ConsoleTool
+﻿using System;
+
+namespace Cscli.ConsoleTool
 {
     public enum CommandOutcome
     {
@@ -6,7 +8,7 @@
         FailureInvalidOptions,
         FailureTimedOut,
         FailureCancelled,
-        FailureUnhandled,
+        FailureUnhandledException,
     }
 
     public class CommandResult
@@ -15,10 +17,14 @@
 
         public string Result { get; }
 
-        public CommandResult(CommandOutcome outcome, string result)
+        public Exception Exception { get; }
+
+        public CommandResult(CommandOutcome outcome, string result, Exception exception = null)
         {
             Outcome = outcome;
             Result = result;
+            Exception = exception;
+
         }
 
         public static CommandResult Success(string result) =>
@@ -33,7 +39,7 @@
         public static CommandResult FailureCancelled(string result) =>
             new(CommandOutcome.FailureCancelled, result);
 
-        public static CommandResult FailureUnhandled(string result) =>
-            new(CommandOutcome.FailureUnhandled, result);
+        public static CommandResult FailureUnhandledException(string result, Exception ex) =>
+            new(CommandOutcome.FailureUnhandledException, result, ex);
     }
 }

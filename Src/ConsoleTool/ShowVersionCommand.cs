@@ -7,13 +7,13 @@ namespace Cscli.ConsoleTool
 {
     public class ShowVersionCommand : ICommand
     {
-        public ValueTask<CommandResult> ExecuteAsync(
-            CancellationToken ct)
+        public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
         {
-            var versionString = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
+            var cardanoSharpVersion = Assembly.GetAssembly(typeof(CardanoSharp.Wallet.KeyService)).GetName().Version.ToString();
+            var cscliVersionString = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 .InformationalVersion;
-            var versionText = $"cscli {versionString}";
+            var versionText = $"cscli {cscliVersionString} | CardanoSharp.Wallet {cardanoSharpVersion}";
             return ValueTask.FromResult(CommandResult.Success(versionText));
         }
     }

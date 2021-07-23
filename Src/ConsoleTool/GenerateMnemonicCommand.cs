@@ -30,9 +30,17 @@ namespace Cscli.ConsoleTool
                     $"Invalid option --language {Language} is not supported"));
             }
 
-            var keyService = new KeyService();
-            var result = CommandResult.Success(keyService.Generate(Size, wordlist));
-            return ValueTask.FromResult(result);
+            try
+            {
+                var keyService = new KeyService();
+                var result = CommandResult.Success(keyService.Generate(Size, wordlist));
+                return ValueTask.FromResult(result);
+            }
+            catch (Exception ex)
+            {
+                return ValueTask.FromResult(
+                    CommandResult.FailureUnhandledException("Unexpected error", ex));
+            }
         }
     }
 }

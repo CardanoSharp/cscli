@@ -19,7 +19,7 @@ namespace Cscli.ConsoleTool
             else
             {
                 Console.Error.WriteLine(commandResult.Result);
-                return 1;
+                return (int)commandResult.Outcome;
             }
             return 0;
         }

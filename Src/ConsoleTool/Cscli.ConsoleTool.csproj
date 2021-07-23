@@ -3,20 +3,20 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>0.0.1.1-alpha</Version>
+    <Version>0.0.0.0-populated-by-NetRevisionTask</Version>
 
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>cscli</ToolCommandName>
     <PackageOutputPath>nupkg</PackageOutputPath>
     <Authors>Keith</Authors>
     <Company>Lovelace Academy</Company>
-    <Description>Global tool / console app for integrating with Cardano wallet data structures</Description>
+    <Description>Cross Platform Global Tool / Console App for generating Cardano keys, addresses and transactions</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>cscli</PackageId>
   </PropertyGroup>
   <PropertyGroup>
-    <NrtRevisionFormat>{semvertag:main:+chash}{!:-mod}</NrtRevisionFormat>
+    <NrtRevisionFormat>{semvertag:main}+{chash}{!:-mod}</NrtRevisionFormat>
     <NrtResolveSimpleAttributes>true</NrtResolveSimpleAttributes>
     <NrtResolveInformationalAttribute>true</NrtResolveInformationalAttribute>
     <NrtResolveCopyright>true</NrtResolveCopyright>
@@ -36,5 +36,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
 
 </Project>
