@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "wallethd mnemonic gen --size 21 --language English"
+      "commandLineArgs": "key payment derive --mnemonic \"rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug\" --account-index 1 --address-index 1"
     }
   }
 }

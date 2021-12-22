@@ -1,38 +1,29 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Cscli.ConsoleTool;
 
-namespace Cscli.ConsoleTool
+class Program
 {
-    class Program
+    static async Task<int> Main(string[] args)
     {
-        static async Task<int> Main(string[] args)
+        var cts = SetupUserInputCancellationTokenSource();
+        var command = CommandParser.ParseArgsToCommand(args);
+        var commandResult = await command.ExecuteAsync(cts.Token).ConfigureAwait(false);
+        if (commandResult.Outcome == CommandOutcome.Success)
         {
-            var cts = SetupUserInputCancellationTokenSource();
-
-            var command = CommandParser.ParseArgsToCommand(args);
-            var commandResult = await command.ExecuteAsync(cts.Token).ConfigureAwait(false);
-            if (commandResult.Outcome == CommandOutcome.Success)
-            {
-                Console.Out.WriteLine(commandResult.Result);
-            }
-            else
-            {
-                Console.Error.WriteLine(commandResult.Result);
-                return (int)commandResult.Outcome;
-            }
+            Console.Out.WriteLine(commandResult.Result);
             return 0;
         }
+        Console.Error.WriteLine(commandResult.Result);
+        return (int)commandResult.Outcome;
+    }
 
-        private static CancellationTokenSource SetupUserInputCancellationTokenSource()
+    private static CancellationTokenSource SetupUserInputCancellationTokenSource()
+    {
+        var cts = new CancellationTokenSource();
+        Console.CancelKeyPress += (s, e) =>
         {
-            var cts = new CancellationTokenSource();
-            Console.CancelKeyPress += (s, e) =>
-            {
-                e.Cancel = true;
-                cts.Cancel();
-            };
-            return cts;
-        }
+            e.Cancel = true;
+            cts.Cancel();
+        };
+        return cts;
     }
 }

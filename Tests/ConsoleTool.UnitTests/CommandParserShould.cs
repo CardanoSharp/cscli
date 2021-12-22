@@ -1,8 +1,9 @@
+using Cscli.ConsoleTool.Commands;
 using FluentAssertions;
 using Xunit;
 
-namespace Cscli.ConsoleTool.UnitTests
-{
+namespace Cscli.ConsoleTool.UnitTests;
+
     public class CommandParserShould
     {
         [Theory]
@@ -48,9 +49,9 @@ namespace Cscli.ConsoleTool.UnitTests
         }
 
         [Theory]
-        [InlineData("wallethd mnemonic gen", GenerateMnemonicCommand.DefaultSize, GenerateMnemonicCommand.DefaultLanguage)]
-        [InlineData("wallethd mnemonic gen --language Spanish", GenerateMnemonicCommand.DefaultSize, "Spanish")]
-        [InlineData("wallethd mnemonic gen --size 15", 15, GenerateMnemonicCommand.DefaultLanguage)]
+        [InlineData("wallethd mnemonic gen", Constants.DefaultMnemonicCount, Constants.DefaultMnemonicLanguage)]
+        [InlineData("wallethd mnemonic gen --language Spanish", Constants.DefaultMnemonicCount, "Spanish")]
+        [InlineData("wallethd mnemonic gen --size 15", 15, Constants.DefaultMnemonicLanguage)]
         [InlineData("wallethd mnemonic gen --size 21 --language English", 21, "English")]
         [InlineData("wallethd mnemonic gen --size 21 --language Spanish", 21, "Spanish")]
         public void ParseArgs_Correctly_To_GenerateMnemonicCommand_When_Options_Are_Valid(
@@ -62,4 +63,3 @@ namespace Cscli.ConsoleTool.UnitTests
             ((GenerateMnemonicCommand)command).Language.Should().Be(expectedLanguage);
         }
     }
-}
