@@ -9,6 +9,7 @@ namespace Cscli.ConsoleTool.Commands;
 public class DeriveRootKeyCommand : ICommand
 {
     public string Mnemonic { get; init; }
+    public string Passphrase { get; init; } = string.Empty;
     public string Language { get; init; } = DefaultMnemonicLanguage;
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
@@ -35,10 +36,12 @@ public class DeriveRootKeyCommand : ICommand
         {
             var mnemonicService = new MnemonicService();
             var mnemonic = mnemonicService.Restore(Mnemonic, wordlist);
-            var rootPrvKey = mnemonic.GetRootKey();
-            //var rootPubKey = rootPrvKey.GetPublicKey();
-            var bech32FormattedRootPrvKey = Bech32.Encode(rootPrvKey.Key, RootKeyBech32Prefix);
-            var result = CommandResult.Success(bech32FormattedRootPrvKey);
+            var rootPrvKey = mnemonic.GetRootKey(Passphrase);
+            var rootKeyExtended = new byte[96];
+            Array.Copy(rootPrvKey.Key, rootKeyExtended, rootPrvKey.Key.Length);
+            Array.Copy(rootPrvKey.Chaincode, 0, rootKeyExtended, rootPrvKey.Key.Length, rootPrvKey.Chaincode.Length);
+            var bech32FormattedRootExtKey = Bech32.Encode(rootKeyExtended, RootKeyExtendedBech32Prefix);
+            var result = CommandResult.Success(bech32FormattedRootExtKey);
             return ValueTask.FromResult(result);
         }
         catch (Exception ex)

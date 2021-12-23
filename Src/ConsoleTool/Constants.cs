@@ -15,7 +15,7 @@ public static class Constants
     public const string VKeyJsonDescriptionField = "";
 
     // Bech32 Prefixes https://cips.cardano.org/cips/cip5/
-    public const string RootKeyBech32Prefix = "root_sk";
+    public const string RootKeyExtendedBech32Prefix = "root_xsk";
     public const string PaymentSigningKeyBech32Prefix = "addr_sk";
     public const string PaymentVerificationKeyBech32Prefix = "addr_vk";
     public const string StakeSigningKeyBech32Prefix = "stake_sk";
