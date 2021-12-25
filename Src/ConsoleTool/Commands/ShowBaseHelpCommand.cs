@@ -7,7 +7,7 @@ public class ShowBaseHelpCommand : ICommand
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
         var versionString = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
-            .GetCustomAttribute<AssemblyFileVersionAttribute>()
+            .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
         var helpText = $@"cscli v{versionString}
 A .NET Cross Platform Tool / Console App for generating Cardano keys, addresses and transactions.

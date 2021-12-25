@@ -7,8 +7,9 @@ namespace Cscli.ConsoleTool.Commands;
 
 public class DeriveStakeAddressCommand : ICommand
 {
-    public string Mnemonic { get; init; }
+    public string? Mnemonic { get; init; }
     public string Language { get; init; } = DefaultMnemonicLanguage;
+    public string Passphrase { get; init; } = string.Empty;
     public int AccountIndex { get; init; } = 0;
     public int AddressIndex { get; init; } = 0;
     public string NetworkTag { get; init; } = "testnet";
@@ -27,25 +28,25 @@ public class DeriveStakeAddressCommand : ICommand
         }
 
         var wordCount = Mnemonic.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (!GenerateMnemonicCommand.ValidSizes.Contains(wordCount))
+        if (!ValidMnemonicSizes.Contains(wordCount))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", GenerateMnemonicCommand.ValidSizes)})"));
+                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
         }
-        if (AccountIndex < 0 || AccountIndex > MaxPathIndex)
+        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --account-index must be between 0 and {MaxPathIndex}"));
+                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}"));
         }
-        if (AddressIndex < 0 || AddressIndex > MaxPathIndex)
+        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --address-index must be between 0 and {MaxPathIndex}"));
+                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}"));
         }
-        if (NetworkTag != "testnet" && NetworkTag != "mainnet")
+        if (NetworkTag != "Testnet" && NetworkTag != "Mainnet")
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --network-tag must be either testnet or mainnet"));
+                $"Invalid option --network-tag must be either Testnet or Mainnet"));
         }
 
         try
@@ -54,21 +55,22 @@ public class DeriveStakeAddressCommand : ICommand
             var addressService = new AddressService();
 
             var mnemonic = mnemonicService.Restore(Mnemonic, wordlist);
-            var rootPrvKey = mnemonic.GetRootKey();
-            var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
-            var paymentSkey = rootPrvKey.Derive(paymentPath);
-            var paymentVkey = paymentSkey.GetPublicKey(false);
+            var rootPrvKey = mnemonic.GetRootKey(Passphrase);
             string stakePath = $"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}";
             var stakeSkey = rootPrvKey.Derive(stakePath);
             var stakeVkey = stakeSkey.GetPublicKey(false);
             var baseAddr = addressService.GetAddress(
-                paymentVkey,
+                null,
                 stakeVkey,
-                NetworkTag == "mainnet" ? NetworkType.Mainnet : NetworkType.Testnet,
+                NetworkTag == "Mainnet" ? NetworkType.Mainnet : NetworkType.Testnet,
                 AddressType.Reward);
 
             var result = CommandResult.Success(baseAddr.ToString());
             return ValueTask.FromResult(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(ex.Message));
         }
         catch (Exception ex)
         {

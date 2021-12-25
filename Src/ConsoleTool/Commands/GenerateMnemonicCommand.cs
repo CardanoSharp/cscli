@@ -6,14 +6,12 @@ namespace Cscli.ConsoleTool.Commands;
 
 public class GenerateMnemonicCommand : ICommand
 {
-    public static int[] ValidSizes = { 9, 12, 15, 18, 21, 24 };
-
     public int Size { get; init; } = DefaultMnemonicCount;
     public string Language { get; init; } = DefaultMnemonicLanguage;
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        if (!ValidSizes.Contains(Size))
+        if (!ValidMnemonicSizes.Contains(Size))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --size {Size} is not supported"));

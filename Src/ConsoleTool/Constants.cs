@@ -6,33 +6,36 @@ public static class Constants
 {
     public const string DefaultMnemonicLanguage = "English";
     public const int DefaultMnemonicCount = 24;
-
-    public const int MaxPathIndex = 2147483647; // 2^31 - 1
-
-    public const string SKeyJsonTypeField = "PaymentSigningKeyShelley_ed25519";
-    public const string VKeyJsonTypeField = "PaymentVerificationKeyShelley_ed25519";
-    public const string SKeyJsonDescriptionField = "Payment Signing Key";
-    public const string VKeyJsonDescriptionField = "";
-
+    public const int MaxDerivationPathIndex = 2147483647; // 2^31 - 1
     // Bech32 Prefixes https://cips.cardano.org/cips/cip5/
     public const string RootKeyExtendedBech32Prefix = "root_xsk";
     public const string PaymentSigningKeyBech32Prefix = "addr_sk";
-    public const string PaymentVerificationKeyBech32Prefix = "addr_vk";
     public const string StakeSigningKeyBech32Prefix = "stake_sk";
-    public const string StakeVerificationKeyBech32Prefix = "stake_vk";
-
+    // JSON CBOR envelopes from cardano-cli
+    public const string PaymentSKeyJsonTypeField = "PaymentSigningKeyShelley_ed25519";
+    public const string PaymentSKeyJsonDescriptionField = "Payment Signing Key";
+    public const string PaymentVKeyJsonTypeField = "PaymentVerificationKeyShelley_ed25519";
+    public const string PaymentVKeyJsonDescriptionField = "Payment Verification Key";
+    public const string StakeSKeyJsonTypeField = "StakeSigningKeyShelley_ed25519";
+    public const string StakeSKeyJsonDescriptionField = "Stake Signing Key";
+    public const string StakeVKeyJsonTypeField = "StakeVerificationKeyShelley_ed25519";
+    public const string StakeVKeyJsonDescriptionField = "Stake Verification Key";
+    public static readonly int[] ValidMnemonicSizes = { 9, 12, 15, 18, 21, 24 };
+    // Defauly JSON Serialiser settings
     public static readonly JsonSerializerOptions SerialiserOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true
     };
-
+    // Commandline args switch mappings
     public static Dictionary<string, string> SwitchMappings => new()
     {
         { "--verification-key-file", "verificationKeyFile" },
         { "--signing-key-file", "signingKeyFile" },
         { "--account-index", "accountIndex" },
         { "--address-index", "addressIndex" },
+        { "--stake-account-index", "stakeAccountIndex" },
+        { "--stake-address-index", "stakeAddressIndex" },
         //{ "--output-format", "outputFormat" },
     };
 }
