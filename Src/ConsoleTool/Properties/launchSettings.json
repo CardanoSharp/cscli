@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "wallethd key stake derive --mnemonic \"rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug\" --account-index 1 --address-index 1"
+      "commandLineArgs": "wallethd key payment derive --mnemonic \"gloom prevent cattle shrimp decrease embody ball tongue agent scene pyramid arch obey task wheel soon ripple seminar upper possible all monkey scrub solid\" --account-index 0 --address-index 0"
     }
   }
 }

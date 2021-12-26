@@ -19,77 +19,44 @@ public class DerivePaymentKeyCommand : ICommand
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(Mnemonic))
+        var (isValid, derivedWorldList, validationErrors) = Validate();
+        if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic is required");
+                string.Join(Environment.NewLine, validationErrors));
         }
-        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
-        {
-            return CommandResult.FailureInvalidOptions(
-                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}");
-        }
-        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
-        {
-            return CommandResult.FailureInvalidOptions(
-                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
-        }
-        if (!string.IsNullOrWhiteSpace(VerificationKeyFile) 
-            && !Directory.Exists(Path.GetDirectoryName(VerificationKeyFile)))
-        {
-            return CommandResult.FailureInvalidOptions(
-                $"Invalid option --verification-key-file path does not exist");
-        }
-        if (!string.IsNullOrWhiteSpace(SigningKeyFile) 
-            && !Directory.Exists(Path.GetDirectoryName(SigningKeyFile)))
-        {
-            return CommandResult.FailureInvalidOptions(
-                $"Invalid option --signing-key-file path does not exist");
-        }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
-        {
-            return CommandResult.FailureInvalidOptions(
-                $"Invalid option --language {Language} is not supported");
-        }
-        var wordCount = Mnemonic.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (!ValidMnemonicSizes.Contains(wordCount))
-        {
-            return CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
-        }
-
         try
         {
             var mnemonicService = new MnemonicService();
-            var mnemonic = mnemonicService.Restore(Mnemonic, wordlist);
-            var rootPrvKey = mnemonic.GetRootKey(Passphrase);
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList).GetRootKey(Passphrase);
             var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
             var paymentSkey = rootPrvKey.Derive(paymentPath);
             var paymentVkey = paymentSkey.GetPublicKey(false);
-            // Write output to CBOR JSON file outputs if file paths supplied
-            if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
-            {
-                var vkeyCbor = new
-                {
-                    type = PaymentVKeyJsonTypeField,
-                    description = PaymentVKeyJsonDescriptionField,
-                    cborHex = $"5820{Convert.ToHexString(paymentVkey.Key)}"
-                };
-                await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
-            }
+            var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedKeyBytes();
+            var bech32PaymentKey = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32PaymentKey);
+            // Write output to CBOR JSON file outputs if file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
-                var sKey = paymentSkey.Key[..32]; // first 32 bytes is the signing key
                 var skeyCbor = new
                 {
                     type = PaymentSKeyJsonTypeField,
                     description = PaymentSKeyJsonDescriptionField,
-                    cborHex = $"5820{Convert.ToHexString(sKey)}"
+                    cborHex = $"58{paymentSkeyExtendedBytes.Length:x2}{Convert.ToHexString(paymentSkeyExtendedBytes)}"
                 };
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
-            var bech32PaymentKey = Bech32.Encode(paymentSkey.Key, PaymentSigningKeyBech32Prefix);
-            var result = CommandResult.Success(bech32PaymentKey);
+            if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
+            {
+                var paymentVkeyExtendedBytes = paymentVkey.BuildExtendedKeyBytes();
+                var vkeyCbor = new
+                {
+                    type = PaymentVKeyJsonTypeField,
+                    description = PaymentVKeyJsonDescriptionField,
+                    cborHex = $"58{paymentVkeyExtendedBytes.Length:x2}{Convert.ToHexString(paymentVkeyExtendedBytes)}"
+                };
+                await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
+            }
             return result;
         }
         catch (ArgumentException ex)
@@ -100,5 +67,52 @@ public class DerivePaymentKeyCommand : ICommand
         {
             return CommandResult.FailureUnhandledException("Unexpected error", ex);
         }
+    }
+
+    private (bool isValid, WordLists derivedWordList, IReadOnlyCollection<string> validationErrors) Validate()
+    {
+        var validationErrors = new List<string>();
+        if (string.IsNullOrWhiteSpace(Mnemonic))
+        {
+            validationErrors.Add(
+                $"Invalid option --mnemonic is required");
+        }
+        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (!string.IsNullOrWhiteSpace(SigningKeyFile)
+            && Path.IsPathFullyQualified(SigningKeyFile)
+            && !Directory.Exists(Path.GetDirectoryName(SigningKeyFile)))
+        {
+            validationErrors.Add(
+                $"Invalid option --signing-key-file path {SigningKeyFile} does not exist");
+        }
+        if (!string.IsNullOrWhiteSpace(VerificationKeyFile)
+            && Path.IsPathFullyQualified(VerificationKeyFile)
+            && !Directory.Exists(Path.GetDirectoryName(VerificationKeyFile)))
+        {
+            validationErrors.Add(
+                $"Invalid option --verification-key-file path {VerificationKeyFile} does not exist");
+        }
+        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        {
+            validationErrors.Add(
+                $"Invalid option --language {Language} is not supported");
+        }
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
+        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        {
+            validationErrors.Add(
+                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
+        }
+
+        return (!validationErrors.Any(), wordlist, validationErrors);
     }
 }

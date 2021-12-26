@@ -72,8 +72,7 @@ public class DerivePaymentAddressCommand : ICommand
             var mnemonicService = new MnemonicService();
             var addressService = new AddressService();
 
-            var mnemonic = mnemonicService.Restore(Mnemonic, wordlist);
-            var rootPrvKey = mnemonic.GetRootKey(Passphrase);
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist).GetRootKey(Passphrase);
             var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
             var paymentSkey = rootPrvKey.Derive(paymentPath);
             var paymentVkey = paymentSkey.GetPublicKey(false);

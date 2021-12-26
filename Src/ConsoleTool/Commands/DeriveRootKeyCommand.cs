@@ -2,7 +2,6 @@
 using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
-using CardanoSharp.Wallet.Models.Keys;
 using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Commands;
@@ -25,7 +24,6 @@ public class DeriveRootKeyCommand : ICommand
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --language {Language} is not supported"));
         }
-
         var wordCount = Mnemonic.Split(' ', StringSplitOptions.TrimEntries).Length;
         if (!ValidMnemonicSizes.Contains(wordCount))
         {
@@ -36,9 +34,8 @@ public class DeriveRootKeyCommand : ICommand
         try
         {
             var mnemonicService = new MnemonicService();
-            var mnemonic = mnemonicService.Restore(Mnemonic, wordlist);
-            var rootPrvKey = mnemonic.GetRootKey(Passphrase);
-            var rootKeyExtendedBytes = BuildExtendedRootKeyBytes(rootPrvKey);
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist).GetRootKey(Passphrase);
+            var rootKeyExtendedBytes = rootPrvKey.BuildExtendedKeyBytes();
             var bech32ExtendedRootKey = Bech32.Encode(rootKeyExtendedBytes, RootKeyExtendedBech32Prefix);
             var result = CommandResult.Success(bech32ExtendedRootKey);
             return ValueTask.FromResult(result);
@@ -53,13 +50,5 @@ public class DeriveRootKeyCommand : ICommand
             return ValueTask.FromResult(
                 CommandResult.FailureUnhandledException("Unexpected error", ex));
         }
-    }
-
-    private static byte[] BuildExtendedRootKeyBytes(PrivateKey rootPrvKey)
-    {
-        var rootKeyExtended = new byte[96];
-        Array.Copy(rootPrvKey.Key, rootKeyExtended, rootPrvKey.Key.Length);
-        Array.Copy(rootPrvKey.Chaincode, 0, rootKeyExtended, rootPrvKey.Key.Length, rootPrvKey.Chaincode.Length);
-        return rootKeyExtended;
     }
 }
