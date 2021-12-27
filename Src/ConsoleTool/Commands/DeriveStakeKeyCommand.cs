@@ -38,11 +38,12 @@ public class DeriveStakeKeyCommand : ICommand
             // Write output to CBOR JSON file outputs if file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
+                var stakeSkeyExtendedWithVkeyBytes = stakeSkey.BuildExtendedKeyWithVerificationKeyBytes();
                 var skeyCbor = new
                 {
                     type = StakeSKeyJsonTypeField,
                     description = StakeSKeyJsonDescriptionField,
-                    cborHex = $"58{stakeSkeyExtendedBytes.Length:x2}{Convert.ToHexString(stakeSkeyExtendedBytes)}"
+                    cborHex = KeyUtils.BuildCborHexPayload(stakeSkeyExtendedWithVkeyBytes)
                 };
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
@@ -53,7 +54,7 @@ public class DeriveStakeKeyCommand : ICommand
                 {
                     type = PaymentVKeyJsonTypeField,
                     description = PaymentVKeyJsonDescriptionField,
-                    cborHex = $"58{stakeVkeyExtendedBytes.Length:x2}{Convert.ToHexString(stakeVkeyExtendedBytes)}"
+                    cborHex = KeyUtils.BuildCborHexPayload(stakeVkeyExtendedBytes)
                 };
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }

@@ -38,11 +38,12 @@ public class DerivePaymentKeyCommand : ICommand
             // Write output to CBOR JSON file outputs if file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
+                var paymentSkeyExtendedWithVkeyBytes = paymentSkey.BuildExtendedKeyWithVerificationKeyBytes();
                 var skeyCbor = new
                 {
                     type = PaymentSKeyJsonTypeField,
                     description = PaymentSKeyJsonDescriptionField,
-                    cborHex = $"58{paymentSkeyExtendedBytes.Length:x2}{Convert.ToHexString(paymentSkeyExtendedBytes)}"
+                    cborHex = KeyUtils.BuildCborHexPayload(paymentSkeyExtendedWithVkeyBytes)
                 };
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
@@ -52,8 +53,8 @@ public class DerivePaymentKeyCommand : ICommand
                 var vkeyCbor = new
                 {
                     type = PaymentVKeyJsonTypeField,
-                    description = PaymentVKeyJsonDescriptionField,
-                    cborHex = $"58{paymentVkeyExtendedBytes.Length:x2}{Convert.ToHexString(paymentVkeyExtendedBytes)}"
+                    description = PaymentVKeyJsonDescriptionField, 
+                    cborHex = KeyUtils.BuildCborHexPayload(paymentVkeyExtendedBytes)
                 };
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
