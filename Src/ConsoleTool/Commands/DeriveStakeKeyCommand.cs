@@ -33,9 +33,9 @@ public class DeriveStakeKeyCommand : ICommand
             var stakeSkey = rootPrvKey.Derive(stakeKeyPath);
             var stakeVkey = stakeSkey.GetPublicKey(false);
             var stakeSkeyExtendedBytes = stakeSkey.BuildExtendedKeyBytes();
-            var bech32StakeKey = Bech32.Encode(stakeSkey.Key, StakeSigningKeyBech32Prefix);
+            var bech32StakeKey = Bech32.Encode(stakeSkeyExtendedBytes, StakeSigningKeyBech32Prefix);
             var result = CommandResult.Success(bech32StakeKey);
-            // Write output to CBOR JSON file outputs if file paths are supplied
+            // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
                 var stakeSkeyExtendedWithVkeyBytes = stakeSkey.BuildExtendedKeyWithVerificationKeyBytes();

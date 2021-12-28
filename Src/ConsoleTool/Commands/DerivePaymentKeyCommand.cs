@@ -35,7 +35,7 @@ public class DerivePaymentKeyCommand : ICommand
             var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedKeyBytes();
             var bech32PaymentKey = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
             var result = CommandResult.Success(bech32PaymentKey);
-            // Write output to CBOR JSON file outputs if file paths are supplied
+            // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
                 var paymentSkeyExtendedWithVkeyBytes = paymentSkey.BuildExtendedKeyWithVerificationKeyBytes();

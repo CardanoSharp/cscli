@@ -79,7 +79,9 @@ public class DerivePaymentAddressCommand : ICommand
 
             var networkType = NetworkTag == "Mainnet" ? NetworkType.Mainnet : NetworkType.Testnet;
             _ = Enum.TryParse<AddressType>(PaymentAddressType, out var addressType);
-            var stakeVkey = TryDeriveStakeVKey(addressType, rootPrvKey);
+            var stakeVkey = rootPrvKey
+                .Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}")
+                .GetPublicKey(false);
             var address = addressService.GetAddress(
                 paymentVkey,
                 stakeVkey,
@@ -99,13 +101,4 @@ public class DerivePaymentAddressCommand : ICommand
                 CommandResult.FailureUnhandledException("Unexpected error", ex));
         }
     }
-
-    private PublicKey? TryDeriveStakeVKey(AddressType addressType, PrivateKey rootPrvKey) =>
-        addressType switch
-        {
-            // Derive stake public key based on stake derivation path
-            AddressType.Base => rootPrvKey
-                .Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}").GetPublicKey(false),
-            _ => null // Enterprise (and everything else)
-        };
 }

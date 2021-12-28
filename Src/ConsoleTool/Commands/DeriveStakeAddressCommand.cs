@@ -55,16 +55,19 @@ public class DeriveStakeAddressCommand : ICommand
             var addressService = new AddressService();
 
             var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist).GetRootKey(Passphrase);
+            var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
+            var paymentSkey = rootPrvKey.Derive(paymentPath);
+            var paymentVkey = paymentSkey.GetPublicKey(false);
             string stakePath = $"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}";
             var stakeSkey = rootPrvKey.Derive(stakePath);
             var stakeVkey = stakeSkey.GetPublicKey(false);
-            var baseAddr = addressService.GetAddress(
-                null,
+            var stakeAddr = addressService.GetAddress(
+                paymentVkey,
                 stakeVkey,
                 NetworkTag == "Mainnet" ? NetworkType.Mainnet : NetworkType.Testnet,
                 AddressType.Reward);
 
-            var result = CommandResult.Success(baseAddr.ToString());
+            var result = CommandResult.Success(stakeAddr.ToString());
             return ValueTask.FromResult(result);
         }
         catch (ArgumentException ex)

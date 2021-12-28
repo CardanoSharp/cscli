@@ -37,6 +37,8 @@ public static class Constants
         { "--address-index", "addressIndex" },
         { "--stake-account-index", "stakeAccountIndex" },
         { "--stake-address-index", "stakeAddressIndex" },
+        { "--payment-address-type", "paymentAddressType" },
+        { "--network-tag", "networkTag" },
         //{ "--output-format", "outputFormat" },
     };
 }
