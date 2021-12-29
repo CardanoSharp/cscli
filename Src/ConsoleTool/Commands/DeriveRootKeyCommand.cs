@@ -34,11 +34,11 @@ public class DeriveRootKeyCommand : ICommand
         try
         {
             var mnemonicService = new MnemonicService();
-            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist).GetRootKey(Passphrase);
-            var rootKeyExtendedBytes = rootPrvKey.BuildExtendedKeyBytes();
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist)
+                .GetRootKey(Passphrase);
+            var rootKeyExtendedBytes = rootPrvKey.BuildExtendedSkeyBytes();
             var bech32ExtendedRootKey = Bech32.Encode(rootKeyExtendedBytes, RootKeyExtendedBech32Prefix);
-            var result = CommandResult.Success(bech32ExtendedRootKey);
-            return ValueTask.FromResult(result);
+            return ValueTask.FromResult(CommandResult.Success(bech32ExtendedRootKey));
         }
         catch (ArgumentException ex)
         {

@@ -28,17 +28,17 @@ public class DeriveStakeKeyCommand : ICommand
         try
         {
             var mnemonicService = new MnemonicService();
-            var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList).GetRootKey(Passphrase);
-            var stakeKeyPath = $"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}";
-            var stakeSkey = rootPrvKey.Derive(stakeKeyPath);
+            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+                .GetRootKey(Passphrase);
+            var stakeSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}");
             var stakeVkey = stakeSkey.GetPublicKey(false);
-            var stakeSkeyExtendedBytes = stakeSkey.BuildExtendedKeyBytes();
-            var bech32StakeKey = Bech32.Encode(stakeSkeyExtendedBytes, StakeSigningKeyBech32Prefix);
-            var result = CommandResult.Success(bech32StakeKey);
+            var stakeSkeyExtendedBytes = stakeSkey.BuildExtendedSkeyBytes();
+            var bech32StakeSkeyExtended = Bech32.Encode(stakeSkeyExtendedBytes, StakeSigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32StakeSkeyExtended);
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
-                var stakeSkeyExtendedWithVkeyBytes = stakeSkey.BuildExtendedKeyWithVerificationKeyBytes();
+                var stakeSkeyExtendedWithVkeyBytes = stakeSkey.BuildExtendedSkeyWithVerificationKeyBytes();
                 var skeyCbor = new
                 {
                     type = StakeSKeyJsonTypeField,
@@ -49,7 +49,7 @@ public class DeriveStakeKeyCommand : ICommand
             }
             if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
             {
-                var stakeVkeyExtendedBytes = stakeVkey.BuildExtendedKeyBytes();
+                var stakeVkeyExtendedBytes = stakeVkey.BuildExtendedVkeyBytes();
                 var vkeyCbor = new
                 {
                     type = PaymentVKeyJsonTypeField,

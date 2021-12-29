@@ -20,76 +20,28 @@ public class DerivePaymentAddressCommand : ICommand
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(Mnemonic))
+        var (isValid, derivedWorldList, addressType, network, errors) = Validate();
+        if (!isValid)
         {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic is required"));
+            return ValueTask.FromResult(
+                CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors)));
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --language {Language} is not supported"));
-        }
-        var wordCount = Mnemonic.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (!ValidMnemonicSizes.Contains(wordCount))
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
-        }
-        if (PaymentAddressType != "Base" && PaymentAddressType != "Enterprise")
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --payment-address-type {PaymentAddressType} is not supported"));
-        }
-        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}"));
-        }
-        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}"));
-        }
-        if (StakeAccountIndex < 0 || StakeAccountIndex > MaxDerivationPathIndex)
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --stake-account-index must be between 0 and {MaxDerivationPathIndex}"));
-        }
-        if (StakeAddressIndex < 0 || StakeAddressIndex > MaxDerivationPathIndex)
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --stake-address-index must be between 0 and {MaxDerivationPathIndex}"));
-        }
-        if (NetworkTag != "Testnet" && NetworkTag != "Mainnet")
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --network-tag must be either Testnet or Mainnet"));
-        }
-
         try
         {
             var mnemonicService = new MnemonicService();
             var addressService = new AddressService();
-
-            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist).GetRootKey(Passphrase);
-            var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
-            var paymentSkey = rootPrvKey.Derive(paymentPath);
-            var paymentVkey = paymentSkey.GetPublicKey(false);
-
-            var networkType = NetworkTag == "Mainnet" ? NetworkType.Mainnet : NetworkType.Testnet;
-            _ = Enum.TryParse<AddressType>(PaymentAddressType, out var addressType);
-            var stakeVkey = rootPrvKey
-                .Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}")
+            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+                .GetRootKey(Passphrase);
+            var paymentVkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}")
+                .GetPublicKey(false);
+            var stakeVkey = rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}")
                 .GetPublicKey(false);
             var address = addressService.GetAddress(
                 paymentVkey,
                 stakeVkey,
-                networkType,
+                network,
                 addressType);
-
-            var result = CommandResult.Success(address.ToString());
-            return ValueTask.FromResult(result);
+            return ValueTask.FromResult(CommandResult.Success(address.ToString()));
         }
         catch (ArgumentException ex)
         {
@@ -100,5 +52,63 @@ public class DerivePaymentAddressCommand : ICommand
             return ValueTask.FromResult(
                 CommandResult.FailureUnhandledException("Unexpected error", ex));
         }
+    }
+
+    private (
+        bool isValid, 
+        WordLists derivedWordList,
+        AddressType addressType,
+        NetworkType derivedNetworkType,
+        IReadOnlyCollection<string> validationErrors) Validate()
+    {
+        var validationErrors = new List<string>();
+        if (string.IsNullOrWhiteSpace(Mnemonic))
+        {
+            validationErrors.Add(
+                $"Invalid option --mnemonic is required");
+        }
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
+        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        {
+            validationErrors.Add(
+                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
+        }
+        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        {
+            validationErrors.Add(
+                $"Invalid option --language {Language} is not supported");
+        }
+        if (!Enum.TryParse<AddressType>(PaymentAddressType, out var paymentAddressType)
+            || paymentAddressType != AddressType.Base && paymentAddressType != AddressType.Enterprise)
+        {
+            validationErrors.Add(
+                $"Invalid option --payment-address-type {PaymentAddressType} is not supported");
+        }
+        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (StakeAccountIndex < 0 || StakeAccountIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --stake-account-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (StakeAddressIndex < 0 || StakeAddressIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --stake-address-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (!Enum.TryParse<NetworkType>(NetworkTag, out var networkType))
+        {
+            validationErrors.Add(
+                $"Invalid option --network-tag must be either Testnet or Mainnet");
+        }
+        return (!validationErrors.Any(), wordlist, paymentAddressType, networkType, validationErrors);
     }
 }

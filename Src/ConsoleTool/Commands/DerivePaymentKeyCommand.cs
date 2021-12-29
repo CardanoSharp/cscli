@@ -28,17 +28,17 @@ public class DerivePaymentKeyCommand : ICommand
         try
         {
             var mnemonicService = new MnemonicService();
-            var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList).GetRootKey(Passphrase);
-            var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
-            var paymentSkey = rootPrvKey.Derive(paymentPath);
+            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+                .GetRootKey(Passphrase);
+            var paymentSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}");
             var paymentVkey = paymentSkey.GetPublicKey(false);
-            var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedKeyBytes();
-            var bech32PaymentKey = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
-            var result = CommandResult.Success(bech32PaymentKey);
+            var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedSkeyBytes();
+            var bech32PaymentSkeyExtended = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32PaymentSkeyExtended);
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
-                var paymentSkeyExtendedWithVkeyBytes = paymentSkey.BuildExtendedKeyWithVerificationKeyBytes();
+                var paymentSkeyExtendedWithVkeyBytes = paymentSkey.BuildExtendedSkeyWithVerificationKeyBytes();
                 var skeyCbor = new
                 {
                     type = PaymentSKeyJsonTypeField,
@@ -49,7 +49,7 @@ public class DerivePaymentKeyCommand : ICommand
             }
             if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
             {
-                var paymentVkeyExtendedBytes = paymentVkey.BuildExtendedKeyBytes();
+                var paymentVkeyExtendedBytes = paymentVkey.BuildExtendedVkeyBytes();
                 var vkeyCbor = new
                 {
                     type = PaymentVKeyJsonTypeField,

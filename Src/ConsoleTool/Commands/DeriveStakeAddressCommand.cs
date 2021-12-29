@@ -16,59 +16,28 @@ public class DeriveStakeAddressCommand : ICommand
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(Mnemonic))
+        var (isValid, derivedWorldList, network, errors) = Validate();
+        if (!isValid)
         {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic is required"));
+            return ValueTask.FromResult(
+                CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors)));
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --language {Language} is not supported"));
-        }
-
-        var wordCount = Mnemonic.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (!ValidMnemonicSizes.Contains(wordCount))
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
-        }
-        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}"));
-        }
-        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}"));
-        }
-        if (NetworkTag != "Testnet" && NetworkTag != "Mainnet")
-        {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --network-tag must be either Testnet or Mainnet"));
-        }
-
         try
         {
             var mnemonicService = new MnemonicService();
             var addressService = new AddressService();
-
-            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist).GetRootKey(Passphrase);
-            var paymentPath = $"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}";
-            var paymentSkey = rootPrvKey.Derive(paymentPath);
-            var paymentVkey = paymentSkey.GetPublicKey(false);
-            string stakePath = $"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}";
-            var stakeSkey = rootPrvKey.Derive(stakePath);
-            var stakeVkey = stakeSkey.GetPublicKey(false);
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+                .GetRootKey(Passphrase);
+            var paymentVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}")
+                .GetPublicKey(false);
+            var stakeVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}")
+                .GetPublicKey(false);
             var stakeAddr = addressService.GetAddress(
                 paymentVkey,
                 stakeVkey,
-                NetworkTag == "Mainnet" ? NetworkType.Mainnet : NetworkType.Testnet,
+                network,
                 AddressType.Reward);
-
-            var result = CommandResult.Success(stakeAddr.ToString());
-            return ValueTask.FromResult(result);
+            return ValueTask.FromResult(CommandResult.Success(stakeAddr.ToString()));
         }
         catch (ArgumentException ex)
         {
@@ -79,5 +48,46 @@ public class DeriveStakeAddressCommand : ICommand
             return ValueTask.FromResult(
                 CommandResult.FailureUnhandledException("Unexpected error", ex));
         }
+    }
+
+    private (
+        bool isValid, 
+        WordLists derivedWordList, 
+        NetworkType derivedNetworkType, 
+        IReadOnlyCollection<string> validationErrors) Validate()
+    {
+        var validationErrors = new List<string>();
+        if (string.IsNullOrWhiteSpace(Mnemonic))
+        {
+            validationErrors.Add(
+                $"Invalid option --mnemonic is required");
+        }
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
+        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        {
+            validationErrors.Add(
+                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
+        }
+        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        {
+            validationErrors.Add(
+                $"Invalid option --language {Language} is not supported");
+        }
+        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (!Enum.TryParse<NetworkType>(NetworkTag, out var networkType))
+        {
+            validationErrors.Add(
+                $"Invalid option --network-tag must be either Testnet or Mainnet");
+        }
+        return (!validationErrors.Any(), wordlist, networkType, validationErrors);
     }
 }
