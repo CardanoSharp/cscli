@@ -19,6 +19,7 @@ Available options:
     -h, --help      Show this help text
 
 Available commands:
+    bech decode --address ""<string>""
     wallethd mnemonic gen --size <size> [--language <language>]
     wallethd key root derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""]
     wallethd key payment derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]

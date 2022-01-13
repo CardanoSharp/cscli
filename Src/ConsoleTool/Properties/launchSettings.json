@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "wallethd address payment derive --mnemonic \"weasel access stock strong destroy buzz initial brave clever taxi rate begin boy fatigue erupt infant cost survey ahead share height cloud decrease custom\" --account-index 0 --address-index 0 --network-tag Testnet --payment-address-type Base"
+      "commandLineArgs": "bech decode --address stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf"
     }
   }
 }

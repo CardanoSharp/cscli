@@ -41,6 +41,7 @@ public static class CommandParser
         args[0] switch
         {
             "wallethd" => ParseWalletHdCommands(intent, args),
+            "bech" => ParseBechCommands(intent, args),
             //"query" => ParseQueryCommands(intent, args), // TODO: query via Blockfrost/Koios integration
             //"tx" => ParseTxCommands(intent, args), // TODO: Easier Tx creation and submission via Blockfrost/Koios integration
             _ => new ShowInvalidArgumentCommand(intent)
@@ -55,6 +56,14 @@ public static class CommandParser
             "wallethd key stake derive" => BuildCommand<DeriveStakeKeyCommand>(args),
             "wallethd address payment derive" => BuildCommand<DerivePaymentAddressCommand>(args),
             "wallethd address stake derive" => BuildCommand<DeriveStakeAddressCommand>(args),
+            "bech decode" => BuildCommand<DeriveStakeAddressCommand>(args),
+            _ => new ShowInvalidArgumentCommand(intent)
+        };
+    
+    private static ICommand ParseBechCommands(string intent, string[] args) =>
+        intent switch
+        {
+            "bech decode" => BuildCommand<BechDecodeCommand>(args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
