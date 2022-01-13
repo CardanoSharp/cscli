@@ -36,11 +36,10 @@ public class DerivePaymentAddressCommand : ICommand
                 .GetPublicKey(false);
             var stakeVkey = rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}")
                 .GetPublicKey(false);
-            var address = addressService.GetAddress(
+            var address = addressService.GetBaseAddress(
                 paymentVkey,
                 stakeVkey,
-                network,
-                addressType);
+                network);
             return ValueTask.FromResult(CommandResult.Success(address.ToString()));
         }
         catch (ArgumentException ex)
