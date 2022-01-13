@@ -1,6 +1,7 @@
 ﻿using CardanoSharp.Wallet;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
+using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Keys;
 using static Cscli.ConsoleTool.Constants;
 
@@ -29,18 +30,11 @@ public class DerivePaymentAddressCommand : ICommand
         try
         {
             var mnemonicService = new MnemonicService();
-            var addressService = new AddressService();
             var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
-            var paymentVkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}")
-                .GetPublicKey(false);
-            var stakeVkey = rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}")
-                .GetPublicKey(false);
-            var address = addressService.GetAddress(
-                paymentVkey,
-                stakeVkey,
-                network,
-                addressType);
+
+            var address = GetPaymentAddress(
+                addressType, rootKey, new AddressService(), network);
             return ValueTask.FromResult(CommandResult.Success(address.ToString()));
         }
         catch (ArgumentException ex)
@@ -53,6 +47,22 @@ public class DerivePaymentAddressCommand : ICommand
                 CommandResult.FailureUnhandledException("Unexpected error", ex));
         }
     }
+
+    private Address GetPaymentAddress(
+        AddressType addressType,
+        PrivateKey rootKey,
+        IAddressService addressService,
+        NetworkType networkType) => addressType switch
+        {
+            AddressType.Enterprise => addressService.GetEnterpriseAddress(
+                rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}").GetPublicKey(false),
+                networkType),
+            AddressType.Base => addressService.GetBaseAddress(
+                rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}").GetPublicKey(false),
+                rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}").GetPublicKey(false),
+                networkType),
+            _ => throw new NotImplementedException($"AddressType not valid for {nameof(DerivePaymentAddressCommand)}")
+        };
 
     private (
         bool isValid, 

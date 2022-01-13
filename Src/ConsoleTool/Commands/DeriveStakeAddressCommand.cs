@@ -28,15 +28,9 @@ public class DeriveStakeAddressCommand : ICommand
             var addressService = new AddressService();
             var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
-            var paymentVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}")
-                .GetPublicKey(false);
             var stakeVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}")
                 .GetPublicKey(false);
-            var stakeAddr = addressService.GetAddress(
-                paymentVkey,
-                stakeVkey,
-                network,
-                AddressType.Reward);
+            var stakeAddr = addressService.GetRewardAddress(stakeVkey, network);
             return ValueTask.FromResult(CommandResult.Success(stakeAddr.ToString()));
         }
         catch (ArgumentException ex)
