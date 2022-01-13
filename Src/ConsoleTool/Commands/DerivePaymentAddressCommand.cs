@@ -32,9 +32,9 @@ public class DerivePaymentAddressCommand : ICommand
             var mnemonicService = new MnemonicService();
             var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
-
             var address = GetPaymentAddress(
                 addressType, rootKey, new AddressService(), network);
+
             return ValueTask.FromResult(CommandResult.Success(address.ToString()));
         }
         catch (ArgumentException ex)
