@@ -21,20 +21,20 @@ public class DerivePaymentAddressCommand : ICommand
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, derivedWorldList, addressType, network, errors) = Validate();
+        var (isValid, wordList, addressType, network, errors) = Validate();
         if (!isValid)
         {
             return ValueTask.FromResult(
                 CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors)));
         }
+
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
-            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+            var rootKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
             var address = GetPaymentAddress(
                 addressType, rootKey, new AddressService(), network);
-
             return ValueTask.FromResult(CommandResult.Success(address.ToString()));
         }
         catch (ArgumentException ex)
@@ -61,12 +61,12 @@ public class DerivePaymentAddressCommand : ICommand
                 rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}").GetPublicKey(false),
                 rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}").GetPublicKey(false),
                 networkType),
-            _ => throw new NotImplementedException($"AddressType not valid for {nameof(DerivePaymentAddressCommand)}")
+            _ => throw new NotImplementedException($"--payment-address-type not valid for {nameof(DerivePaymentAddressCommand)}")
         };
 
     private (
         bool isValid, 
-        WordLists derivedWordList,
+        WordLists wordList,
         AddressType addressType,
         NetworkType derivedNetworkType,
         IReadOnlyCollection<string> validationErrors) Validate()

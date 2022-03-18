@@ -22,9 +22,9 @@ public class GenerateMnemonicCommand : ICommand
                 $"Invalid option --language {Language} is not supported"));
         }
 
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
             var mnemonic = mnemonicService.Generate(Size, wordlist);
             var wordsResult = CommandResult.Success(mnemonic.Words);
             return ValueTask.FromResult(wordsResult);

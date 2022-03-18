@@ -10,7 +10,7 @@ public class ShowBaseHelpCommand : ICommand
             .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
         var helpText = $@"cscli v{versionString}
-A cross-platform tool / console app for generating Cardano keys, addresses and transactions.
+A cross-platform tool for generating Cardano keys, addresses and transactions.
 
 USAGE: cscli (OPTION | COMMAND)
 
@@ -24,7 +24,7 @@ Available commands:
     wallethd key payment derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallethd key stake derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallethd address payment derive --mnemonic ""<string>""  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
-    (WIP) wallethd address stake derive --mnemonic ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallethd address stake derive --mnemonic ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(Default)

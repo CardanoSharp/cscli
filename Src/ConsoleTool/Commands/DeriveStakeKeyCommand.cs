@@ -25,9 +25,10 @@ public class DeriveStakeKeyCommand : ICommand
             return CommandResult.FailureInvalidOptions(
                 string.Join(Environment.NewLine, validationErrors));
         }
+
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
             var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
             var stakeSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}");
@@ -70,7 +71,10 @@ public class DeriveStakeKeyCommand : ICommand
         }
     }
 
-    private (bool isValid, WordLists derivedWordList, IReadOnlyCollection<string> validationErrors) Validate()
+    private (
+        bool isValid, 
+        WordLists derivedWordList, 
+        IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
         if (string.IsNullOrWhiteSpace(Mnemonic))
@@ -107,8 +111,8 @@ public class DeriveStakeKeyCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --language {Language} is not supported");
         }
-        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length;
+        if (wordCount.HasValue && wordCount > 0 && !ValidMnemonicSizes.Contains(wordCount.Value))
         {
             validationErrors.Add(
                 $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");

@@ -6,7 +6,7 @@ public static class Constants
 {
     public const string DefaultMnemonicLanguage = "English";
     public const int DefaultMnemonicCount = 24;
-    public const int MaxDerivationPathIndex = 2147483647; // 2^31 - 1
+    public const int MaxDerivationPathIndex = Int32.MaxValue; // 2^31 - 1
     // Bech32 Prefixes https://cips.cardano.org/cips/cip5/
     public const string RootKeyExtendedBech32Prefix = "root_xsk";
     public const string PaymentSigningKeyBech32Prefix = "addr_xsk";

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Cscli.ConsoleTool.UnitTests;
 
-public class DerivePaymentKeyCommandShould
+public class DerivePaymentAddressCommandShould
 {
     [Theory]
     [InlineData(null, null)]
@@ -13,7 +13,6 @@ public class DerivePaymentKeyCommandShould
     [InlineData("invalid", "shoe follow blossom remain learn venue harvest fossil found")]
     [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug")]
     [InlineData("English", "")]
-    [InlineData("Spanish", "shoe")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Properties_Are_Invalid(
         string language, string mnemonic)
     {
@@ -31,6 +30,7 @@ public class DerivePaymentKeyCommandShould
 
     [Theory]
     [InlineData("Spanish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug")]
+    [InlineData("Spanish", "shoe")]
     [InlineData("English", "brusco kilo trabajo rodar parque muela zorro boti´n minero")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Wrong_Word_List_Language_Is_Used(
         string language, string mnemonic)
@@ -49,17 +49,17 @@ public class DerivePaymentKeyCommandShould
     [Theory]
     [InlineData(
         "English", "", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
-        "addr_sk13qf2w4jsex0a27xjpwvv68jlk6vhlfql6la88wv495x9mfx5sa8h2xx5wxzx6ghgg504nqkaw55cev37xer2mpwcast76zk98zt7c35eagfuj4wnzv3pgmzxlfhucqg03s4c8ha6jg8j6y2h6ghdplpelqjtss3r")]
+        "addr_xsk1sqltfrmwph2x9qarf9h3dtnpeuyavq34d2y2hqd5qfq2hdk5sa8jyjj360azt08e30zx5sh5025syp7l5ah9jsjxk808p9lgn2ag99ttp849evwpy8sdctu4sx2vc8sftdt4g8kfrgdxvrm2f6ul0l3l4uycfw8y")]
     [InlineData(
         "English", "", "wagon extra crucial bomb lake thumb diamond damp carry window mammal name load barely mixed decorate boss cancel sadness anxiety swim friend bracket frame",
-        "addr_sk1crr05lc9w35hdmz4qrgzv2895jvksqsk5lk58zt8l4kvntczrdr5we87q8mg0pfsefey2wsejpjp8hh94c8y3l976uha5qlmcsezpc7r975hd5vg30jfuu0g3qhux6ynjw7t5mamg57tkelpwukzcyrxty7s0qs7")]
+        "addr_xsk1uz8nprlx2vk5et594g4k9lu2c9lc7rl2hqml5dkxrmwrrjgzrdrc7s6q4t35ynwzjylcnl2wjr4hcg0te3mpu8jfpks7he6ly4fw3tl7crlckxtjphnuyl4tf9l6dlh84jzhejxm9vdh3drapdxapsh4cu4rjwrd")]
     [InlineData(
         "English", "", "tobacco toe brand law piece awkward awkward angle hint hen flame morning drop oxygen mother mom click because bulk seminar strong above toilet bird",
-        "addr_sk1rrqsavyh9ktz599kgd8jwmvmnhh2wavp6swqs7nh5vw6zktv0exg6h8quvuemwwcd3tr9pr3jmyh6ap0rqsn8dmafrl5u4p35vw50pe2r43t0yujkcarqygam5j0c3yjag0m0k2hxpuwd2eage9nhaduwct9dgnx")]
+        "addr_xsk17qemn6k0cq0hm28f9r6xpjw459eae7ey07pn28p3akpnz6rv0ex2qavdnnqvmdyk9palrhjf5u5xk53k52zmsn9qe3au0my3f69ynk8gca680qzhq8zl5tmnaa0ysfuucejzmynj5xvcw7pmqmszfnfw6gv88mpw")]
     [InlineData(
         "English", "", "gap motor liberty title also carry aerobic confirm beef become dawn angry boring coconut program daughter flag ripple fashion peace balance cool purchase rocket",
-        "addr_sk17rhsqm2xsu3pyulu74rufpfpmcknn0j9v5fkqn55svz8nuq4sfrqfu5zhz8pgpq6r8gqye8g7m20y9y53pwt6af9nxwr9hqs5x4p0cx2tav2n426th85dn2v6gsue2tg7rp7nvgkj2c7csdlyx7pn5c66sd2ywjk")]
-    public async Task Execute_Successfully_With_Correct_Bech32_Extended_Root_Key_When_Properties_Are_Valid(
+        "addr_xsk1nrpt2gjva3syj7c0wacc00zqhgzw44g24w903xr278krgpqksfr2vd2ngydhvf0e3nxpyg9ed9a7j55e94s2n5tqm2rnmvktwjgzrvvymu0mj2nr05drwn5tw90k7wd65p8yghj76dhren2as92fed5j2q9rgz3c")]
+    public async Task Execute_Successfully_With_Correct_Bech32_Extended_Root_Key_When_Mandatory_Properties_Are_Valid(
         string language, string passphrase, string mnemonic, string expectedBech32Key)
     {
         var command = new DerivePaymentKeyCommand()
@@ -72,7 +72,6 @@ public class DerivePaymentKeyCommandShould
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.Success);
-        // TODO:
-        //executionResult.Result.Should().Be(expectedBech32Key);
+        executionResult.Result.Should().Be(expectedBech32Key);
     }
 }

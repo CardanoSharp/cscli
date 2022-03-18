@@ -19,16 +19,17 @@ public class DerivePaymentKeyCommand : ICommand
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, derivedWorldList, validationErrors) = Validate();
+        var (isValid, wordList, validationErrors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
                 string.Join(Environment.NewLine, validationErrors));
         }
+
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
-            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+            var rootKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
             var paymentSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}");
             var paymentVkey = paymentSkey.GetPublicKey(false);
@@ -70,7 +71,10 @@ public class DerivePaymentKeyCommand : ICommand
         }
     }
 
-    private (bool isValid, WordLists derivedWordList, IReadOnlyCollection<string> validationErrors) Validate()
+    private (
+        bool isValid, 
+        WordLists wordList, 
+        IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
         if (string.IsNullOrWhiteSpace(Mnemonic))
@@ -107,8 +111,8 @@ public class DerivePaymentKeyCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --language {Language} is not supported");
         }
-        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length;
+        if (wordCount.HasValue && wordCount > 0 && !ValidMnemonicSizes.Contains(wordCount.Value))
         {
             validationErrors.Add(
                 $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");

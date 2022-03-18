@@ -31,9 +31,9 @@ public class DeriveRootKeyCommand : ICommand
                 $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
         }
 
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
             var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist)
                 .GetRootKey(Passphrase);
             var rootKeyExtendedBytes = rootPrvKey.BuildExtendedSkeyBytes();

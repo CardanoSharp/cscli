@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "wallethd address stake derive --mnemonic \"more enjoy seminar food bench online render dry essence indoor crazy page eight fragile mango zoo burger exhibit crouch drop rocket property alter uphold\" --network-tag Mainnet"
+      "commandLineArgs": "wallethd key stake derive --mnemonic \"fitness juice ankle box prepare gallery purse narrow miracle next soccer category\" --passphrase \"b\" --account-index 1 --address-index 1"
     }
   }
 }

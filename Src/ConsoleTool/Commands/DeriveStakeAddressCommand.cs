@@ -22,10 +22,11 @@ public class DeriveStakeAddressCommand : ICommand
             return ValueTask.FromResult(
                 CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors)));
         }
+
+        var mnemonicService = new MnemonicService();
+        var addressService = new AddressService();
         try
         {
-            var mnemonicService = new MnemonicService();
-            var addressService = new AddressService();
             var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
             var stakeVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}")
