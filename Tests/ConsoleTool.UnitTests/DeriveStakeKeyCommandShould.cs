@@ -196,7 +196,7 @@ public class DeriveStakeKeyCommandShould
             Language = language,
             Mnemonic = mnemonic
         };
-        var englishSpecificCommand = new DeriveStakeKeyCommand()
+        var zeroIndexCommand = new DeriveStakeKeyCommand()
         {
             Language = language,
             Mnemonic = mnemonic,
@@ -205,7 +205,7 @@ public class DeriveStakeKeyCommandShould
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
-        var englishSpecificCommandResult = await englishSpecificCommand.ExecuteAsync(CancellationToken.None);
+        var englishSpecificCommandResult = await zeroIndexCommand.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.Success);
         executionResult.Result.Should().Be(expectedBech32Key);
@@ -289,10 +289,10 @@ public class DeriveStakeKeyCommandShould
     [Theory]
     [InlineData(0, 0, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category",
         "stake_xsk15z26egywy2y70cd50jpx88ljucghl5q7uln6crsr9md209nsl3fpq2dcefv7qhp22v9zhuu53mhqsqgrt0tw6secexwrmyfu0tqe0v6us7py79708vqmyfydc2hcryt3na5zg5nsv8624xvqyw7596gjxy53a2pd")]
-    [InlineData(1, 0, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category",
-        "stake_xsk1zz9zm6386lnttyqegxygcekfj26vymz82xqh94v2p2m2lynsl3f8mturlcgp0umq6jlmv2cgyyfs8j43k56hhxskh0qjgnghs6r94jgp7j4nqmk03f3mugd2dqj7p668fpvfrsv52p44ffqs788hn0ehuqawqs46")]
     [InlineData(0, 1, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category",
         "stake_xsk19p5gx4jef904a9a2223hnqjzjw8je0uqvae0wfnwgl8lhytsl3fy80d86vu35h4tg0v3eedqapyd78qrz0l58qp6hxqppy35srvm5w47jeld5a3pwcv6f7vhx2ju3scctj3xhu38pj5dvam89ykme4pewy5eh25j")]
+    [InlineData(1, 0, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category",
+        "stake_xsk1zz9zm6386lnttyqegxygcekfj26vymz82xqh94v2p2m2lynsl3f8mturlcgp0umq6jlmv2cgyyfs8j43k56hhxskh0qjgnghs6r94jgp7j4nqmk03f3mugd2dqj7p668fpvfrsv52p44ffqs788hn0ehuqawqs46")]
     [InlineData(1, 1, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category",
         "stake_xsk1jq2tcshfsajht5kdn6023m0kh5d6svqm2aeq7sh0uwh2rymsl3fdap745jvey56sf0x7jzhlz66924lwtlepy00quzlyc8au2fgmq623q609uuxg55e2pgw7rpmmraku5h0wa8dnrz5k6frryx6hcnkxjcxp97fr")]
     [InlineData(280916, 0, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category",

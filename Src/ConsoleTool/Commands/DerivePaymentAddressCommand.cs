@@ -17,7 +17,7 @@ public class DerivePaymentAddressCommand : ICommand
     public int AddressIndex { get; init; } = 0;
     public int StakeAccountIndex { get; init; } = 0;
     public int StakeAddressIndex { get; init; } = 0;
-    public string NetworkTag { get; init; } = "testnet";
+    public string? NetworkTag { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
@@ -77,8 +77,8 @@ public class DerivePaymentAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --mnemonic is required");
         }
-        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length;
+        if (wordCount.HasValue && wordCount > 0 && !ValidMnemonicSizes.Contains(wordCount.Value))
         {
             validationErrors.Add(
                 $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
