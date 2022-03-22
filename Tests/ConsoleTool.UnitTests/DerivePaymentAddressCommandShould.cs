@@ -579,31 +579,161 @@ public class DerivePaymentAddressCommandShould
     }
 
     [Theory]
-    [InlineData(0, 0, "English", "month normal able please smile electric month tube vanish put yard absurd color rate explain", "Mainnet", "", "Base",
-        "addr1q9rc8jjh5rpnct5cmvulhwl3ucz382at8n8gngjn5p2p2vnvvzt6ncfy4x8y8dcj3hhnzqej0v6pq3cffn80jx4kyrysyf5wjx")]
-    [InlineData(128, 256, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category", "Testnet", "", "Enterprise",
+    [InlineData("trap report remind insane change toy rotate suggest misery vault language mind bone hen mountain", "Testnet",
+        "addr_test1vqdgwyhh07nl5geppqglg45mnhayalz3rynr7vfcdzz5spcmlaz2y")]
+    [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Testnet",
+        "addr_test1vzxha8wnyley93q3g8xu49un3rcfa8cn72p9fhlexvusm8c0muydn")]
+    [InlineData("trap report remind insane change toy rotate suggest misery vault language mind bone hen mountain", "Mainnet",
+        "addr1vydgwyhh07nl5geppqglg45mnhayalz3rynr7vfcdzz5spcqhf79p")]
+    [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Mainnet",
+        "addr1vxxha8wnyley93q3g8xu49un3rcfa8cn72p9fhlexvusm8c5ngczk")]
+    public async Task Derive_Correct_Bech32_Extended_Payment_Enterprise_Address_Defaulting_To_English_When_Passphrase_And_Language_Are_Not_Supplied_And_Mnemonic_Is_Valid_English(
+        string mnemonic, string networkTag, string expectedBech32Key)
+    {
+        var command = new DerivePaymentAddressCommand()
+        {
+            Mnemonic = mnemonic,
+            NetworkTag = networkTag,
+            PaymentAddressType = "Enterprise"
+        };
+        var englishSpecificCommand = new DerivePaymentAddressCommand()
+        {
+            Mnemonic = mnemonic,
+            NetworkTag = networkTag,
+            PaymentAddressType = "Enterprise",
+            Language = "English",
+        };
+
+        var executionResult = await command.ExecuteAsync(CancellationToken.None);
+        var englishSpecificCommandResult = await englishSpecificCommand.ExecuteAsync(CancellationToken.None);
+
+        executionResult.Outcome.Should().Be(CommandOutcome.Success);
+        executionResult.Result.Should().Be(expectedBech32Key);
+        executionResult.Result.Should().Be(englishSpecificCommandResult.Result);
+    }
+
+    [Theory]
+    [InlineData("trap report remind insane change toy rotate suggest misery vault language mind bone hen mountain", "Testnet",
+        "addr_test1qqdgwyhh07nl5geppqglg45mnhayalz3rynr7vfcdzz5spag0578hervgc3lutmdkjlsxljjafs02canfzy4kdjaztaqqmtghs")]
+    [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Testnet",
+        "addr_test1qzxha8wnyley93q3g8xu49un3rcfa8cn72p9fhlexvusm8mtk8vg0tpqxr0dwmaaakm07w39p4grset5aps8yytuvvjq8mqa0p")]
+    [InlineData("trap report remind insane change toy rotate suggest misery vault language mind bone hen mountain", "Mainnet",
+        "addr1qydgwyhh07nl5geppqglg45mnhayalz3rynr7vfcdzz5spag0578hervgc3lutmdkjlsxljjafs02canfzy4kdjaztaqrdkgm0")]
+    [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Mainnet",
+        "addr1qxxha8wnyley93q3g8xu49un3rcfa8cn72p9fhlexvusm8mtk8vg0tpqxr0dwmaaakm07w39p4grset5aps8yytuvvjqydaar7")]
+    public async Task Derive_Correct_Bech32_Extended_Payment_Base_Address_Defaulting_To_English_When_Passphrase_And_Language_Are_Not_Supplied_And_Mnemonic_Is_Valid_English(
+        string mnemonic, string networkTag, string expectedBech32Key)
+    {
+        var command = new DerivePaymentAddressCommand()
+        {
+            Mnemonic = mnemonic,
+            NetworkTag = networkTag,
+            PaymentAddressType = "Base"
+        };
+        var englishSpecificCommand = new DerivePaymentAddressCommand()
+        {
+            Mnemonic = mnemonic,
+            NetworkTag = networkTag,
+            PaymentAddressType = "Base",
+            Language = "English",
+        };
+
+        var executionResult = await command.ExecuteAsync(CancellationToken.None);
+        var englishSpecificCommandResult = await englishSpecificCommand.ExecuteAsync(CancellationToken.None);
+
+        executionResult.Outcome.Should().Be(CommandOutcome.Success);
+        executionResult.Result.Should().Be(expectedBech32Key);
+        executionResult.Result.Should().Be(englishSpecificCommandResult.Result);
+    }
+
+    [Theory]
+    [InlineData(
+        0, 0, 
+        "English", "month normal able please smile electric month tube vanish put yard absurd color rate explain", 
+        "", "Mainnet",
+        "addr1v9rc8jjh5rpnct5cmvulhwl3ucz382at8n8gngjn5p2p2vssgxm4e")]
+    [InlineData(
+        128, 256, 
+        "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category", 
+        "", "Testnet",
         "addr_test1vz57jm2zyuv2szl05v2py0ncymyckacd3044e25u336sgkqupgd69")]
-    [InlineData(2147483647, 2147483647, "English", "call calm deny negative spawn rail state domain special auto worry address ankle control hurdle mother please fiber help gasp drama firm window post", "Mainnet", "0ZYM4ND145", "Base",
-        "addr1q9tkxjhjmrv45axdekqu3prca5k0ytwaal787hexgf6mlhlyqg6lm35lw9fcc9gllqcr85xrpvclnjvlml9q940353sqc9w5hs")]
+    [InlineData(
+        2147483647, 2147483647, 
+        "English", "call calm deny negative spawn rail state domain special auto worry address ankle control hurdle mother please fiber help gasp drama firm window post", 
+        "", "Mainnet",
+        "addr1v93ahas99cnmscnc59snrdr8jrg64nn6f2na9wu6zvj3rnq89067j")]
     public async Task Derive_Correct_Bech32_Extended_Payment_Enterprise_Address_When_All_Properties_Are_Valid(
-        int accountIndex, 
-        int addressIndex, 
-        string language, 
-        string mnemonic, 
-        string networkTag, 
-        string passPhrase, 
-        string paymentAddressType, 
+        int accountIndex, int addressIndex, 
+        string language, string mnemonic, 
+        string passPhrase, string networkTag, 
         string expectedBech32Key)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            PaymentAddressType = paymentAddressType,
+            Passphrase = passPhrase,
+            PaymentAddressType = "Enterprise",
             NetworkTag = networkTag,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
-            Passphrase = passPhrase
+        };
+
+        var executionResult = await command.ExecuteAsync(CancellationToken.None);
+
+        executionResult.Outcome.Should().Be(CommandOutcome.Success);
+        executionResult.Result.Should().Be(expectedBech32Key);
+    }
+
+    [Theory]
+    [InlineData(
+        0, 0,
+        0, 0,
+        "English", "month normal able please smile electric month tube vanish put yard absurd color rate explain", 
+        "", "Mainnet",
+        "addr1q9rc8jjh5rpnct5cmvulhwl3ucz382at8n8gngjn5p2p2vnvvzt6ncfy4x8y8dcj3hhnzqej0v6pq3cffn80jx4kyrysyf5wjx")]
+    [InlineData(
+        128, 256,
+        512, 1024,
+        "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category", 
+        "", "Testnet",
+        "addr_test1qz57jm2zyuv2szl05v2py0ncymyckacd3044e25u336sgk835zfjuuqu0g7fsf65576qrdjc3jwg8me6jed3mtt86ypqvek2ae")]
+    [InlineData(
+        2147483647, 2147483647,
+        0, 0,
+        "English", "call calm deny negative spawn rail state domain special auto worry address ankle control hurdle mother please fiber help gasp drama firm window post", 
+        "", "Mainnet",
+        "addr1q93ahas99cnmscnc59snrdr8jrg64nn6f2na9wu6zvj3rnxpyuzx6r35mfkx4wuqpcr04staphs3rq7kv7lkqj6zwrtq3xcm8r")]
+    [InlineData(
+        2147483647, 2147483647,
+        2147483647, 2147483647,
+        "English", "tenant sign hawk account actual hill breeze until kidney resource roast good stumble spread trade detail bean junior whale impact post report bike announce",
+        "", "Mainnet",
+        "addr1qyczqhu6asxyzgdl8h8rksm30ryv3s4hzjrfgmg6605uf97pu36v0qaawdz3xxfffrlesl60xhrl5uzle603v5a3mk7qw45fv6")]
+    [InlineData(
+        1, 6,
+        2, 1,
+        "Spanish", "moreno diario asiento falda enseñar médula mambo tarde línea celoso escena asegurar poner banda lápiz azul yodo champú metro ombligo neón ajuste resto carga",
+        "0ZYM4ND145", "Mainnet",
+        "addr1q9k7g0qh9ljtvflgax8ecnf39a6cpwa4qxzl5mjdpq6f8546uvf3nzhru4yhxxudaua8yjs8n38wzra7sjkfsnqdpzxqks2vdy")]
+    public async Task Derive_Correct_Bech32_Extended_Payment_Base_Address_When_All_Properties_Are_Valid(
+        int accountIndex, int addressIndex,
+        int stakeAccountIndex, int stakeAddressIndex,
+        string language, string mnemonic, 
+        string passPhrase, string networkTag, 
+        string expectedBech32Key)
+    {
+        var command = new DerivePaymentAddressCommand()
+        {
+            Mnemonic = mnemonic,
+            Language = language,
+            Passphrase = passPhrase,
+            PaymentAddressType = "Base",
+            NetworkTag = networkTag,
+            AccountIndex = accountIndex,
+            AddressIndex = addressIndex,
+            StakeAccountIndex = stakeAccountIndex,
+            StakeAddressIndex = stakeAddressIndex,
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
