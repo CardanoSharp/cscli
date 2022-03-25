@@ -34,7 +34,7 @@ jobs:
 
       - name: Pack Tool 
         shell: bash
-        run: dotnet pack --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Release
+        run: dotnet pack --no-build ./Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Release
 
       - name: Publish To nuget.org
         shell: bash
