@@ -34,7 +34,9 @@ jobs:
 
       - name: Get pwd for workspace path checking
         shell: bash
-        run: pwd
+        run: |
+            pwd
+            ls Src/ConsoleTool/
         
       - name: Pack Tool 
         shell: bash
