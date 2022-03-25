@@ -13,7 +13,7 @@
 		<Authors>Keith</Authors>
 		<Company>Lovelace Academy</Company>
 		<Description>Cross Platform Global Tool / Console App for generating Cardano keys, addresses and transactions</Description>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageId>cscli</PackageId>
 	</PropertyGroup>
@@ -28,7 +28,7 @@
 		<NrtShowRevision>true</NrtShowRevision>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="CardanoSharp.Wallet" Version="1.0.3" />
+		<PackageReference Include="CardanoSharp.Wallet" Version="2.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
@@ -37,9 +37,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="nupkg\" />
 	</ItemGroup>
 
 </Project>

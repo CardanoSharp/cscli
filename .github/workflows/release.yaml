@@ -1,0 +1,45 @@
+name: Publish Release and its artefacts
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Release 
+    strategy:
+      matrix:
+        kind: ['linux', 'windows', 'macOS']
+        include:
+          - kind: linux
+            os: ubuntu-latest
+            target: linux-x64
+          - kind: windows
+            os: windows-latest
+            target: win-x64
+          - kind: macOS
+            os: macos-latest
+            target: osx-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@main
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build
+        shell: bash
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          release_name="cscli-$tag-${{ matrix.target }}"
+          dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" -p:PublishSingleFile=true --self-contained true
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "cscli*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
