@@ -1,4 +1,4 @@
-name: Build, Test and Publish to Nuget
+name: build
 
 on: push  
 
@@ -40,8 +40,8 @@ jobs:
         
       - name: Pack Tool 
         shell: bash
-        run: dotnet pack /home/runner/work/cscli/cscli/Src/ConsoleTool/Cscli.ConsoleTool.csproj -o /home/runner/work/cscli/cscli/nupkg -c Release
+        run: dotnet pack Src/ConsoleTool/Cscli.ConsoleTool.csproj -o nupkg -c Release
 
       - name: Publish To nuget.org
         shell: bash
-        run: dotnet nuget push /home/runner/work/cscli/cscli/nupkg/*.nupkg -k $NUGET_TOKEN -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push nupkg/*.nupkg -k $NUGET_TOKEN -s https://api.nuget.org/v3/index.json
