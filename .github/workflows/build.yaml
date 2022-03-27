@@ -31,16 +31,10 @@ jobs:
       - name: Test
         shell: bash
         run: dotnet test --no-build --verbosity normal
-
-      - name: Get pwd for workspace path checking
-        shell: bash
-        run: |
-            pwd
-            ls Src/ConsoleTool/
         
       - name: Pack Tool 
         shell: bash
-        run: dotnet pack Src/ConsoleTool/Cscli.ConsoleTool.csproj -o nupkg -c Release
+        run: dotnet pack --no-build Src/ConsoleTool/Cscli.ConsoleTool.csproj -o nupkg -c Release
 
       - name: Publish To nuget.org
         shell: bash

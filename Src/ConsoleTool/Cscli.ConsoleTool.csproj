@@ -18,7 +18,7 @@
 		<PackageId>cscli</PackageId>
 	</PropertyGroup>
 	<PropertyGroup>
-		<NrtRevisionFormat>{semvertag:main}+{chash}{!:-mod}</NrtRevisionFormat>
+		<NrtRevisionFormat>{semvertag:main}+{chash:7}{!:-mod}</NrtRevisionFormat>
 		<NrtResolveSimpleAttributes>true</NrtResolveSimpleAttributes>
 		<NrtResolveInformationalAttribute>true</NrtResolveInformationalAttribute>
 		<NrtResolveCopyright>true</NrtResolveCopyright>
