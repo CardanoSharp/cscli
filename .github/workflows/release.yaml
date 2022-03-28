@@ -6,7 +6,12 @@ on:
 
 jobs:
   release:
-    name: Release 
+    name: Release
+    env:
+      DOTNET_VERSION: '6.0.x'
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_NOLOGO: true
     strategy:
       matrix:
         kind: ['linux', 'windows', 'macOS']
@@ -28,18 +33,18 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@main
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Build
         shell: bash
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="cscli-$tag-${{ matrix.target }}"
-          dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" -p:PublishSingleFile=true --self-contained true
+          dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "cscli*"
+          files: "cscli.*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
