@@ -11,7 +11,7 @@ public class CommandParserShould
     [InlineData("-z")]
     [InlineData("--make")]
     [InlineData("!")]
-    [InlineData("walethd", "mnemonic", "gen")]
+    [InlineData("walethd", "mnemonic", "generate")]
     public void ParseArgs_To_ShowInvalidArgumentCommand_When_Arguments_Are_Invalid(params string[] args)
     {
         var command = CommandParser.ParseArgsToCommand(args);
@@ -19,8 +19,8 @@ public class CommandParserShould
     }
 
     [Theory]
-    [InlineData("walethd", "mnemonic", "gen")]
-    [InlineData("wallethd", "mnuemonic", "gen")]
+    [InlineData("walethd", "mnemonic", "generate")]
+    [InlineData("wallethd", "mnuemonic", "generate")]
     [InlineData("wallethd", "mnemonic", "create")]
     public void ParseArgs_To_ShowInvalidArgumentCommand_When_Arguments_Have_Spelling_Mistakes(params string[] args)
     {
@@ -49,11 +49,11 @@ public class CommandParserShould
     }
 
     [Theory]
-    [InlineData("wallethd mnemonic gen", Constants.DefaultMnemonicCount, Constants.DefaultMnemonicLanguage)]
-    [InlineData("wallethd mnemonic gen --language Spanish", Constants.DefaultMnemonicCount, "Spanish")]
-    [InlineData("wallethd mnemonic gen --size 15", 15, Constants.DefaultMnemonicLanguage)]
-    [InlineData("wallethd mnemonic gen --size 21 --language English", 21, "English")]
-    [InlineData("wallethd mnemonic gen --size 21 --language Spanish", 21, "Spanish")]
+    [InlineData("wallethd mnemonic generate", Constants.DefaultMnemonicCount, Constants.DefaultMnemonicLanguage)]
+    [InlineData("wallethd mnemonic generate --language Spanish", Constants.DefaultMnemonicCount, "Spanish")]
+    [InlineData("wallethd mnemonic generate --size 15", 15, Constants.DefaultMnemonicLanguage)]
+    [InlineData("wallethd mnemonic generate --size 21 --language English", 21, "English")]
+    [InlineData("wallethd mnemonic generate --size 21 --language Spanish", 21, "Spanish")]
     public void ParseArgs_Correctly_To_GenerateMnemonicCommand_When_Options_Are_Valid(
         string flatArgs, int expectedSize, string expectedLanguage)
     {

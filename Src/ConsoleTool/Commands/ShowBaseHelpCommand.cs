@@ -19,7 +19,7 @@ Available options:
     -h, --help      Show this help text
 
 Available commands:
-    wallethd mnemonic gen --size <size> [--language <language>]
+    wallethd mnemonic generate --size <size> [--language <language>]
     wallethd key root derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""]
     wallethd key payment derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallethd key stake derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]

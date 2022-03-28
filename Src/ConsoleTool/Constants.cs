@@ -31,6 +31,7 @@ public static class Constants
     // Commandline args switch mappings
     public static Dictionary<string, string> SwitchMappings => new()
     {
+        { "--recovery-phrase", "recoveryPhrase" },
         { "--verification-key-file", "verificationKeyFile" },
         { "--signing-key-file", "signingKeyFile" },
         { "--account-index", "accountIndex" },

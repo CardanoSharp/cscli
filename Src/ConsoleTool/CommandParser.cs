@@ -49,7 +49,7 @@ public static class CommandParser
     private static ICommand ParseWalletHdCommands(string intent, string[] args) =>
         intent switch
         {
-            "wallethd mnemonic gen" => BuildCommand<GenerateMnemonicCommand>(args),
+            "wallethd mnemonic generate" => BuildCommand<GenerateMnemonicCommand>(args),
             "wallethd key root derive" => BuildCommand<DeriveRootKeyCommand>(args),
             "wallethd key payment derive" => BuildCommand<DerivePaymentKeyCommand>(args),
             "wallethd key stake derive" => BuildCommand<DeriveStakeKeyCommand>(args),
