@@ -1,4 +1,4 @@
-name: Publish Release and its artefacts
+name: Publish GitHub Release and Artifacts
 
 on:
   release:
@@ -28,10 +28,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@main
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -41,6 +43,12 @@ jobs:
           tag=$(git describe --tags --abbrev=0)
           release_name="cscli-$tag-${{ matrix.target }}"
           dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Application_Artifact
+          path: cscli*
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v1

@@ -6,7 +6,14 @@ dotnet pack --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Rele
 
 # Generate cross-platform executables
 #dotnet publish --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release --nologo
-#dotnet publish -r win-x64 Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
+#dotnet publish -r win-x64 Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release -p:PublishSingleFile=true -p:PublishTrimmed=true -p:AssemblyName=cscli --self-contained true
 #dotnet publish -r linux-x64 Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release -p:PublishSingleFile=true --self-contained true
 #dotnet publish -r osx-x64 Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release -p:PublishSingleFile=true --self-contained true
 #dotnet publish -r osx.12-arm64 Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release -p:PublishSingleFile=true --self-contained true
+
+# Another way (per target)
+#$target = "linux-x64"
+#$tag=$(git describe --tags --abbrev=0)
+#$release_name="cscli-$tag-$target"
+#dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r $target -c Release -o $release_name "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.$target" --self-contained true
+

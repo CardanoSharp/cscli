@@ -1,13 +1,11 @@
 # cscli
 
-[![Build, Test and Publish to Nuget](https://github.com/CardanoSharp/cscli/actions/workflows/build.yaml/badge.svg)](https://github.com/CardanoSharp/cscli/actions/workflows/build.yaml)
-
 ## Goals
 A cross-platform CLI for building and interacting with [Cardano's](https://developers.cardano.org/) primitives (i.e. keys, addresses and transactions) 
 using .NET native types built on top of [CardanoSharp](https://github.com/CardanoSharp/cardanosharp-wallet).
 
 ### Advantages
- - Easy recovery-phrase based key and address derivation for [Hierarchical Deterministic (HD) wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), perfect for cold key/address/tx management and storage
+ - Easy recovery-phrase (aka mnemonics) based key and address derivation for [Hierarchical Deterministic (HD) wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), perfect for cold key/address/tx management and storage
  - [Passphrase](https://vault12.com/securemycrypto/crypto-security-basics/what-is-a-passphrase/passphrases-increase-your-protection-and-your-risk) support for additional root key security
  - International multi-language support for [mnemonics](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
  - Generates compatible outputs for `cardano-cli` and `cardano-addresses` without any additional dependencies

@@ -1,8 +1,9 @@
-name: build
+name: Build, Test and Publish Package
 
 on:
   push:
     branches:
+      - main
       - feature/*
 
 jobs:
@@ -16,7 +17,9 @@ jobs:
       NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1

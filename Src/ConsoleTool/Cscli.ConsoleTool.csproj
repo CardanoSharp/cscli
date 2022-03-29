@@ -6,17 +6,16 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Version>0.0.0.0-populated-by-NetRevisionTask</Version>
-
 		<PackAsTool>true</PackAsTool>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<ToolCommandName>cscli</ToolCommandName>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageId>cscli</PackageId>
 		<PackageOutputPath>nupkg</PackageOutputPath>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<Authors>Keith</Authors>
 		<Company>Lovelace Academy</Company>
 		<Description>Cross Platform Global Tool / Console App for generating Cardano keys, addresses and transactions</Description>
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<PackageId>cscli</PackageId>
 	</PropertyGroup>
 	<PropertyGroup>
 		<NrtRevisionFormat>{semvertag:main}+{chash:7}{!:-mod}</NrtRevisionFormat>
