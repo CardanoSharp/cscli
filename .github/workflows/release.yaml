@@ -48,11 +48,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Application_Artifact
-          path: cscli*
+          path: "cscli-$tag-${{ matrix.target }}/*"
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "cscli.*"
+          files: "cscli-$tag-${{ matrix.target }}/*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
