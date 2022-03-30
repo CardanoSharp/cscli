@@ -1,7 +1,7 @@
 # cscli
 
 ## Goals
-A cross-platform CLI for building and interacting with [Cardano's](https://developers.cardano.org/) primitives (i.e. keys, addresses and transactions) 
+A cross-platform CLI for building and interacting with [Cardano's](https://developers.cardano.org/) wallet primitives (i.e. recovery-phrases, keys, addresses and transactions) 
 using .NET native types built on top of [CardanoSharp](https://github.com/CardanoSharp/cardanosharp-wallet).
 
 ### Advantages
@@ -12,12 +12,14 @@ using .NET native types built on top of [CardanoSharp](https://github.com/Cardan
 
 ## Usage
 
+📝❗Note: Recovery-phrases and keys should only be generated and stored in airgapped machines when used in real world transactions.
+
 ### Overview and Help
 ```bash
 cscli --help
 
 > cscli v0.0.3
-> A cross-platform tool to generate and manage Cardano recovery-phrases, keys, addresses and transactions.
+> A cross-platform tool for building and interacting with Cardano's wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
 > 
 > USAGE: cscli (OPTION | COMMAND)
 > 
@@ -40,8 +42,6 @@ cscli --help
 >     <network-type> ::= Testnet | Mainnet
 >     <payment-address-type> ::= Enterprise | Base
 ```
-
-📝❗Note: Recovery-phrases and keys should only be generated and stored in airgapped machines if used for real world transactions
 
 ### Generate Mnemonics
 ```bash
@@ -127,7 +127,7 @@ dotnet restore
 dotnet build --no-restore
 dotnet test --no-build
 dotnet pack --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Release
-dotnet tool install --global --add-source ./nupkg cscli --version 0.0.4
+dotnet tool install --global --add-source ./nupkg cscli --version 0.0.4-local-branch.1
 ```
 
 ## Contributing

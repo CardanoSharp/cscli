@@ -10,7 +10,7 @@ public class ShowBaseHelpCommand : ICommand
             .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
         var helpText = $@"cscli v{versionString}
-A cross-platform tool to generate and manage Cardano recovery-phrases, keys, addresses and transactions.
+A cross-platform tool for building and interacting with Cardano's wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
 
 USAGE: cscli (OPTION | COMMAND)
 
@@ -19,7 +19,7 @@ Available options:
     -h, --help      Show this help text
 
 Available commands:
-    wallet mnemonic generate --size <size> [--language <language>]
+    wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""]
     wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
