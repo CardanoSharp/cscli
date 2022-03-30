@@ -80,7 +80,7 @@ public class DerivePaymentKeyCommand : ICommand
         if (string.IsNullOrWhiteSpace(Mnemonic))
         {
             validationErrors.Add(
-                $"Invalid option --mnemonic is required");
+                $"Invalid option --recovery-phrase is required");
         }
         if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
         {
@@ -115,7 +115,7 @@ public class DerivePaymentKeyCommand : ICommand
         if (wordCount.HasValue && wordCount > 0 && !ValidMnemonicSizes.Contains(wordCount.Value))
         {
             validationErrors.Add(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
+                $"Invalid option --recovery-phrase must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
         }
 
         return (!validationErrors.Any(), wordlist, validationErrors);

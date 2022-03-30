@@ -10,7 +10,7 @@ public class ShowBaseHelpCommand : ICommand
             .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
         var helpText = $@"cscli v{versionString}
-A cross-platform tool for generating Cardano keys, addresses and transactions.
+A cross-platform tool to generate and manage Cardano recovery-phrases, keys, addresses and transactions.
 
 USAGE: cscli (OPTION | COMMAND)
 
@@ -19,12 +19,12 @@ Available options:
     -h, --help      Show this help text
 
 Available commands:
-    wallethd mnemonic generate --size <size> [--language <language>]
-    wallethd key root derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""]
-    wallethd key payment derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallethd key stake derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallethd address payment derive --mnemonic ""<string>""  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
-    wallethd address stake derive --mnemonic ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallet mnemonic generate --size <size> [--language <language>]
+    wallet key root derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""]
+    wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
+    wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
+    wallet address payment derive --recovery-phrase ""<string>""  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallet address stake derive --recovery-phrase ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(Default)

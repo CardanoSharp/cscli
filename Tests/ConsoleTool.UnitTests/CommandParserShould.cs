@@ -11,18 +11,7 @@ public class CommandParserShould
     [InlineData("-z")]
     [InlineData("--make")]
     [InlineData("!")]
-    [InlineData("walethd", "mnemonic", "generate")]
     public void ParseArgs_To_ShowInvalidArgumentCommand_When_Arguments_Are_Invalid(params string[] args)
-    {
-        var command = CommandParser.ParseArgsToCommand(args);
-        command.Should().BeOfType<ShowInvalidArgumentCommand>();
-    }
-
-    [Theory]
-    [InlineData("walethd", "mnemonic", "generate")]
-    [InlineData("wallethd", "mnuemonic", "generate")]
-    [InlineData("wallethd", "mnemonic", "create")]
-    public void ParseArgs_To_ShowInvalidArgumentCommand_When_Arguments_Have_Spelling_Mistakes(params string[] args)
     {
         var command = CommandParser.ParseArgsToCommand(args);
         command.Should().BeOfType<ShowInvalidArgumentCommand>();
@@ -49,11 +38,23 @@ public class CommandParserShould
     }
 
     [Theory]
-    [InlineData("wallethd mnemonic generate", Constants.DefaultMnemonicCount, Constants.DefaultMnemonicLanguage)]
-    [InlineData("wallethd mnemonic generate --language Spanish", Constants.DefaultMnemonicCount, "Spanish")]
-    [InlineData("wallethd mnemonic generate --size 15", 15, Constants.DefaultMnemonicLanguage)]
-    [InlineData("wallethd mnemonic generate --size 21 --language English", 21, "English")]
-    [InlineData("wallethd mnemonic generate --size 21 --language Spanish", 21, "Spanish")]
+    [InlineData("walet", "recovery-phrase", "generate")]
+    [InlineData("wallet", "recovery-phase", "generate")]
+    [InlineData("wallet", "recovery-phrase", "gen")]
+    [InlineData("wallethd", "recovery-phrase", "generate")]
+    public void ParseArgs_To_ShowInvalidArgumentCommand_When_Arguments_Have_Spelling_Mistakes(params string[] args)
+    {
+        var command = CommandParser.ParseArgsToCommand(args);
+        command.Should().BeOfType<ShowInvalidArgumentCommand>();
+    }
+
+    [Theory]
+    [InlineData("wallet recovery-phrase generate", Constants.DefaultMnemonicCount, Constants.DefaultMnemonicLanguage)]
+    [InlineData("wallet recovery-phrase generate --language Spanish", Constants.DefaultMnemonicCount, "Spanish")]
+    [InlineData("wallet recovery-phrase generate --size 15", 15, Constants.DefaultMnemonicLanguage)]
+    [InlineData("wallet recovery-phrase generate --size 21 --language English", 21, "English")]
+    [InlineData("wallet recovery-phrase generate --size 21 --language Spanish", 21, "Spanish")]
+    [InlineData("wallet recovery-phrase generate --size 24 --language Japanese", 24, "Japanese")]
     public void ParseArgs_Correctly_To_GenerateMnemonicCommand_When_Options_Are_Valid(
         string flatArgs, int expectedSize, string expectedLanguage)
     {
@@ -65,13 +66,13 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallethd key root derive --mnemonic {MNEMONIC}",
-        "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
+        "wallet key root derive --recovery-phrase {MNEMONIC}",
+        "noise ability outer loud cabbage borrow model daughter small visual connect awake attract topic float gift bench video trial tomorrow piece risk decrease daring",
         Constants.DefaultMnemonicLanguage, 
         "")]
     [InlineData(
-        "wallethd key root derive --mnemonic {MNEMONIC} --passphrase helloworld --language Spanish",
-        "main ivory bring aim auction wheat credit horn picnic road horse never myth photo devote pen slice small wrestle play group two usage egg",
+        "wallet key root derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish",
+        "visor sepia feria señal brecha logro sirena flaco lámina arroz juicio cumbre centro aseo jarra ganso mes abogado rociar ámbito isla anuncio dosis dolor",
         "Spanish",
         "helloworld")]
     public void ParseArgs_Correctly_To_DeriveRootKeyCommand_When_Options_Are_Valid(
@@ -89,13 +90,13 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallethd key payment derive --mnemonic {MNEMONIC}",
-        "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
+        "wallet key payment derive --recovery-phrase {MNEMONIC}",
+        "repeat jazz magnet finger sunny gaze shuffle deputy feel forget decline parent immune actor anchor funny avocado source replace setup grace best inflict capable",
         Constants.DefaultMnemonicLanguage,
         "", 0, 0)]
     [InlineData(
-        "wallethd key payment derive --mnemonic {MNEMONIC} --passphrase helloworld --language Spanish --account-index 2 --address-index 256",
-        "main ivory bring aim auction wheat credit horn picnic road horse never myth photo devote pen slice small wrestle play group two usage egg",
+        "wallet key payment derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --account-index 2 --address-index 256",
+        "guiso calamar suplir uno ingenio furia papel otoño rebaño treinta hazaña fallo coser ánimo palco piloto edición túnica cara probar elixir toser grosor verbo",
         "Spanish",
         "helloworld", 2, 256)]
     public void ParseArgs_Correctly_To_DerivePaymentKeyCommand_When_Options_Are_Valid(
@@ -116,13 +117,13 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallethd key stake derive --mnemonic {MNEMONIC}",
+        "wallet key stake derive --recovery-phrase {MNEMONIC}",
         "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
         Constants.DefaultMnemonicLanguage,
         "", 0, 0)]
     [InlineData(
-        "wallethd key stake derive --mnemonic {MNEMONIC} --passphrase helloworld --language Spanish --account-index 2 --address-index 256",
-        "main ivory bring aim auction wheat credit horn picnic road horse never myth photo devote pen slice small wrestle play group two usage egg",
+        "wallet key stake derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --account-index 2 --address-index 256",
+        "acabar maestro llaga cruz senda veinte remar avance toro oído loción sótano resto tesis velero programa zafiro fresa alteza faltar metro género pelea pista",
         "Spanish",
         "helloworld", 2, 256)]
     public void ParseArgs_Correctly_To_DeriveStakeKeyCommand_When_Options_Are_Valid(
@@ -143,17 +144,17 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallethd address stake derive --mnemonic {MNEMONIC} --network-tag Testnet",
-        "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --network-tag Testnet",
+        "rabbit fence domain dirt burden bone entry genre twelve obey dwarf icon fabric tattoo chalk monster deputy tomato gun toy garment portion gun ribbon",
         Constants.DefaultMnemonicLanguage,
         "", 0, 0, "Testnet")]
     [InlineData(
-        "wallethd address stake derive --mnemonic {MNEMONIC} --passphrase helloworld --language Spanish --network-tag Mainnet --account-index 101 --address-index 980",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --network-tag Mainnet --account-index 101 --address-index 980",
         "vena pomo bolero papel colina paleta regalo alma dibujo examen lindo programa venir bozal elogio tacto romper observar bono separar refrán ecuador clase reducir",
         "Spanish",
         "helloworld", 101, 980, "Mainnet")]
     [InlineData(
-        "wallethd address stake derive --mnemonic {MNEMONIC} --passphrase 0ZYM4ND14Z --language Japanese --network-tag Mainnet --account-index 2147483647 --address-index 2147483647",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase 0ZYM4ND14Z --language Japanese --network-tag Mainnet --account-index 2147483647 --address-index 2147483647",
         "みすい よけい ちしりょう つみき たいせつ たりる せんぱい れんぞく めいぶつ あじわう はらう ちぬき やぶる ひろう にんい うらぐち おやゆび きんじょ きりん たいおう ねいる みつかる うよく かあつ",
         "Japanese",
         "0ZYM4ND14Z", 2147483647, 2147483647, "Mainnet")]
@@ -175,12 +176,12 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallethd address payment derive --mnemonic {MNEMONIC} --network-tag Testnet --payment-address-type Enterprise",
-        "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
+        "wallet address payment derive --recovery-phrase {MNEMONIC} --network-tag Testnet --payment-address-type Enterprise",
+        "slight aspect potato wealth two lazy ill try kick visit chunk cloth snap follow now sun curve quality cousin sister decrease help stadium enact",
         Constants.DefaultMnemonicLanguage,
         "", 0, 0, 0, 0, "Testnet", "Enterprise")]
     [InlineData(
-        "wallethd address payment derive --language Portugese --mnemonic {MNEMONIC} --network-tag Mainnet --payment-address-type Base --account-index 256 --address-index 512 --stake-account-index 88 --stake-address-index 29 --passphrase 0ZYM4ND14Z",
+        "wallet address payment derive --language Portugese --recovery-phrase {MNEMONIC} --network-tag Mainnet --payment-address-type Base --account-index 256 --address-index 512 --stake-account-index 88 --stake-address-index 29 --passphrase 0ZYM4ND14Z",
         "sadio sombrio prato selvagem enrugar fugir depois braveza acolhida javali enviado alfinete emenda mexer legado goela vedar refogar pivete afrontar tracejar materno vespa chapada",
         "Portugese", "0ZYM4ND14Z", 256, 512, 88, 29, "Mainnet", "Base")]
     public void ParseArgs_Correctly_To_DerivePaymentAddressCommand_When_Options_Are_Valid(

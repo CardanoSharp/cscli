@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "wallethd key stake derive --mnemonic \"fitness juice ankle box prepare gallery purse narrow miracle next soccer category\" --passphrase \"b\" --account-index 1 --address-index 1"
+      "commandLineArgs": "wallet key stake derive --recovery-phrase \"fitness juice ankle box prepare gallery purse narrow miracle next soccer category\" --passphrase \"b\" --account-index 1 --address-index 1"
     }
   }
 }

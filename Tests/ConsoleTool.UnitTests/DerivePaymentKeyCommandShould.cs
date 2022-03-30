@@ -27,7 +27,7 @@ public class DerivePaymentKeyCommandShould
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
-        executionResult.Result.Should().Be("Invalid option --mnemonic is required");
+        executionResult.Result.Should().Be("Invalid option --recovery-phrase is required");
     }
 
     [Theory]
@@ -57,7 +57,7 @@ public class DerivePaymentKeyCommandShould
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
-        executionResult.Result.Should().Be("Invalid option --mnemonic must have the following word count (9, 12, 15, 18, 21, 24)");
+        executionResult.Result.Should().Be("Invalid option --recovery-phrase must have the following word count (9, 12, 15, 18, 21, 24)");
     }
 
     [Theory]
