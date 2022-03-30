@@ -83,12 +83,12 @@ public class DerivePaymentAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --recovery-phrase must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             validationErrors.Add(
                 $"Invalid option --language {Language} is not supported");
         }
-        if (!Enum.TryParse<AddressType>(PaymentAddressType, out var paymentAddressType)
+        if (!Enum.TryParse<AddressType>(PaymentAddressType, ignoreCase: true, out var paymentAddressType)
             || paymentAddressType != AddressType.Base && paymentAddressType != AddressType.Enterprise)
         {
             validationErrors.Add(
@@ -114,10 +114,10 @@ public class DerivePaymentAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --stake-address-index must be between 0 and {MaxDerivationPathIndex}");
         }
-        if (!Enum.TryParse<NetworkType>(NetworkTag, out var networkType))
+        if (!Enum.TryParse<NetworkType>(NetworkTag, ignoreCase: true, out var networkType))
         {
             validationErrors.Add(
-                $"Invalid option --network-tag must be either Testnet or Mainnet");
+                $"Invalid option --network-tag must be either testnet or mainnet");
         }
         return (!validationErrors.Any(), wordlist, paymentAddressType, networkType, validationErrors);
     }

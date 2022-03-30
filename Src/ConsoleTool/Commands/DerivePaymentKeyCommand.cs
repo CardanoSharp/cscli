@@ -106,7 +106,7 @@ public class DerivePaymentKeyCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --verification-key-file path {VerificationKeyFile} does not exist");
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             validationErrors.Add(
                 $"Invalid option --language {Language} is not supported");

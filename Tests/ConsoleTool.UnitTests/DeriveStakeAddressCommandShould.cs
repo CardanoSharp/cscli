@@ -10,9 +10,10 @@ public class DeriveStakeAddressCommandShould
     [InlineData("")]
     [InlineData("a")]
     [InlineData("test")]
-    [InlineData("testnet")]
+    [InlineData("tastnet")]
     [InlineData("Mainet")]
-    [InlineData("mainnet")]
+    [InlineData("mainet")]
+    [InlineData("mainnetwork")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Valid_But_Network_Is_Invalid(
         string networkTag)
     {
@@ -25,7 +26,7 @@ public class DeriveStakeAddressCommandShould
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
-        executionResult.Result.Should().Be("Invalid option --network-tag must be either Testnet or Mainnet");
+        executionResult.Result.Should().Be("Invalid option --network-tag must be either testnet or mainnet");
     }
 
     [Theory]
@@ -111,12 +112,12 @@ public class DeriveStakeAddressCommandShould
     [InlineData("Australian", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
     [InlineData("en-GB", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
-    [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Testnet")]
+    [InlineData("engish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Testnet")]
     [InlineData("invalid", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("Australian", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("en-GB", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
-    [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
+    [InlineData("aenglish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Language_Is_Not_Supported(
         string language, string mnemonic, string networkTag)
     {

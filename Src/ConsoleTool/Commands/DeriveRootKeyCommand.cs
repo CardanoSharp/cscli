@@ -19,7 +19,7 @@ public class DeriveRootKeyCommand : ICommand
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --recovery-phrase is required"));
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --language {Language} is not supported"));

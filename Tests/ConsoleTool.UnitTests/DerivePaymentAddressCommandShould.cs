@@ -11,16 +11,12 @@ public class DerivePaymentAddressCommandShould
     [InlineData("", "Base")]
     [InlineData("a", "Base")]
     [InlineData("test", "Base")]
-    [InlineData("testnet", "Base")]
     [InlineData("Mainet", "Base")]
-    [InlineData("mainnet", "Base")]
     [InlineData(null, "Enterprise")]
     [InlineData("", "Enterprise")]
     [InlineData("a", "Enterprise")]
     [InlineData("test", "Enterprise")]
-    [InlineData("testnet", "Enterprise")]
     [InlineData("Mainet", "Enterprise")]
-    [InlineData("mainnet", "Enterprise")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_NetworkTag_Is_Invalid(
         string networkTag, string paymentAddressType)
     {
@@ -34,7 +30,7 @@ public class DerivePaymentAddressCommandShould
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
-        executionResult.Result.Should().Be("Invalid option --network-tag must be either Testnet or Mainnet");
+        executionResult.Result.Should().Be("Invalid option --network-tag must be either testnet or mainnet");
     }
 
     [Theory]
@@ -42,17 +38,17 @@ public class DerivePaymentAddressCommandShould
     [InlineData("", "Testnet")]
     [InlineData("a", "Testnet")]
     [InlineData("test", "Testnet")]
-    [InlineData("base", "Testnet")]
+    [InlineData("based", "Testnet")]
     [InlineData("Stake", "Testnet")]
-    [InlineData("enterprise", "Testnet")]
-    [InlineData("Delegating", "Testnet")]
+    [InlineData("enterprised", "Testnet")]
+    [InlineData("delegating", "Testnet")]
     [InlineData(null, "Mainnet")]
     [InlineData("", "Mainnet")]
     [InlineData("a", "Mainnet")]
     [InlineData("test", "Mainnet")]
-    [InlineData("base", "Mainnet")]
+    [InlineData("baste", "Mainnet")]
     [InlineData("Stake", "Mainnet")]
-    [InlineData("enterprise", "Mainnet")]
+    [InlineData("entorprise", "Mainnet")]
     [InlineData("Delegating", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Type_Is_Invalid(
         string paymentAddressType, string networkTag)
@@ -235,12 +231,12 @@ public class DerivePaymentAddressCommandShould
     [InlineData("Australian", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
     [InlineData("en-GB", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
-    [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Testnet")]
+    [InlineData("englis", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Testnet")]
     [InlineData("invalid", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("Australian", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("en-GB", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
-    [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
+    [InlineData("aenglish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Language_Is_Not_Supported_Deriving_Enterprise_Address_Type(
         string language, string mnemonic, string networkTag)
     {
@@ -263,12 +259,12 @@ public class DerivePaymentAddressCommandShould
     [InlineData("Australian", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
     [InlineData("en-GB", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Testnet")]
-    [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Testnet")]
+    [InlineData("englis", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Testnet")]
     [InlineData("invalid", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("Australian", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("en-GB", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
-    [InlineData("english", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
+    [InlineData("anglish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Language_Is_Not_Supported_Deriving_Base_Address_Type(
         string language, string mnemonic, string networkTag)
     {
