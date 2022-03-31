@@ -1,0 +1,58 @@
+name: Publish GitHub Release and Artifacts
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Release
+    env:
+      DOTNET_VERSION: '6.0.x'
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_NOLOGO: true
+    strategy:
+      matrix:
+        kind: ['linux', 'windows', 'macOS']
+        include:
+          - kind: linux
+            os: ubuntu-latest
+            target: linux-x64
+          - kind: windows
+            os: windows-latest
+            target: win-x64
+          - kind: macOS
+            os: macos-latest
+            target: osx-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        shell: bash
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          release_name="cscli-$tag-${{ matrix.target }}"
+          dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Application_Artifact
+          path: "cscli-$tag-${{ matrix.target }}/*"
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "cscli-$tag-${{ matrix.target }}/*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

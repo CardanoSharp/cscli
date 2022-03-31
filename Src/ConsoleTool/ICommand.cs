@@ -1,10 +1,6 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Cscli.ConsoleTool;
 
-namespace Cscli.ConsoleTool
+public interface ICommand
 {
-    public interface ICommand
-    {
-        ValueTask<CommandResult> ExecuteAsync(CancellationToken ct);
-    }
+    ValueTask<CommandResult> ExecuteAsync(CancellationToken ct);
 }
