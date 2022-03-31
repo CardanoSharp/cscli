@@ -108,7 +108,7 @@ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --paym
 
 #### Payment Enterprise Address with Custom Indexes
 ```bash
-cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network-tag minnet --account-index 1387 --address-index 12 | tee pay_1387_12.addr
+cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network-tag mainnet --account-index 1387 --address-index 12 | tee pay_1387_12.addr
 
 >addr1vy3y89nnzdqs4fmqv49fmpqw24hjheen3ce7tch082hh6xcc8pzd9
 ```
@@ -124,7 +124,7 @@ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --paym
 ```bash
 cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type base --network-tag mainnet --account-index 1387 --address-index 12 --stake-account-index 968 --stake-address-index 83106 | tee pay_1387_12_968_83106.addr
 
->addr1qxfnqvyyl2w4zfhpuw8d3kc4e6jztz2ht6xyn5letnr3p4x2jdeuyjdg05f0n68qrvr9r5wcrj8f9u6pjn3ns8v2uzjssvv8th
+>addr1qy3y89nnzdqs4fmqv49fmpqw24hjheen3ce7tch082hh6x7nwwgg06dngunf9ea4rd7mu9084sd3km6z56rqd7e04ylslhzn9h
 ```
 
 ## Installation
