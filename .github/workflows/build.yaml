@@ -2,6 +2,8 @@ name: Build, Test and Publish Package
 
 on:
   push:
+    tags: 
+      - v*
     branches:
       - main
       - feature/*
