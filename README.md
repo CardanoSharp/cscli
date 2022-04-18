@@ -163,9 +163,9 @@ $ cat stake_0_0.skey
 }
 $ cat stake_0_0.vkey
 {
-  "type": "StakeExtendedVerificationKeyShelley_ed25519_bip32",
+  "type": "StakeVerificationKeyShelley_ed25519",
   "description": "Stake Verification Key",
-  "cborHex": "58401bd85ec71d2d8ce0180138310983aafffa4585486db1576bc385b0ae350562e6a001925239b5726e3132b8a5598904eaf248b688668450dbd12febe1ebe127ed"
+  "cborHex": "58201bd85ec71d2d8ce0180138310983aafffa4585486db1576bc385b0ae350562e6"
 }
 ```
 </details>
