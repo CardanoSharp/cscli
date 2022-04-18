@@ -53,6 +53,7 @@ public static class CommandParser
             "wallet key root derive" => BuildCommand<DeriveRootKeyCommand>(args),
             "wallet key payment derive" => BuildCommand<DerivePaymentKeyCommand>(args),
             "wallet key stake derive" => BuildCommand<DeriveStakeKeyCommand>(args),
+            "wallet key policy derive" => BuildCommand<DerivePolicyKeyCommand>(args),
             "wallet address payment derive" => BuildCommand<DerivePaymentAddressCommand>(args),
             "wallet address stake derive" => BuildCommand<DeriveStakeAddressCommand>(args),
             _ => new ShowInvalidArgumentCommand(intent)

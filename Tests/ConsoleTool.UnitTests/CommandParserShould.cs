@@ -117,6 +117,32 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
+        "wallet key policy derive --recovery-phrase {MNEMONIC}",
+        "essay choose supply announce entire cart gap duty grow dog similar moral illegal screen jump fury identify world sail arena devote only gas video",
+        Constants.DefaultMnemonicLanguage,
+        "", 0)]
+    [InlineData(
+        "wallet key policy derive --recovery-phrase {MNEMONIC} --passphrase p455 --language Spanish --policy-index 8",
+        "dardo demora osadía severo veinte peor humilde óxido secta bocina hallar flauta orador recreo villa fax tienda delito amante lector vicio buitre cosmos zona",
+        "Spanish",
+        "p455", 8)]
+    public void ParseArgs_Correctly_To_DerivePolicyKeyCommand_When_Options_Are_Valid(
+        string flatArgs, string expectedMnemonic, string expectedLanguage, string expectedPassPhrase, int expectedPolicyIndex)
+    {
+        var args = GenerateArgs(flatArgs, expectedMnemonic);
+
+        var command = CommandParser.ParseArgsToCommand(args);
+
+        var policyKeyCommand = (DerivePolicyKeyCommand)command;
+        command.Should().BeOfType<DerivePolicyKeyCommand>();
+        policyKeyCommand.Mnemonic.Should().Be(expectedMnemonic);
+        policyKeyCommand.Language.Should().Be(expectedLanguage);
+        policyKeyCommand.Passphrase.Should().Be(expectedPassPhrase);
+        policyKeyCommand.PolicyIndex.Should().Be(expectedPolicyIndex);
+    }
+
+    [Theory]
+    [InlineData(
         "wallet key stake derive --recovery-phrase {MNEMONIC}",
         "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
         Constants.DefaultMnemonicLanguage,
