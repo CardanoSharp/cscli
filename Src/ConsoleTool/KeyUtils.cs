@@ -5,11 +5,14 @@ namespace Cscli.ConsoleTool;
 
 public static class KeyUtils
 {
-    private const int MinimumSigningKeyLength = 32;
-
-    public static byte[] BuildBasicSkeyBytes(this PrivateKey prvKey)
-        => prvKey.Key.Length > MinimumSigningKeyLength 
-            ? prvKey.Key[..MinimumSigningKeyLength] : prvKey.Key;
+    public static byte[] BuildNonExtendedSkeyWithVerificationKeyBytes(this PrivateKey prvKey)
+    {
+        var pubKey = prvKey.GetPublicKey(false);
+        var skeyBytes = new byte[prvKey.Key.Length + pubKey.Key.Length];
+        Array.Copy(prvKey.Key, skeyBytes, prvKey.Key.Length);
+        Array.Copy(pubKey.Key, 0, skeyBytes, prvKey.Key.Length, pubKey.Key.Length);
+        return skeyBytes;
+    }
 
     public static byte[] BuildExtendedSkeyBytes(this PrivateKey prvKey)
     {

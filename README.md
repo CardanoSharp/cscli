@@ -52,7 +52,7 @@ dotnet restore
 dotnet build --no-restore
 dotnet test --no-build
 dotnet pack --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Release
-dotnet tool install --global --add-source ./nupkg cscli --version 0.0.5-local-branch.1
+dotnet tool install --global --add-source ./nupkg cscli --version 6-local-branch.1
 ```
 </details>
 
@@ -63,7 +63,7 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.0.5-local-br
 ### Overview and Help
 ```console
 $ cscli --help
-cscli v0.0.5
+cscli v0.0.6
 A cross-platform tool for building and interacting with Cardano wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
 
 USAGE: cscli (OPTION | COMMAND)
@@ -259,7 +259,6 @@ $ cscli bech32 decode --value "$(cat pay_0_0.addr)"
 ```console
 $ cscli bech32 encode --value 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600 --prefix addr
 addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w
-```
 
 ## Contributing
 Please see [CONTRIBUTING.md](./CONTRIBUTING.md)
