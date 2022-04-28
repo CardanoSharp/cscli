@@ -42,7 +42,7 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="cscli-$tag-${{ matrix.target }}"
-          dotnet publish Src/ConsoleTool/CsCli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
+          dotnet publish Src/ConsoleTool/Cscli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v2

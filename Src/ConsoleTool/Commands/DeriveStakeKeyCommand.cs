@@ -39,24 +39,19 @@ public class DeriveStakeKeyCommand : ICommand
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
-                var stakeSkeyExtendedWithVkeyBytes = stakeSkey.BuildExtendedSkeyWithVerificationKeyBytes();
-                var skeyCbor = new
-                {
-                    type = StakeSKeyJsonTypeField,
-                    description = StakeSKeyJsonDescriptionField,
-                    cborHex = KeyUtils.BuildCborHexPayload(stakeSkeyExtendedWithVkeyBytes)
-                };
+                var skeyCbor = new TextEnvelope(
+                    StakeExtendedSKeyJsonTypeField,
+                    StakeSKeyJsonDescriptionField,
+                    KeyUtils.BuildCborHexPayload(stakeSkey.BuildExtendedSkeyWithVerificationKeyBytes()));
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
             {
-                var stakeVkeyExtendedBytes = stakeVkey.BuildExtendedVkeyBytes();
-                var vkeyCbor = new
-                {
-                    type = PaymentVKeyJsonTypeField,
-                    description = PaymentVKeyJsonDescriptionField,
-                    cborHex = KeyUtils.BuildCborHexPayload(stakeVkeyExtendedBytes)
-                };
+                // cardano-cli compatibility requires us to use non-extended verification keys
+                var vkeyCbor = new TextEnvelope(
+                    StakeVKeyJsonTypeField,
+                    StakeVKeyJsonDescriptionField,
+                    KeyUtils.BuildCborHexPayload(stakeVkey.Key)); 
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             return result;
