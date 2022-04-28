@@ -1,6 +1,7 @@
 ﻿using CardanoSharp.Wallet;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
+using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Keys;
 using static Cscli.ConsoleTool.Constants;
 
@@ -16,30 +17,24 @@ public class DerivePaymentAddressCommand : ICommand
     public int AddressIndex { get; init; } = 0;
     public int StakeAccountIndex { get; init; } = 0;
     public int StakeAddressIndex { get; init; } = 0;
-    public string NetworkTag { get; init; } = "testnet";
+    public string? NetworkTag { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, derivedWorldList, addressType, network, errors) = Validate();
+        var (isValid, wordList, addressType, network, errors) = Validate();
         if (!isValid)
         {
             return ValueTask.FromResult(
                 CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors)));
         }
+
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
-            var addressService = new AddressService();
-            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+            var rootKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
-            var paymentVkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}")
-                .GetPublicKey(false);
-            var stakeVkey = rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}")
-                .GetPublicKey(false);
-            var address = addressService.GetBaseAddress(
-                paymentVkey,
-                stakeVkey,
-                network);
+            var address = GetPaymentAddress(
+                addressType, rootKey, new AddressService(), network);
             return ValueTask.FromResult(CommandResult.Success(address.ToString()));
         }
         catch (ArgumentException ex)
@@ -53,9 +48,25 @@ public class DerivePaymentAddressCommand : ICommand
         }
     }
 
+    private Address GetPaymentAddress(
+        AddressType addressType,
+        PrivateKey rootKey,
+        IAddressService addressService,
+        NetworkType networkType) => addressType switch
+        {
+            AddressType.Enterprise => addressService.GetEnterpriseAddress(
+                rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}").GetPublicKey(false),
+                networkType),
+            AddressType.Base => addressService.GetBaseAddress(
+                rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}").GetPublicKey(false),
+                rootKey.Derive($"m/1852'/1815'/{StakeAccountIndex}'/2/{StakeAddressIndex}").GetPublicKey(false),
+                networkType),
+            _ => throw new NotImplementedException($"--payment-address-type not valid for {nameof(DerivePaymentAddressCommand)}")
+        };
+
     private (
         bool isValid, 
-        WordLists derivedWordList,
+        WordLists wordList,
         AddressType addressType,
         NetworkType derivedNetworkType,
         IReadOnlyCollection<string> validationErrors) Validate()
@@ -64,20 +75,20 @@ public class DerivePaymentAddressCommand : ICommand
         if (string.IsNullOrWhiteSpace(Mnemonic))
         {
             validationErrors.Add(
-                $"Invalid option --mnemonic is required");
+                $"Invalid option --recovery-phrase is required");
         }
-        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length;
+        if (wordCount.HasValue && wordCount > 0 && !ValidMnemonicSizes.Contains(wordCount.Value))
         {
             validationErrors.Add(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
+                $"Invalid option --recovery-phrase must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             validationErrors.Add(
                 $"Invalid option --language {Language} is not supported");
         }
-        if (!Enum.TryParse<AddressType>(PaymentAddressType, out var paymentAddressType)
+        if (!Enum.TryParse<AddressType>(PaymentAddressType, ignoreCase: true, out var paymentAddressType)
             || paymentAddressType != AddressType.Base && paymentAddressType != AddressType.Enterprise)
         {
             validationErrors.Add(
@@ -103,10 +114,10 @@ public class DerivePaymentAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --stake-address-index must be between 0 and {MaxDerivationPathIndex}");
         }
-        if (!Enum.TryParse<NetworkType>(NetworkTag, out var networkType))
+        if (!Enum.TryParse<NetworkType>(NetworkTag, ignoreCase: true, out var networkType))
         {
             validationErrors.Add(
-                $"Invalid option --network-tag must be either Testnet or Mainnet");
+                $"Invalid option --network-tag must be either testnet or mainnet");
         }
         return (!validationErrors.Any(), wordlist, paymentAddressType, networkType, validationErrors);
     }

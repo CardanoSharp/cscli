@@ -16,15 +16,15 @@ public class GenerateMnemonicCommand : ICommand
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --size {Size} is not supported"));
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --language {Language} is not supported"));
         }
 
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
             var mnemonic = mnemonicService.Generate(Size, wordlist);
             var wordsResult = CommandResult.Success(mnemonic.Words);
             return ValueTask.FromResult(wordsResult);

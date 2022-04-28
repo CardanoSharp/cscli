@@ -3,27 +3,27 @@ using CardanoSharp.Wallet.Extensions;
 
 namespace Cscli.ConsoleTool.Commands;
 
-public class BechDecodeCommand : ICommand
+public class Bech32DecodeCommand : ICommand
 {
-    public string Address { get; init; } = string.Empty;
+    public string Value { get; init; } = string.Empty;
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        if (string.IsNullOrEmpty(Address))
+        if (string.IsNullOrEmpty(Value))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --address is required."));
+                $"Invalid option --value is required."));
         }
-        if (!Bech32.IsValid(Address))
+        if (!Bech32.IsValid(Value))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --address {Address} is not a valid bech32 encoding."));
+                $"Invalid option --value {Value} is not a valid bech32 encoding."));
         }        
         
         try
         {
             var hex = Bech32
-                .Decode(Address, out var ver, out var prefix)
+                .Decode(Value, out var ver, out var prefix)
                 .ToStringHex();
             var result = CommandResult.Success(hex);
             return ValueTask.FromResult(result);

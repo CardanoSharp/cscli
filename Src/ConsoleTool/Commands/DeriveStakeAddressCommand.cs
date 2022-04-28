@@ -12,7 +12,7 @@ public class DeriveStakeAddressCommand : ICommand
     public string Passphrase { get; init; } = string.Empty;
     public int AccountIndex { get; init; } = 0;
     public int AddressIndex { get; init; } = 0;
-    public string NetworkTag { get; init; } = "testnet";
+    public string? NetworkTag { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
@@ -22,17 +22,16 @@ public class DeriveStakeAddressCommand : ICommand
             return ValueTask.FromResult(
                 CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors)));
         }
+
+        var mnemonicService = new MnemonicService();
+        var addressService = new AddressService();
         try
         {
-            var mnemonicService = new MnemonicService();
-            var addressService = new AddressService();
             var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
             var stakeVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}")
                 .GetPublicKey(false);
-            var stakeAddr = addressService.GetRewardAddress(
-                stakeVkey,
-                network);
+            var stakeAddr = addressService.GetRewardAddress(stakeVkey, network);
             return ValueTask.FromResult(CommandResult.Success(stakeAddr.ToString()));
         }
         catch (ArgumentException ex)
@@ -56,15 +55,15 @@ public class DeriveStakeAddressCommand : ICommand
         if (string.IsNullOrWhiteSpace(Mnemonic))
         {
             validationErrors.Add(
-                $"Invalid option --mnemonic is required");
+                $"Invalid option --recovery-phrase is required");
         }
-        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries).Length;
-        if (wordCount.HasValue && !ValidMnemonicSizes.Contains(wordCount.Value))
+        var wordCount = Mnemonic?.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length;
+        if (wordCount.HasValue && wordCount > 0 && !ValidMnemonicSizes.Contains(wordCount.Value))
         {
             validationErrors.Add(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
+                $"Invalid option --recovery-phrase must have the following word count ({string.Join(", ", ValidMnemonicSizes)})");
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             validationErrors.Add(
                 $"Invalid option --language {Language} is not supported");
@@ -79,10 +78,10 @@ public class DeriveStakeAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
         }
-        if (!Enum.TryParse<NetworkType>(NetworkTag, out var networkType))
+        if (!Enum.TryParse<NetworkType>(NetworkTag, ignoreCase: true, out var networkType))
         {
             validationErrors.Add(
-                $"Invalid option --network-tag must be either Testnet or Mainnet");
+                $"Invalid option --network-tag must be either testnet or mainnet");
         }
         return (!validationErrors.Any(), wordlist, networkType, validationErrors);
     }

@@ -10,7 +10,7 @@ public class ShowBaseHelpCommand : ICommand
             .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
         var helpText = $@"cscli v{versionString}
-A cross-platform tool / console app for generating Cardano keys, addresses and transactions.
+A cross-platform tool for building and interacting with Cardano's wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
 
 USAGE: cscli (OPTION | COMMAND)
 
@@ -19,20 +19,22 @@ Available options:
     -h, --help      Show this help text
 
 Available commands:
-    bech decode --address ""<string>""
-    wallethd mnemonic gen --size <size> [--language <language>]
-    wallethd key root derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""]
-    wallethd key payment derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallethd key stake derive --mnemonic ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallethd address payment derive --mnemonic ""<string>""  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
-    (WIP) wallethd address stake derive --mnemonic ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallet recovery-phrase generate --size <size> [--language <language>]
+    wallet key root derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""]
+    wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
+    wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
+    wallet key policy derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--policy-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
+    wallet address stake derive --recovery-phrase ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallet address payment derive --recovery-phrase ""<string>""  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
+    bech32 encode --value ""<hex_string>"" --prefix ""<string>""
+    bech32 decode --value ""<bech32_string>""
 
 Arguments:
-    <size> ::= 9 | 12 | 15 | 18 | 21 | 24(Default)
-    <language> ::= English(Default)|ChineseSimplified|ChineseTraditional|French|Italian|Japanese|Korean|Spanish|Czech|Portuguese
-    <derivation-index> ::= 0(Default) | 1 | .. | 2147483647
-    <network-type> ::= Testnet | Mainnet
-    <payment-address-type> ::= Enterprise | Base
+    <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
+    <language> ::= english(default)|chinesesimplified|chinesetraditional|french|italian|japanese|korean|spanish|czech|portuguese
+    <derivation-index> ::= 0(default) | 1 | .. | 2147483647
+    <network-type> ::= testnet | mainnet
+    <payment-address-type> ::= enterprise | base
 ";
         return ValueTask.FromResult(CommandResult.Success(helpText));
     }

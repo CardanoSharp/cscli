@@ -4,6 +4,7 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
         var cts = SetupUserInputCancellationTokenSource();
         var command = CommandParser.ParseArgsToCommand(args);
         var commandResult = await command.ExecuteAsync(cts.Token).ConfigureAwait(false);

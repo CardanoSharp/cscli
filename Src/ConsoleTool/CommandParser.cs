@@ -40,32 +40,33 @@ public static class CommandParser
     private static ICommand ParseCommands(string intent, string[] args) =>
         args[0] switch
         {
-            "wallethd" => ParseWalletHdCommands(intent, args),
-            "bech" => ParseBechCommands(intent, args),
+            "wallet" => ParseWalletCommands(intent, args),
+            "bech32" => ParseBechCommands(intent, args),
             //"query" => ParseQueryCommands(intent, args), // TODO: query via Blockfrost/Koios integration
             //"tx" => ParseTxCommands(intent, args), // TODO: Easier Tx creation and submission via Blockfrost/Koios integration
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
-    private static ICommand ParseWalletHdCommands(string intent, string[] args) =>
+    private static ICommand ParseWalletCommands(string intent, string[] args) =>
         intent switch
         {
-            "wallethd mnemonic gen" => BuildCommand<GenerateMnemonicCommand>(args),
-            "wallethd key root derive" => BuildCommand<DeriveRootKeyCommand>(args),
-            "wallethd key payment derive" => BuildCommand<DerivePaymentKeyCommand>(args),
-            "wallethd key stake derive" => BuildCommand<DeriveStakeKeyCommand>(args),
-            "wallethd address payment derive" => BuildCommand<DerivePaymentAddressCommand>(args),
-            "wallethd address stake derive" => BuildCommand<DeriveStakeAddressCommand>(args),
-            "bech decode" => BuildCommand<DeriveStakeAddressCommand>(args),
+            "wallet recovery-phrase generate" => BuildCommand<GenerateMnemonicCommand>(args),
+            "wallet key root derive" => BuildCommand<DeriveRootKeyCommand>(args),
+            "wallet key payment derive" => BuildCommand<DerivePaymentKeyCommand>(args),
+            "wallet key stake derive" => BuildCommand<DeriveStakeKeyCommand>(args),
+            "wallet key policy derive" => BuildCommand<DerivePolicyKeyCommand>(args),
+            "wallet address payment derive" => BuildCommand<DerivePaymentAddressCommand>(args),
+            "wallet address stake derive" => BuildCommand<DeriveStakeAddressCommand>(args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
-    
+
     private static ICommand ParseBechCommands(string intent, string[] args) =>
-        intent switch
-        {
-            "bech decode" => BuildCommand<BechDecodeCommand>(args),
-            _ => new ShowInvalidArgumentCommand(intent)
-        };
+       intent switch
+       {
+           "bech32 encode" => BuildCommand<Bech32EncodeCommand>(args),
+           "bech32 decode" => BuildCommand<Bech32DecodeCommand>(args),
+           _ => new ShowInvalidArgumentCommand(intent)
+       };
 
     private static ICommand BuildCommand<T>(
         string[] args)

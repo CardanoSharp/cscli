@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "bech decode --address stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf"
+      "commandLineArgs": "wallet key stake derive --recovery-phrase \"fitness juice ankle box prepare gallery purse narrow miracle next soccer category\" --passphrase \"b\" --account-index 1 --address-index 1"
     }
   }
 }

@@ -17,9 +17,9 @@ public class DeriveRootKeyCommand : ICommand
         if (string.IsNullOrWhiteSpace(Mnemonic))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic is required"));
+                $"Invalid option --recovery-phrase is required"));
         }
-        if (!Enum.TryParse<WordLists>(Language, out var wordlist))
+        if (!Enum.TryParse<WordLists>(Language, ignoreCase: true, out var wordlist))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --language {Language} is not supported"));
@@ -28,12 +28,12 @@ public class DeriveRootKeyCommand : ICommand
         if (!ValidMnemonicSizes.Contains(wordCount))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --mnemonic must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
+                $"Invalid option --recovery-phrase must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
         }
 
+        var mnemonicService = new MnemonicService();
         try
         {
-            var mnemonicService = new MnemonicService();
             var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist)
                 .GetRootKey(Passphrase);
             var rootKeyExtendedBytes = rootPrvKey.BuildExtendedSkeyBytes();

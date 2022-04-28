@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Cscli.ConsoleTool.UnitTests;
 
-public class BechCommandShould
+public class Bech32DecodeCommandShould
 {
     [Theory]
     [InlineData(
@@ -55,11 +55,11 @@ public class BechCommandShould
         "e0337b62cfff6403a06a3acbc34f8c46003c69fe79a3628cefa9c47251")]
     [InlineData("stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf",
         "f0c37b1b5dc0669f1d3c61a6fddb2e8fde96be87b881c60bce8e8d542f")]
-    public async Task Execute_Successfully_With_Bech_Decoding_When_Properties_Are_Valid(string address, string expectedHex)
+    public async Task Execute_Successfully_With_Bech_Decoding_When_Properties_Are_Valid(string value, string expectedHex)
     {
-        var command = new BechDecodeCommand()
+        var command = new Bech32DecodeCommand()
         {
-            Address = address
+            Value = value
         };
         
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -73,11 +73,11 @@ public class BechCommandShould
     [InlineData(null)]
     [InlineData("this is not a valid address")]
     [InlineData("addr_fake1yz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerkr0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shsf5r8qx")]
-    public async Task Execute_Failure_With_Bech_Decoding_When_Properities_Are_Invalid(string address)
+    public async Task Execute_Failure_With_Bech_Decoding_When_Properities_Are_Invalid(string value)
     {
-        var command = new BechDecodeCommand()
+        var command = new Bech32DecodeCommand()
         {
-            Address = address
+            Value = value
         };
         
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
