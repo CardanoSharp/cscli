@@ -65,6 +65,7 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.0.6-local-br
 $ cscli --help
 cscli v0.0.6
 A cross-platform tool for building and interacting with Cardano wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
+Please see https://github.com/CardanoSharp/cscli from more detailed documentation.
 
 USAGE: cscli (OPTION | COMMAND)
 
@@ -82,6 +83,7 @@ Available commands:
     wallet address payment derive --recovery-phrase "<string>"  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
     bech32 encode --value "<hex_string>" --prefix "<string>"
     bech32 decode --value "<bech32_string>" 
+    blake2b hash --value "<hex_string>" --length <digest_length>
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
@@ -89,6 +91,7 @@ Arguments:
     <derivation-index> ::= 0(default) | 1 | .. | 2147483647
     <network-type> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
+    <digest_length> ::= 160 | 224 | 256 | 512
 ```
 
 ### Generate Recovery Phrase
@@ -259,6 +262,11 @@ $ cscli bech32 decode --value "$(cat pay_0_0.addr)"
 ```console
 $ cscli bech32 encode --value 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600 --prefix addr
 addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w
+
+### Blake2b Hash
+```console
+$ cscli blake2b hash --length 224 --value 1872bc5ecc95b419de3f72544a6656ceb9a813755544618bb6b4dcc230ed9721 
+9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01
 
 ## Contributing
 Please see [CONTRIBUTING.md](./CONTRIBUTING.md)

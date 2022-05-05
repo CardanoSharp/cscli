@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Cscli.ConsoleTool.UnitTests;
 
-public class Bech32EncodeCommandShould
+public class EncodeBech32CommandShould
 {
     [Theory]
     [InlineData(
@@ -89,7 +89,7 @@ public class Bech32EncodeCommandShould
         "stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf")]
     public async Task Execute_Successfully_With_Bech_Decoding_When_Properties_Are_Valid(string value, string prefix, string expectedBech32)
     {
-        var command = new Bech32EncodeCommand()
+        var command = new EncodeBech32Command()
         {
             Value = value,
             Prefix = prefix,
@@ -107,9 +107,9 @@ public class Bech32EncodeCommandShould
     [InlineData(" ")]
     [InlineData("this is not a valid hex value")]
     [InlineData(" another invalid value")]
-    public async Task Execute_Failure_With_Bech_Decoding_When_Properities_Are_Invalid(string invalidValue)
+    public async Task Fail_With_Bech_Encoding_When_Properities_Are_Invalid(string invalidValue)
     {
-        var command = new Bech32EncodeCommand()
+        var command = new EncodeBech32Command()
         {
             Value = invalidValue
         };

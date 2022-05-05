@@ -3,7 +3,7 @@ using CardanoSharp.Wallet.Extensions;
 
 namespace Cscli.ConsoleTool.Commands;
 
-public class Bech32DecodeCommand : ICommand
+public class DecodeBech32Command : ICommand
 {
     public string Value { get; init; } = string.Empty;
 
@@ -18,8 +18,8 @@ public class Bech32DecodeCommand : ICommand
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --value {Value} is not a valid bech32 encoding."));
-        }        
-        
+        }
+
         try
         {
             var hex = Bech32

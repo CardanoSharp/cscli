@@ -41,9 +41,9 @@ public static class CommandParser
         args[0] switch
         {
             "wallet" => ParseWalletCommands(intent, args),
-            "bech32" => ParseBechCommands(intent, args),
             //"query" => ParseQueryCommands(intent, args), // TODO: query via Blockfrost/Koios integration
             //"tx" => ParseTxCommands(intent, args), // TODO: Easier Tx creation and submission via Blockfrost/Koios integration
+            "bech32" or "blake2b" => ParseEncodingHashingCommands(intent, args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
@@ -60,13 +60,15 @@ public static class CommandParser
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
-    private static ICommand ParseBechCommands(string intent, string[] args) =>
+    private static ICommand ParseEncodingHashingCommands(string intent, string[] args) =>
        intent switch
        {
-           "bech32 encode" => BuildCommand<Bech32EncodeCommand>(args),
-           "bech32 decode" => BuildCommand<Bech32DecodeCommand>(args),
+           "bech32 encode" => BuildCommand<EncodeBech32Command>(args),
+           "bech32 decode" => BuildCommand<DecodeBech32Command>(args),
+           "blake2b hash" => BuildCommand<HashBlake2bCommand>(args),
            _ => new ShowInvalidArgumentCommand(intent)
        };
+
 
     private static ICommand BuildCommand<T>(
         string[] args)

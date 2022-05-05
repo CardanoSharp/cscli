@@ -1,9 +1,8 @@
 ﻿using CardanoSharp.Wallet.Encoding;
-using CardanoSharp.Wallet.Extensions;
 
 namespace Cscli.ConsoleTool.Commands;
 
-public class Bech32EncodeCommand : ICommand
+public class EncodeBech32Command : ICommand
 {
     public string Prefix { get; init; } = string.Empty;
     public string Value { get; init; } = string.Empty;
@@ -13,7 +12,7 @@ public class Bech32EncodeCommand : ICommand
         if (string.IsNullOrEmpty(Value))
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                $"Invalid option --value is required."));
+                $"Invalid option --value is required"));
         } 
         
         try
@@ -26,7 +25,7 @@ public class Bech32EncodeCommand : ICommand
         catch (FormatException ex)
         {
             return ValueTask.FromResult(
-                CommandResult.FailureInvalidOptions($"Invalid --value {ex.Message}"));
+                CommandResult.FailureInvalidOptions($"Invalid option --value {ex.Message}"));
         }
         catch (Exception ex)
         {
