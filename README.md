@@ -83,7 +83,7 @@ Available commands:
     wallet address payment derive --recovery-phrase "<string>"  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
     bech32 encode --value "<hex_string>" --prefix "<string>"
     bech32 decode --value "<bech32_string>" 
-    blake2b hash --value "<hex_string>" --length <digest_length>
+    blake2b hash --value "<hex_string>" [--length <digest_length>]
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
@@ -91,7 +91,7 @@ Arguments:
     <derivation-index> ::= 0(default) | 1 | .. | 2147483647
     <network-type> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
-    <digest_length> ::= 160 | 224 | 256 | 512
+    <digest_length> ::= 160 | 224(default) | 256 | 512
 ```
 
 ### Generate Recovery Phrase
