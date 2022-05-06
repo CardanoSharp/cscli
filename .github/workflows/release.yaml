@@ -37,22 +37,27 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Set release outputs
+        id: release-params
+        run: | 
+          VERSION_TAG=$(git describe --tags --abbrev=0)
+          RELEASE_NAME="cscli-$VERSION_TAG-${{ matrix.target }}"
+          echo "::set-output name=release_name::$RELEASE_NAME"
+
       - name: Build
         shell: bash
         run: |
-          tag=$(git describe --tags --abbrev=0)
-          release_name="cscli-$tag-${{ matrix.target }}"
-          dotnet publish Src/ConsoleTool/Cscli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "$release_name" "-p:PublishSingleFile=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
+          dotnet publish Src/ConsoleTool/Cscli.ConsoleTool.csproj -r "${{ matrix.target }}" -c Release -o "${{steps.release-params.outputs.release_name}}" "-p:PublishSingleFile=true" "-p:PublishTrimmed=true" "-p:AssemblyName=cscli.${{ matrix.target }}" --self-contained true
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v2
         with:
           name: Application_Artifact
-          path: "cscli-$tag-${{ matrix.target }}/*"
+          path: "${{steps.release-params.outputs.release_name}}/*"
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "cscli-$tag-${{ matrix.target }}/*"
+          files: "${{steps.release-params.outputs.release_name}}/*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

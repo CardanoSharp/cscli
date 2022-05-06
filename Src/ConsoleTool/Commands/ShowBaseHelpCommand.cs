@@ -11,6 +11,7 @@ public class ShowBaseHelpCommand : ICommand
             .Version;
         var helpText = $@"cscli v{versionString}
 A cross-platform tool for building and interacting with Cardano's wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
+Please see https://github.com/CardanoSharp/cscli from more detailed documentation.
 
 USAGE: cscli (OPTION | COMMAND)
 
@@ -26,6 +27,9 @@ Available commands:
     wallet key policy derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--policy-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallet address stake derive --recovery-phrase ""<string>"" --network-type <network-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
     wallet address payment derive --recovery-phrase ""<string>""  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
+    bech32 encode --value ""<hex_string>"" --prefix ""<string>""
+    bech32 decode --value ""<bech32_string>""
+    blake2b hash --value ""<hex_string>"" --length <digest_length> 
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
@@ -33,6 +37,7 @@ Arguments:
     <derivation-index> ::= 0(default) | 1 | .. | 2147483647
     <network-type> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
+    <digest_length> ::= 160 | 224 | 256 | 512
 ";
         return ValueTask.FromResult(CommandResult.Success(helpText));
     }

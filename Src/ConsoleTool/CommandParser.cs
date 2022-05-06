@@ -43,6 +43,7 @@ public static class CommandParser
             "wallet" => ParseWalletCommands(intent, args),
             //"query" => ParseQueryCommands(intent, args), // TODO: query via Blockfrost/Koios integration
             //"tx" => ParseTxCommands(intent, args), // TODO: Easier Tx creation and submission via Blockfrost/Koios integration
+            "bech32" or "blake2b" => ParseEncodingHashingCommands(intent, args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
@@ -58,6 +59,16 @@ public static class CommandParser
             "wallet address stake derive" => BuildCommand<DeriveStakeAddressCommand>(args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
+
+    private static ICommand ParseEncodingHashingCommands(string intent, string[] args) =>
+       intent switch
+       {
+           "bech32 encode" => BuildCommand<EncodeBech32Command>(args),
+           "bech32 decode" => BuildCommand<DecodeBech32Command>(args),
+           "blake2b hash" => BuildCommand<HashBlake2bCommand>(args),
+           _ => new ShowInvalidArgumentCommand(intent)
+       };
+
 
     private static ICommand BuildCommand<T>(
         string[] args)

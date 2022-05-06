@@ -232,6 +232,53 @@ public class CommandParserShould
         paymentAddressCommand.PaymentAddressType.Should().Be(expectedPaymentAddressType);
     }
 
+    [Theory]
+    [InlineData("bech32 encode --value 009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e337b62cfff6403a06a3acbc34f8c46003c69fe79a3628cefa9c47251 --prefix addr",
+    "009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e337b62cfff6403a06a3acbc34f8c46003c69fe79a3628cefa9c47251",
+    "addr")]
+    [InlineData("bech32 encode --prefix addr_test --value 609493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e",
+    "609493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e",
+    "addr_test")]
+    public void ParseArgs_Correctly_To_EncodeBech32Command_When_Options_Are_Valid(string args, string expectedValue, string expectedPrefix)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var bech32DecodeCommand = (EncodeBech32Command)command;
+        bech32DecodeCommand.Should().BeOfType<EncodeBech32Command>();
+        bech32DecodeCommand.Value.Should().Be(expectedValue);
+        bech32DecodeCommand.Prefix.Should().Be(expectedPrefix);
+    }
+
+    [Theory]
+    [InlineData("bech32 decode --value addr_test1zrphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgsxj90mg",
+        "addr_test1zrphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgsxj90mg")]
+    [InlineData("bech32 decode --value addr1x8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gt7r0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shskhj42g",
+        "addr1x8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gt7r0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shskhj42g")]
+    public void ParseArgs_Correctly_To_DecodeBech32Command_When_Options_Are_Valid(string args, string expectedValue)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var bech32DecodeCommand = (DecodeBech32Command)command;
+        bech32DecodeCommand.Should().BeOfType<DecodeBech32Command>();
+        bech32DecodeCommand.Value.Should().Be(expectedValue);
+    }
+
+    [Theory]
+    [InlineData("blake2b hash --value 8512f8eb5d0a26038f703d58e2b45123b6e441e2208cb37fc22605f0d215a26a",
+        "8512f8eb5d0a26038f703d58e2b45123b6e441e2208cb37fc22605f0d215a26a", 224)]
+    [InlineData("blake2b hash --length 160 --value d92b380b5413b76202056eea98b6bf579d52a54a44688c1f7f97b8237469636B65745F6D61647269645F3033",
+        "d92b380b5413b76202056eea98b6bf579d52a54a44688c1f7f97b8237469636B65745F6D61647269645F3033", 160)]
+    public void ParseArgs_Correctly_To_HashBlake2bCommand_When_Options_Are_Valid(string args, string expectedValue, int expectedLength)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var hashBlake2bCommand = (HashBlake2bCommand)command;
+        hashBlake2bCommand.Should().BeOfType<HashBlake2bCommand>();
+        hashBlake2bCommand.Value.Should().Be(expectedValue);
+        hashBlake2bCommand.Length.Should().Be(expectedLength);
+    }
+
+
     private static string[] GenerateArgs(string flatArgs, string expectedMnemonic)
     {
         var args = flatArgs.Split(' ');
