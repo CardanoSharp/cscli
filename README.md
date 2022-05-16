@@ -63,7 +63,7 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.0.6-local-br
 ### Overview and Help
 ```console
 $ cscli --help
-cscli v0.0.6
+cscli v0.0.7
 A cross-platform tool for building and interacting with Cardano wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
 Please see https://github.com/CardanoSharp/cscli from more detailed documentation.
 
@@ -73,23 +73,35 @@ Available options:
     -v, --version   Show the cscli version
     -h, --help      Show this help text
 
-Available commands:
+Wallet commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"]
     wallet key stake derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallet key payment derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallet key policy derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--policy-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallet address stake derive --recovery-phrase "<string>" --network-type <network-type> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>]
-    wallet address payment derive --recovery-phrase "<string>"  --network-type <network-type> --payment-address-type <payment-address-type> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
-    bech32 encode --value "<hex_string>" --prefix "<string>"
-    bech32 decode --value "<bech32_string>" 
-    blake2b hash --value "<hex_string>" [--length <digest_length>]
+    wallet address stake derive --recovery-phrase "<string>" --network <network> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallet address payment derive --recovery-phrase "<string>"  --network <network> --payment-address-type <payment-address-type> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
+
+Query commands:
+    query tip --network <network>
+    query protocol-parameters --network <network>
+    query info account --network <network> --stake-address <bech32_stake_address>
+    query asset account --network <network> --stake-address <bech32_stake_address>
+    query info address --network <network> --address <bech32_payment_address>
+
+Transaction Commands:
+    transaction submit --network <network> --cbor-hex <hex_string>
+
+Encoding/Crypto Commands:
+    bech32 encode --value <hex_string> --prefix <string>
+    bech32 decode --value <bech32_string>
+    blake2b hash --value <hex_string> [--length <digest_length>]
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
     <language> ::= english(default)|chinesesimplified|chinesetraditional|french|italian|japanese|korean|spanish|czech|portuguese
     <derivation-index> ::= 0(default) | 1 | .. | 2147483647
-    <network-type> ::= testnet | mainnet
+    <network> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
     <digest_length> ::= 160 | 224(default) | 256 | 512
 ```
@@ -177,7 +189,7 @@ $ cat stake_0_0.vkey
 
 ### Derive Stake/Reward Address
 ```console
-$ cscli wallet address stake derive --recovery-phrase "$(cat phrase.prv)" --network-tag mainnet | tee stake_0_0.addr
+$ cscli wallet address stake derive --recovery-phrase "$(cat phrase.prv)" --network mainnet | tee stake_0_0.addr
 stake1u9wqktpz964g6jaemt5wr5tspy9cqxpdkw98d022d85kxxc2n2yxj
 ```
 
@@ -185,35 +197,35 @@ stake1u9wqktpz964g6jaemt5wr5tspy9cqxpdkw98d022d85kxxc2n2yxj
   <summary>Stake Address with Custom Indexes</summary>
 
 ```console
-$ cscli wallet address stake derive --recovery-phrase "$(cat phrase.prv)" --network-tag mainnet --account-index 1 --address-index 7 | tee stake_1_7.addr
+$ cscli wallet address stake derive --recovery-phrase "$(cat phrase.prv)" --network mainnet --account-index 1 --address-index 7 | tee stake_1_7.addr
 stake1u87phtdn9shvp39c44elyfdduuqg7wz072vs0vjvc20hvaqym7xan
 ```
 </details>
 
 ### Derive Payment Enterprise Address
 ```console
-$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network-tag mainnet | tee pay_0_0.addr
+$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network mainnet | tee pay_0_0.addr
 addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w
 ```
 
 <details>
   <summary>Payment Enterprise Address with Custom Indexes</summary>
 ```console
-$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network-tag mainnet --account-index 1387 --address-index 12 | tee pay_1387_12.addr
+$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network mainnet --account-index 1387 --address-index 12 | tee pay_1387_12.addr
 addr1vy3y89nnzdqs4fmqv49fmpqw24hjheen3ce7tch082hh6xcc8pzd9
 ```
 </details>
 
 ### Derive Payment Base Address
 ```console
-$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type base --network-tag mainnet | tee pay_0_0_0_0.addr
+$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type base --network mainnet | tee pay_0_0_0_0.addr
 addr1qy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqzupvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvdspma4ht
 ```
 
 <details>
   <summary>Payment Base Address with Custom Indexes</summary>
 ```console
-$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type base --network-tag mainnet --account-index 1387 --address-index 12 --stake-account-index 968 --stake-address-index 83106 | tee pay_1387_12_968_83106.addr
+$ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type base --network mainnet --account-index 1387 --address-index 12 --stake-account-index 968 --stake-address-index 83106 | tee pay_1387_12_968_83106.addr
 addr1qy3y89nnzdqs4fmqv49fmpqw24hjheen3ce7tch082hh6x7nwwgg06dngunf9ea4rd7mu9084sd3km6z56rqd7e04ylslhzn9h
 ```
 </details>
@@ -251,6 +263,36 @@ $ cat policy_0.vkey
 }
 ```
 </details>
+
+### Query Tip Command
+```console
+$ cscli query tip --network mainnet
+
+```
+
+### Query Protocol Parameters Command
+```console
+$ cscli query protocol-parameters --network mainnet
+
+```
+
+### Query Account Info Command
+```console
+$ cscli query info account --network testnet --stake-address $(cat stake_0_0.addr)
+
+```
+
+### Query Account Asset Command
+```console
+$ cscli query asset account --network testnet --stake-address $(cat stake_0_0.addr)
+
+```
+
+### Query Address Info Command
+```console
+$ cscli query info address --network testnet --stake-address $(cat payment_0_0_0_0.addr)
+
+```
 
 ### Bech32 Decode
 ```console

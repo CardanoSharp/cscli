@@ -2,7 +2,7 @@
   "profiles": {
     "Cscli.ConsoleTool": {
       "commandName": "Project",
-      "commandLineArgs": "bech32 encode --value 00e3f81c986990cfd80283944858ae50c2d82f6a79d330ce7014e0b7fd9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01 --prefix addr_test"
+      "commandLineArgs": "query protocol-parameters --network mainnet"
     }
   }
 }

@@ -5,21 +5,21 @@ using CardanoSharp.Wallet.Extensions.Models;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
-public class DeriveStakeKeyCommand : ICommand
+// See https://cips.cardano.org/cips/cip1855/
+public class DerivePolicyKeyCommand : ICommand
 {
     public string? Mnemonic { get; init; }
     public string Language { get; init; } = DefaultMnemonicLanguage;
     public string Passphrase { get; init; } = string.Empty;
-    public int AccountIndex { get; init; } = 0;
-    public int AddressIndex { get; init; } = 0;
+    public int PolicyIndex { get; init; } = 0;
     public string? VerificationKeyFile { get; init; } = null;
     public string? SigningKeyFile { get; init; } = null;
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, derivedWorldList, validationErrors) = Validate();
+        var (isValid, wordList, validationErrors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
@@ -29,29 +29,27 @@ public class DeriveStakeKeyCommand : ICommand
         var mnemonicService = new MnemonicService();
         try
         {
-            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+            var rootKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
-            var stakeSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}");
-            var stakeVkey = stakeSkey.GetPublicKey(false);
-            var stakeSkeyExtendedBytes = stakeSkey.BuildExtendedSkeyBytes();
-            var bech32StakeSkeyExtended = Bech32.Encode(stakeSkeyExtendedBytes, StakeSigningKeyBech32Prefix);
-            var result = CommandResult.Success(bech32StakeSkeyExtended);
+            var policySkey = rootKey.Derive($"m/1855'/1815'/{PolicyIndex}'");
+            var policyVkey = policySkey.GetPublicKey(false);
+            var bech32PolicyKey = Bech32.Encode(policySkey.Key, PolicySigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32PolicyKey);
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
                 var skeyCbor = new TextEnvelope(
-                    StakeExtendedSKeyJsonTypeField,
-                    StakeSKeyJsonDescriptionField,
-                    KeyUtils.BuildCborHexPayload(stakeSkey.BuildExtendedSkeyWithVerificationKeyBytes()));
+                    PaymentExtendedSKeyJsonTypeField, // required for cardano-cli compatibility
+                    PaymentSKeyJsonDescriptionField,
+                    KeyUtils.BuildCborHexPayload(policySkey.BuildExtendedSkeyWithVerificationKeyBytes()));
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
             {
-                // cardano-cli compatibility requires us to use non-extended verification keys
                 var vkeyCbor = new TextEnvelope(
-                    StakeVKeyJsonTypeField,
-                    StakeVKeyJsonDescriptionField,
-                    KeyUtils.BuildCborHexPayload(stakeVkey.Key)); 
+                    PaymentExtendedVKeyJsonTypeField, // required for cardano-cli compatibility
+                    PaymentVKeyJsonDescriptionField,
+                    KeyUtils.BuildCborHexPayload(policyVkey.BuildExtendedVkeyBytes()));
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             return result;
@@ -68,7 +66,7 @@ public class DeriveStakeKeyCommand : ICommand
 
     private (
         bool isValid, 
-        WordLists derivedWordList, 
+        WordLists wordList, 
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
@@ -77,15 +75,10 @@ public class DeriveStakeKeyCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --recovery-phrase is required");
         }
-        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
+        if (PolicyIndex < 0 || PolicyIndex > MaxDerivationPathIndex)
         {
             validationErrors.Add(
-                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}");
-        }
-        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
-        {
-            validationErrors.Add(
-                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
+                $"Invalid option --policy-index must be between 0 and {MaxDerivationPathIndex}");
         }
         if (!string.IsNullOrWhiteSpace(SigningKeyFile)
             && Path.IsPathFullyQualified(SigningKeyFile)

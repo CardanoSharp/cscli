@@ -1,4 +1,7 @@
-﻿using Cscli.ConsoleTool.Commands;
+﻿using CardanoSharp.Wallet.Enums;
+using Cscli.ConsoleTool.Crypto;
+using Cscli.ConsoleTool.Query;
+using Cscli.ConsoleTool.Wallet;
 using FluentAssertions;
 using Xunit;
 
@@ -170,17 +173,17 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallet address stake derive --recovery-phrase {MNEMONIC} --network-tag Testnet",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --network Testnet",
         "rabbit fence domain dirt burden bone entry genre twelve obey dwarf icon fabric tattoo chalk monster deputy tomato gun toy garment portion gun ribbon",
         Constants.DefaultMnemonicLanguage,
         "", 0, 0, "Testnet")]
     [InlineData(
-        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --network-tag Mainnet --account-index 101 --address-index 980",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --network mainnet --account-index 101 --address-index 980",
         "vena pomo bolero papel colina paleta regalo alma dibujo examen lindo programa venir bozal elogio tacto romper observar bono separar refrán ecuador clase reducir",
         "Spanish",
-        "helloworld", 101, 980, "Mainnet")]
+        "helloworld", 101, 980, "mainnet")]
     [InlineData(
-        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase 0ZYM4ND14Z --language Japanese --network-tag Mainnet --account-index 2147483647 --address-index 2147483647",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase 0ZYM4ND14Z --language Japanese --network Mainnet --account-index 2147483647 --address-index 2147483647",
         "みすい よけい ちしりょう つみき たいせつ たりる せんぱい れんぞく めいぶつ あじわう はらう ちぬき やぶる ひろう にんい うらぐち おやゆび きんじょ きりん たいおう ねいる みつかる うよく かあつ",
         "Japanese",
         "0ZYM4ND14Z", 2147483647, 2147483647, "Mainnet")]
@@ -197,17 +200,17 @@ public class CommandParserShould
         stakeAddressCommand.Passphrase.Should().Be(expectedPassPhrase);
         stakeAddressCommand.AccountIndex.Should().Be(expectedAccountIndex);
         stakeAddressCommand.AddressIndex.Should().Be(expectedAddressIndex);
-        stakeAddressCommand.NetworkTag.Should().Be(expectedNetworkTag);
+        stakeAddressCommand.Network.Should().Be(expectedNetworkTag);
     }
 
     [Theory]
     [InlineData(
-        "wallet address payment derive --recovery-phrase {MNEMONIC} --network-tag Testnet --payment-address-type Enterprise",
+        "wallet address payment derive --recovery-phrase {MNEMONIC} --network testnet --payment-address-type Enterprise",
         "slight aspect potato wealth two lazy ill try kick visit chunk cloth snap follow now sun curve quality cousin sister decrease help stadium enact",
         Constants.DefaultMnemonicLanguage,
-        "", 0, 0, 0, 0, "Testnet", "Enterprise")]
+        "", 0, 0, 0, 0, "testnet", "Enterprise")]
     [InlineData(
-        "wallet address payment derive --language Portugese --recovery-phrase {MNEMONIC} --network-tag Mainnet --payment-address-type Base --account-index 256 --address-index 512 --stake-account-index 88 --stake-address-index 29 --passphrase 0ZYM4ND14Z",
+        "wallet address payment derive --language Portugese --recovery-phrase {MNEMONIC} --network Mainnet --payment-address-type Base --account-index 256 --address-index 512 --stake-account-index 88 --stake-address-index 29 --passphrase 0ZYM4ND14Z",
         "sadio sombrio prato selvagem enrugar fugir depois braveza acolhida javali enviado alfinete emenda mexer legado goela vedar refogar pivete afrontar tracejar materno vespa chapada",
         "Portugese", "0ZYM4ND14Z", 256, 512, 88, 29, "Mainnet", "Base")]
     public void ParseArgs_Correctly_To_DerivePaymentAddressCommand_When_Options_Are_Valid(
@@ -228,7 +231,7 @@ public class CommandParserShould
         paymentAddressCommand.AddressIndex.Should().Be(expectedAddressIndex);
         paymentAddressCommand.StakeAccountIndex.Should().Be(expectedStakeAccountIndex);
         paymentAddressCommand.StakeAddressIndex.Should().Be(expectedStakeAddressIndex);
-        paymentAddressCommand.NetworkTag.Should().Be(expectedNetworkTag);
+        paymentAddressCommand.Network.Should().Be(expectedNetworkTag);
         paymentAddressCommand.PaymentAddressType.Should().Be(expectedPaymentAddressType);
     }
 
@@ -278,6 +281,31 @@ public class CommandParserShould
         hashBlake2bCommand.Length.Should().Be(expectedLength);
     }
 
+    [Theory]
+    [InlineData("query tip", "testnet")]
+    [InlineData("query tip --network testnet", "testnet")]
+    [InlineData("query tip --network mainnet", "mainnet")]
+    public void ParseArgs_Correctly_To_QueryTipCommand_When_Options_Are_Valid(string args, string expectedNetwork)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryTipCommand = (QueryTipCommand)command;
+        queryTipCommand.Should().BeOfType<QueryTipCommand>();
+        queryTipCommand.Network.Should().Be(expectedNetwork);
+    }
+
+    [Theory]
+    [InlineData("query protocol-parameters", "testnet")]
+    [InlineData("query protocol-parameters --network testnet", "testnet")]
+    [InlineData("query protocol-parameters --network mainnet", "mainnet")]
+    public void ParseArgs_Correctly_To_QueryProtocolParametersCommand_When_Options_Are_Valid(string args, string expectedNetwork)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryProtocolParametersCommand = (QueryProtocolParametersCommand)command;
+        queryProtocolParametersCommand.Should().BeOfType<QueryProtocolParametersCommand>();
+        queryProtocolParametersCommand.Network.Should().Be(expectedNetwork);
+    }
 
     private static string[] GenerateArgs(string flatArgs, string expectedMnemonic)
     {

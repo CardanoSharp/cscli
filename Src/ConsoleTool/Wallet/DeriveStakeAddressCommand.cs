@@ -3,7 +3,7 @@ using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
 public class DeriveStakeAddressCommand : ICommand
 {
@@ -12,11 +12,11 @@ public class DeriveStakeAddressCommand : ICommand
     public string Passphrase { get; init; } = string.Empty;
     public int AccountIndex { get; init; } = 0;
     public int AddressIndex { get; init; } = 0;
-    public string? NetworkTag { get; init; }
+    public string? Network { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, derivedWorldList, network, errors) = Validate();
+        var (isValid, wordList, network, errors) = Validate();
         if (!isValid)
         {
             return ValueTask.FromResult(
@@ -27,7 +27,7 @@ public class DeriveStakeAddressCommand : ICommand
         var addressService = new AddressService();
         try
         {
-            var rootPrvKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
             var stakeVkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}")
                 .GetPublicKey(false);
@@ -78,10 +78,10 @@ public class DeriveStakeAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
         }
-        if (!Enum.TryParse<NetworkType>(NetworkTag, ignoreCase: true, out var networkType))
+        if (!Enum.TryParse<NetworkType>(Network, ignoreCase: true, out var networkType))
         {
             validationErrors.Add(
-                $"Invalid option --network-tag must be either testnet or mainnet");
+                $"Invalid option --network must be either testnet or mainnet");
         }
         return (!validationErrors.Any(), wordlist, networkType, validationErrors);
     }

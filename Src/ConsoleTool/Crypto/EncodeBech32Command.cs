@@ -1,6 +1,6 @@
 ﻿using CardanoSharp.Wallet.Encoding;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Crypto;
 
 public class EncodeBech32Command : ICommand
 {

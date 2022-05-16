@@ -2,7 +2,7 @@
 using CardanoSharp.Wallet.Enums;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
 public class GenerateMnemonicCommand : ICommand
 {

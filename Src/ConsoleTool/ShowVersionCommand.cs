@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool;
 
 public class ShowVersionCommand : ICommand
 {

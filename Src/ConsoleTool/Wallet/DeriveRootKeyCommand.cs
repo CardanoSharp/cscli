@@ -4,7 +4,7 @@ using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
 public class DeriveRootKeyCommand : ICommand
 {

@@ -1,4 +1,4 @@
-﻿using Cscli.ConsoleTool.Commands;
+﻿using Cscli.ConsoleTool.Wallet;
 using FluentAssertions;
 using Xunit;
 
@@ -24,13 +24,13 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
             PaymentAddressType = paymentAddressType,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
-        executionResult.Result.Should().Be("Invalid option --network-tag must be either testnet or mainnet");
+        executionResult.Result.Should().Be("Invalid option --network must be either testnet or mainnet");
     }
 
     [Theory]
@@ -57,7 +57,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
             PaymentAddressType = paymentAddressType,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -90,7 +90,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
         };
 
@@ -124,7 +124,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
         };
 
@@ -170,7 +170,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
         };
 
@@ -216,7 +216,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
         };
 
@@ -244,7 +244,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
         };
 
@@ -272,7 +272,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
         };
 
@@ -302,7 +302,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
         };
 
@@ -332,7 +332,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
         };
 
@@ -361,7 +361,7 @@ public class DerivePaymentAddressCommandShould
             Mnemonic = mnemonic,
             Language = language,
             AccountIndex = accountIndex,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
         };
 
@@ -390,7 +390,7 @@ public class DerivePaymentAddressCommandShould
             Mnemonic = mnemonic,
             Language = language,
             AccountIndex = accountIndex,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
         };
 
@@ -418,7 +418,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             AddressIndex = addressIndex,
             PaymentAddressType = "Enterprise",
         };
@@ -447,7 +447,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             AddressIndex = addressIndex,
             PaymentAddressType = "Base",
         };
@@ -477,7 +477,7 @@ public class DerivePaymentAddressCommandShould
             Mnemonic = mnemonic,
             Language = language,
             StakeAccountIndex = accountIndex,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
         };
 
@@ -506,7 +506,7 @@ public class DerivePaymentAddressCommandShould
             Mnemonic = mnemonic,
             Language = language,
             StakeAccountIndex = accountIndex,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
         };
 
@@ -534,7 +534,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             StakeAddressIndex = addressIndex,
             PaymentAddressType = "Enterprise",
         };
@@ -563,7 +563,7 @@ public class DerivePaymentAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             StakeAddressIndex = addressIndex,
             PaymentAddressType = "Base",
         };
@@ -589,13 +589,13 @@ public class DerivePaymentAddressCommandShould
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise"
         };
         var englishSpecificCommand = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Enterprise",
             Language = "English",
         };
@@ -623,13 +623,13 @@ public class DerivePaymentAddressCommandShould
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base"
         };
         var englishSpecificCommand = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
             PaymentAddressType = "Base",
             Language = "English",
         };
@@ -670,7 +670,7 @@ public class DerivePaymentAddressCommandShould
             Language = language,
             Passphrase = passPhrase,
             PaymentAddressType = "Enterprise",
-            NetworkTag = networkTag,
+            Network = networkTag,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
         };
@@ -725,7 +725,7 @@ public class DerivePaymentAddressCommandShould
             Language = language,
             Passphrase = passPhrase,
             PaymentAddressType = "Base",
-            NetworkTag = networkTag,
+            Network = networkTag,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
             StakeAccountIndex = stakeAccountIndex,
