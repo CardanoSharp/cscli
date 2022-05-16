@@ -25,7 +25,7 @@ public class QueryAccountInfoCommand : ICommand
         try
         {
             var accountInfo = await accountClient.GetStakeInformation(StakeAddress).ConfigureAwait(false);
-            var json = JsonSerializer.Serialize(accountInfo.First(), SerialiserOptions);
+            var json = JsonSerializer.Serialize(accountInfo, SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)

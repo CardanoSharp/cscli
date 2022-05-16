@@ -290,7 +290,7 @@ $ cscli query asset account --network testnet --stake-address $(cat stake_0_0.ad
 
 ### Query Address Info Command
 ```console
-$ cscli query info address --network testnet --stake-address $(cat payment_0_0_0_0.addr)
+$ cscli query info address --network testnet --address $(cat payment_0_0_0_0.addr)
 
 ```
 
