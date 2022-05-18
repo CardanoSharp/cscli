@@ -48,7 +48,7 @@ public static class Constants
         { "--stake-address-index", "stakeAddressIndex" },
         { "--payment-address-type", "paymentAddressType" },
         { "--stake-address", "stakeAddress" },
-        { "--tx-hex", "txHex" },
+        { "--cbor-hex", "cborHex" },
         //{ "--output-format", "outputFormat" },
     };
 }
