@@ -10,12 +10,11 @@ public class ShowBaseHelpCommand : ICommand
             .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
         var helpText = $@"cscli v{versionString}
-A cross-platform tool for building and interacting with Cardano's wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
-Please see https://github.com/CardanoSharp/cscli from more detailed documentation.
+A lightweight cross-platform tool for generating/serialising Cardano wallet primitives (i.e. recovery-phrases, keys, addresses and transactions), querying the chain and submitting transactions to the testnet or mainnet networks. Please refer to https://github.com/CardanoSharp/cscli for further documentation.
 
 USAGE: cscli (OPTION | COMMAND)
 
-Available options:
+Options:
     -v, --version   Show the cscli version
     -h, --help      Show this help text
 
@@ -31,9 +30,10 @@ Wallet commands:
 Query commands:
     query tip --network <network>
     query protocol-parameters --network <network>
-    query info account --network <network> --stake-address <bech32_stake_address>
-    query asset account --network <network> --stake-address <bech32_stake_address>
-    query info address --network <network> --address <bech32_payment_address>
+    query info account --network <network> [--stake-address <stake_address>][--address <payment_base_address>]
+    query asset account --network <network> --stake-address <stake_address>
+    query info address --network <network> --address <payment_address>
+    query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
     transaction submit --network <network> --cbor-hex <hex_string>

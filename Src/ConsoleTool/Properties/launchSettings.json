@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Cscli.ConsoleTool": {
-      "commandName": "Project",
-      "commandLineArgs": "query protocol-parameters --network mainnet"
+      "commandName": "Project"
     }
   }
 }

@@ -8,7 +8,7 @@ namespace Cscli.ConsoleTool.Query;
 
 public class QueryProtocolParametersCommand : ICommand
 {
-    public string? Network { get; init; } = "testnet";
+    public string? Network { get; init; }
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {

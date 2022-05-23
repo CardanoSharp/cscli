@@ -8,9 +8,9 @@ using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Query;
 
-public class QueryAddressInfoCommand : ICommand
+public class QueryTransactionInfoCommand : ICommand
 {
-    public string? Address { get; init; }
+    public string? TxId { get; init; }
     public string? Network { get; init; }
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
@@ -22,13 +22,14 @@ public class QueryAddressInfoCommand : ICommand
                 string.Join(Environment.NewLine, errors));
         }
 
-        var addressClient = BackendGateway.GetBackendClient<IAddressClient>(networkType);
+        var transactionClient = BackendGateway.GetBackendClient<ITransactionClient>(networkType);
         try
         {
 #pragma warning disable CS8604 // Possible null reference warning suppressed because of validation above
-            var addressInfo = await addressClient.GetAddressInformation(Address).ConfigureAwait(false);
-#pragma warning restore CS8604 
-            var json = JsonSerializer.Serialize(addressInfo, SerialiserOptions);
+            var txInfo = await transactionClient.GetTransactionInformation(
+                new GetTransactionRequest { TxHashes = new List<string>{ TxId } }).ConfigureAwait(false);
+#pragma warning restore CS8604
+            var json = JsonSerializer.Serialize(txInfo, SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)
@@ -48,16 +49,10 @@ public class QueryAddressInfoCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --network must be either testnet or mainnet");
         }
-        if (string.IsNullOrWhiteSpace(Address))
+        if (string.IsNullOrWhiteSpace(TxId))
         {
             validationErrors.Add(
-                $"Invalid option --address is required");
-        }
-        var address = new Address(Address);
-        if (!Bech32.IsValid(Address) || address.NetworkType != networkType)
-        {
-            validationErrors.Add(
-                $"Invalid option --address {Address} is invalid for {Network}");
+                $"Invalid option --tx-id is required");
         }
         return (!validationErrors.Any(), networkType, validationErrors);
     }

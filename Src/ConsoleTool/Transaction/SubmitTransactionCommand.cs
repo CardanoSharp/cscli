@@ -7,11 +7,11 @@ namespace Cscli.ConsoleTool.Transaction;
 public class SubmitTransactionCommand : ICommand
 {
     public string? CborHex { get; init; }
-    public string? Network { get; init; } = "testnet";
+    public string? Network { get; init; }
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, networkType, errors) = Validate();
+        var (isValid, networkType, txCborBytes, errors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
@@ -21,8 +21,7 @@ public class SubmitTransactionCommand : ICommand
         var txClient = BackendGateway.GetBackendClient<ITransactionClient>(networkType);
         try
         {
-            var txRawBytes = Convert.FromHexString(CborHex ?? throw new ArgumentException(nameof(CborHex)));
-            using var stream = new MemoryStream(txRawBytes);
+            using var stream = new MemoryStream(txCborBytes);
             var txHash = await txClient.Submit(stream).ConfigureAwait(false); 
             return CommandResult.Success(txHash);
         }
@@ -35,6 +34,7 @@ public class SubmitTransactionCommand : ICommand
     private (
         bool isValid,
         NetworkType derivedNetworkType,
+        byte[] txCborBytes,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
@@ -46,9 +46,21 @@ public class SubmitTransactionCommand : ICommand
         if (string.IsNullOrWhiteSpace(CborHex))
         {
             validationErrors.Add(
-                $"Invalid option --tx-hex is required");
+                $"Invalid option --cbor-hex is required");
         }
-
-        return (!validationErrors.Any(), networkType, validationErrors);
+        else
+        {
+            try
+            {
+                var txCborBytes = Convert.FromHexString(CborHex);
+                return (!validationErrors.Any(), networkType, txCborBytes, validationErrors);
+            }
+            catch (FormatException)
+            {
+                validationErrors.Add(
+                    $"Invalid option --cbor-hex {CborHex} is not in hexadecimal format");
+            }
+        }
+        return (!validationErrors.Any(), networkType, Array.Empty<byte>(), validationErrors);
     }
 }

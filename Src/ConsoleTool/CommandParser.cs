@@ -71,6 +71,7 @@ public static class CommandParser
            "query info account" => BuildCommand<QueryAccountInfoCommand>(args),
            "query asset account" => BuildCommand<QueryAccountAssetCommand>(args),
            "query info address" => BuildCommand<QueryAddressInfoCommand>(args),
+           "query info transaction" => BuildCommand<QueryTransactionInfoCommand>(args),
            _ => new ShowInvalidArgumentCommand(intent)
        };
 
