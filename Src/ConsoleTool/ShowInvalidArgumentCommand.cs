@@ -1,4 +1,4 @@
-﻿namespace Cscli.ConsoleTool.Commands;
+﻿namespace Cscli.ConsoleTool;
 
 public class ShowInvalidArgumentCommand : ICommand
 {

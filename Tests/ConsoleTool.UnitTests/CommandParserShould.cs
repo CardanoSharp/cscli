@@ -1,4 +1,7 @@
-﻿using Cscli.ConsoleTool.Commands;
+﻿using Cscli.ConsoleTool.Crypto;
+using Cscli.ConsoleTool.Query;
+using Cscli.ConsoleTool.Transaction;
+using Cscli.ConsoleTool.Wallet;
 using FluentAssertions;
 using Xunit;
 
@@ -170,17 +173,17 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
-        "wallet address stake derive --recovery-phrase {MNEMONIC} --network-tag Testnet",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --network Testnet",
         "rabbit fence domain dirt burden bone entry genre twelve obey dwarf icon fabric tattoo chalk monster deputy tomato gun toy garment portion gun ribbon",
         Constants.DefaultMnemonicLanguage,
         "", 0, 0, "Testnet")]
     [InlineData(
-        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --network-tag Mainnet --account-index 101 --address-index 980",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase helloworld --language Spanish --network mainnet --account-index 101 --address-index 980",
         "vena pomo bolero papel colina paleta regalo alma dibujo examen lindo programa venir bozal elogio tacto romper observar bono separar refrán ecuador clase reducir",
         "Spanish",
-        "helloworld", 101, 980, "Mainnet")]
+        "helloworld", 101, 980, "mainnet")]
     [InlineData(
-        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase 0ZYM4ND14Z --language Japanese --network-tag Mainnet --account-index 2147483647 --address-index 2147483647",
+        "wallet address stake derive --recovery-phrase {MNEMONIC} --passphrase 0ZYM4ND14Z --language Japanese --network Mainnet --account-index 2147483647 --address-index 2147483647",
         "みすい よけい ちしりょう つみき たいせつ たりる せんぱい れんぞく めいぶつ あじわう はらう ちぬき やぶる ひろう にんい うらぐち おやゆび きんじょ きりん たいおう ねいる みつかる うよく かあつ",
         "Japanese",
         "0ZYM4ND14Z", 2147483647, 2147483647, "Mainnet")]
@@ -197,17 +200,17 @@ public class CommandParserShould
         stakeAddressCommand.Passphrase.Should().Be(expectedPassPhrase);
         stakeAddressCommand.AccountIndex.Should().Be(expectedAccountIndex);
         stakeAddressCommand.AddressIndex.Should().Be(expectedAddressIndex);
-        stakeAddressCommand.NetworkTag.Should().Be(expectedNetworkTag);
+        stakeAddressCommand.Network.Should().Be(expectedNetworkTag);
     }
 
     [Theory]
     [InlineData(
-        "wallet address payment derive --recovery-phrase {MNEMONIC} --network-tag Testnet --payment-address-type Enterprise",
+        "wallet address payment derive --recovery-phrase {MNEMONIC} --network testnet --payment-address-type Enterprise",
         "slight aspect potato wealth two lazy ill try kick visit chunk cloth snap follow now sun curve quality cousin sister decrease help stadium enact",
         Constants.DefaultMnemonicLanguage,
-        "", 0, 0, 0, 0, "Testnet", "Enterprise")]
+        "", 0, 0, 0, 0, "testnet", "Enterprise")]
     [InlineData(
-        "wallet address payment derive --language Portugese --recovery-phrase {MNEMONIC} --network-tag Mainnet --payment-address-type Base --account-index 256 --address-index 512 --stake-account-index 88 --stake-address-index 29 --passphrase 0ZYM4ND14Z",
+        "wallet address payment derive --language Portugese --recovery-phrase {MNEMONIC} --network Mainnet --payment-address-type Base --account-index 256 --address-index 512 --stake-account-index 88 --stake-address-index 29 --passphrase 0ZYM4ND14Z",
         "sadio sombrio prato selvagem enrugar fugir depois braveza acolhida javali enviado alfinete emenda mexer legado goela vedar refogar pivete afrontar tracejar materno vespa chapada",
         "Portugese", "0ZYM4ND14Z", 256, 512, 88, 29, "Mainnet", "Base")]
     public void ParseArgs_Correctly_To_DerivePaymentAddressCommand_When_Options_Are_Valid(
@@ -228,7 +231,7 @@ public class CommandParserShould
         paymentAddressCommand.AddressIndex.Should().Be(expectedAddressIndex);
         paymentAddressCommand.StakeAccountIndex.Should().Be(expectedStakeAccountIndex);
         paymentAddressCommand.StakeAddressIndex.Should().Be(expectedStakeAddressIndex);
-        paymentAddressCommand.NetworkTag.Should().Be(expectedNetworkTag);
+        paymentAddressCommand.Network.Should().Be(expectedNetworkTag);
         paymentAddressCommand.PaymentAddressType.Should().Be(expectedPaymentAddressType);
     }
 
@@ -278,6 +281,94 @@ public class CommandParserShould
         hashBlake2bCommand.Length.Should().Be(expectedLength);
     }
 
+    [Theory]
+    [InlineData("query tip --network testnet", "testnet")]
+    [InlineData("query tip --network mainnet", "mainnet")]
+    public void ParseArgs_Correctly_To_QueryTipCommand_When_Options_Are_Valid(string args, string expectedNetwork)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryTipCommand = (QueryTipCommand)command;
+        queryTipCommand.Should().BeOfType<QueryTipCommand>();
+        queryTipCommand.Network.Should().Be(expectedNetwork);
+    }
+
+    [Theory]
+    [InlineData("query protocol-parameters --network testnet", "testnet")]
+    [InlineData("query protocol-parameters --network mainnet", "mainnet")]
+    public void ParseArgs_Correctly_To_QueryProtocolParametersCommand_When_Options_Are_Valid(string args, string expectedNetwork)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryProtocolParametersCommand = (QueryProtocolParametersCommand)command;
+        queryProtocolParametersCommand.Should().BeOfType<QueryProtocolParametersCommand>();
+        queryProtocolParametersCommand.Network.Should().Be(expectedNetwork);
+    }
+
+    [Theory]
+    [InlineData("query asset account --network testnet --stake-address stake_test1uzdyuk9ts8eguyzn6s64hwy8phzkhqf76zfwznwfpaw94dgmj3zcx", "testnet", "stake_test1uzdyuk9ts8eguyzn6s64hwy8phzkhqf76zfwznwfpaw94dgmj3zcx")]
+    [InlineData("query asset account --network mainnet --stake-address stake1uxwlj9umavxw38uyqf0q9ts3cx9nqql8dyq5nj4xvta06qg8t55dn", "mainnet", "stake1uxwlj9umavxw38uyqf0q9ts3cx9nqql8dyq5nj4xvta06qg8t55dn")]
+    public void ParseArgs_Correctly_To_QueryAccountAssetCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedStakeAddress)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryAccountAssetCommand = (QueryAccountAssetCommand)command;
+        queryAccountAssetCommand.Should().BeOfType<QueryAccountAssetCommand>();
+        queryAccountAssetCommand.Network.Should().Be(expectedNetwork);
+        queryAccountAssetCommand.StakeAddress.Should().Be(expectedStakeAddress);
+    }
+
+    [Theory]
+    [InlineData("query info account --network testnet --stake-address stake_test1uzdyuk9ts8eguyzn6s64hwy8phzkhqf76zfwznwfpaw94dgmj3zcx", "testnet", "stake_test1uzdyuk9ts8eguyzn6s64hwy8phzkhqf76zfwznwfpaw94dgmj3zcx")]
+    [InlineData("query info account --network mainnet --stake-address stake1uxwlj9umavxw38uyqf0q9ts3cx9nqql8dyq5nj4xvta06qg8t55dn", "mainnet", "stake1uxwlj9umavxw38uyqf0q9ts3cx9nqql8dyq5nj4xvta06qg8t55dn")]
+    public void ParseArgs_Correctly_To_QueryAccountInfoCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedStakeAddress)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryAccountInfoCommand = (QueryAccountInfoCommand)command;
+        queryAccountInfoCommand.Should().BeOfType<QueryAccountInfoCommand>();
+        queryAccountInfoCommand.Network.Should().Be(expectedNetwork);
+        queryAccountInfoCommand.StakeAddress.Should().Be(expectedStakeAddress);
+    }
+
+    [Theory]
+    [InlineData("query info address --network testnet --address addr_test1qr3ls8ycdxgvlkqzsw2ysk9w2rpdstm208fnpnnsznst0lvalyteh6cvaz0cgqj7q2hprsvtxqp7w6gpf892vch6l5qs6ug90f", "testnet", "addr_test1qr3ls8ycdxgvlkqzsw2ysk9w2rpdstm208fnpnnsznst0lvalyteh6cvaz0cgqj7q2hprsvtxqp7w6gpf892vch6l5qs6ug90f")]
+    [InlineData("query info address --network mainnet --address addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w", "mainnet", "addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w")]
+    public void ParseArgs_Correctly_To_QueryAddressInfoCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedAddress)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryAddressInfoCommand = (QueryAddressInfoCommand)command;
+        queryAddressInfoCommand.Should().BeOfType<QueryAddressInfoCommand>();
+        queryAddressInfoCommand.Network.Should().Be(expectedNetwork);
+        queryAddressInfoCommand.Address.Should().Be(expectedAddress);
+    }
+
+    [Theory]
+    [InlineData("query info transaction --network testnet --tx-id 18d10520a11acfa8ceb8e13b2560747cf4f357cfaac1dc83b35a26c5dc61a2e3", "testnet", "18d10520a11acfa8ceb8e13b2560747cf4f357cfaac1dc83b35a26c5dc61a2e3")]
+    [InlineData("query info transaction --network mainnet --tx-id 421734e5c8e5be24d788da2defeb9005516c20eb7d3ddef2140e836d20282a2a", "mainnet", "421734e5c8e5be24d788da2defeb9005516c20eb7d3ddef2140e836d20282a2a")]
+    public void ParseArgs_Correctly_To_QueryTransactionInfoCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedTxId)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var queryTransactionInfoCommand = (QueryTransactionInfoCommand)command;
+        queryTransactionInfoCommand.Should().BeOfType<QueryTransactionInfoCommand>();
+        queryTransactionInfoCommand.Network.Should().Be(expectedNetwork);
+        queryTransactionInfoCommand.TxId.Should().Be(expectedTxId);
+    }
+
+    [Theory]
+    [InlineData("transaction submit --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
+    [InlineData("transaction submit --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
+    public void ParseArgs_Correctly_SubmitTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+        var submitTransactionCommand = (SubmitTransactionCommand)command;
+        submitTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
+        submitTransactionCommand.Network.Should().Be(expectedNetwork);
+        submitTransactionCommand.CborHex.Should().Be(expectedCborHex);
+    }
 
     private static string[] GenerateArgs(string flatArgs, string expectedMnemonic)
     {

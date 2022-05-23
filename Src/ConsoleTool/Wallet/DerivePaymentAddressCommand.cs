@@ -5,7 +5,7 @@ using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Keys;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
 public class DerivePaymentAddressCommand : ICommand
 {
@@ -17,7 +17,7 @@ public class DerivePaymentAddressCommand : ICommand
     public int AddressIndex { get; init; } = 0;
     public int StakeAccountIndex { get; init; } = 0;
     public int StakeAddressIndex { get; init; } = 0;
-    public string? NetworkTag { get; init; }
+    public string? Network { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
@@ -66,8 +66,8 @@ public class DerivePaymentAddressCommand : ICommand
 
     private (
         bool isValid, 
-        WordLists wordList,
-        AddressType addressType,
+        WordLists derivedWordList,
+        AddressType derivedAddressType,
         NetworkType derivedNetworkType,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
@@ -114,10 +114,10 @@ public class DerivePaymentAddressCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --stake-address-index must be between 0 and {MaxDerivationPathIndex}");
         }
-        if (!Enum.TryParse<NetworkType>(NetworkTag, ignoreCase: true, out var networkType))
+        if (!Enum.TryParse<NetworkType>(Network, ignoreCase: true, out var networkType))
         {
             validationErrors.Add(
-                $"Invalid option --network-tag must be either testnet or mainnet");
+                $"Invalid option --network must be either testnet or mainnet");
         }
         return (!validationErrors.Any(), wordlist, paymentAddressType, networkType, validationErrors);
     }

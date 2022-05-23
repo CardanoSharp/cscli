@@ -5,15 +5,15 @@ using CardanoSharp.Wallet.Extensions.Models;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
-// See https://cips.cardano.org/cips/cip1855/
-public class DerivePolicyKeyCommand : ICommand
+public class DerivePaymentKeyCommand : ICommand
 {
     public string? Mnemonic { get; init; }
     public string Language { get; init; } = DefaultMnemonicLanguage;
     public string Passphrase { get; init; } = string.Empty;
-    public int PolicyIndex { get; init; } = 0;
+    public int AccountIndex { get; init; } = 0;
+    public int AddressIndex { get; init; } = 0;
     public string? VerificationKeyFile { get; init; } = null;
     public string? SigningKeyFile { get; init; } = null;
 
@@ -31,25 +31,26 @@ public class DerivePolicyKeyCommand : ICommand
         {
             var rootKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
-            var policySkey = rootKey.Derive($"m/1855'/1815'/{PolicyIndex}'");
-            var policyVkey = policySkey.GetPublicKey(false);
-            var bech32PolicyKey = Bech32.Encode(policySkey.Key, PolicySigningKeyBech32Prefix);
-            var result = CommandResult.Success(bech32PolicyKey);
+            var paymentSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}");
+            var paymentVkey = paymentSkey.GetPublicKey(false);
+            var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedSkeyBytes();
+            var bech32PaymentSkeyExtended = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32PaymentSkeyExtended);
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
                 var skeyCbor = new TextEnvelope(
-                    PaymentExtendedSKeyJsonTypeField, // required for cardano-cli compatibility
+                    PaymentExtendedSKeyJsonTypeField,
                     PaymentSKeyJsonDescriptionField,
-                    KeyUtils.BuildCborHexPayload(policySkey.BuildExtendedSkeyWithVerificationKeyBytes()));
+                    KeyUtils.BuildCborHexPayload(paymentSkey.BuildExtendedSkeyWithVerificationKeyBytes()));
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
             {
                 var vkeyCbor = new TextEnvelope(
-                    PaymentExtendedVKeyJsonTypeField, // required for cardano-cli compatibility
+                    PaymentExtendedVKeyJsonTypeField,
                     PaymentVKeyJsonDescriptionField,
-                    KeyUtils.BuildCborHexPayload(policyVkey.BuildExtendedVkeyBytes()));
+                    KeyUtils.BuildCborHexPayload(paymentVkey.BuildExtendedVkeyBytes()));
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             return result;
@@ -75,10 +76,15 @@ public class DerivePolicyKeyCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --recovery-phrase is required");
         }
-        if (PolicyIndex < 0 || PolicyIndex > MaxDerivationPathIndex)
+        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
         {
             validationErrors.Add(
-                $"Invalid option --policy-index must be between 0 and {MaxDerivationPathIndex}");
+                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}");
+        }
+        if (AddressIndex < 0 || AddressIndex > MaxDerivationPathIndex)
+        {
+            validationErrors.Add(
+                $"Invalid option --address-index must be between 0 and {MaxDerivationPathIndex}");
         }
         if (!string.IsNullOrWhiteSpace(SigningKeyFile)
             && Path.IsPathFullyQualified(SigningKeyFile)

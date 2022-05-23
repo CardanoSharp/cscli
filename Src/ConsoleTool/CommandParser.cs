@@ -1,4 +1,7 @@
-﻿using Cscli.ConsoleTool.Commands;
+﻿using Cscli.ConsoleTool.Crypto;
+using Cscli.ConsoleTool.Query;
+using Cscli.ConsoleTool.Transaction;
+using Cscli.ConsoleTool.Wallet;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 
@@ -41,9 +44,9 @@ public static class CommandParser
         args[0] switch
         {
             "wallet" => ParseWalletCommands(intent, args),
-            //"query" => ParseQueryCommands(intent, args), // TODO: query via Blockfrost/Koios integration
-            //"tx" => ParseTxCommands(intent, args), // TODO: Easier Tx creation and submission via Blockfrost/Koios integration
-            "bech32" or "blake2b" => ParseEncodingHashingCommands(intent, args),
+            "query" => ParseQueryCommands(intent, args), 
+            "transaction" => ParseTransactionCommands(intent, args), 
+            "bech32" or "blake2b" => ParseCryptoCommands(intent, args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
@@ -60,7 +63,26 @@ public static class CommandParser
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
-    private static ICommand ParseEncodingHashingCommands(string intent, string[] args) =>
+    private static ICommand ParseQueryCommands(string intent, string[] args) =>
+       intent switch
+       {
+           "query tip" => BuildCommand<QueryTipCommand>(args),
+           "query protocol-parameters" => BuildCommand<QueryProtocolParametersCommand>(args),
+           "query info account" => BuildCommand<QueryAccountInfoCommand>(args),
+           "query asset account" => BuildCommand<QueryAccountAssetCommand>(args),
+           "query info address" => BuildCommand<QueryAddressInfoCommand>(args),
+           "query info transaction" => BuildCommand<QueryTransactionInfoCommand>(args),
+           _ => new ShowInvalidArgumentCommand(intent)
+       };
+
+    private static ICommand ParseTransactionCommands(string intent, string[] args) =>
+       intent switch
+       {
+           "transaction submit" => BuildCommand<SubmitTransactionCommand>(args),
+           _ => new ShowInvalidArgumentCommand(intent)
+       };
+
+    private static ICommand ParseCryptoCommands(string intent, string[] args) =>
        intent switch
        {
            "bech32 encode" => BuildCommand<EncodeBech32Command>(args),
@@ -68,7 +90,6 @@ public static class CommandParser
            "blake2b hash" => BuildCommand<HashBlake2bCommand>(args),
            _ => new ShowInvalidArgumentCommand(intent)
        };
-
 
     private static ICommand BuildCommand<T>(
         string[] args)

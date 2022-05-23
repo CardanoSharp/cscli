@@ -5,9 +5,9 @@ using CardanoSharp.Wallet.Extensions.Models;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Wallet;
 
-public class DerivePaymentKeyCommand : ICommand
+public class DeriveStakeKeyCommand : ICommand
 {
     public string? Mnemonic { get; init; }
     public string Language { get; init; } = DefaultMnemonicLanguage;
@@ -19,7 +19,7 @@ public class DerivePaymentKeyCommand : ICommand
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, wordList, validationErrors) = Validate();
+        var (isValid, derivedWorldList, validationErrors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
@@ -29,28 +29,29 @@ public class DerivePaymentKeyCommand : ICommand
         var mnemonicService = new MnemonicService();
         try
         {
-            var rootKey = mnemonicService.Restore(Mnemonic, wordList)
+            var rootKey = mnemonicService.Restore(Mnemonic, derivedWorldList)
                 .GetRootKey(Passphrase);
-            var paymentSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}");
-            var paymentVkey = paymentSkey.GetPublicKey(false);
-            var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedSkeyBytes();
-            var bech32PaymentSkeyExtended = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
-            var result = CommandResult.Success(bech32PaymentSkeyExtended);
+            var stakeSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/2/{AddressIndex}");
+            var stakeVkey = stakeSkey.GetPublicKey(false);
+            var stakeSkeyExtendedBytes = stakeSkey.BuildExtendedSkeyBytes();
+            var bech32StakeSkeyExtended = Bech32.Encode(stakeSkeyExtendedBytes, StakeSigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32StakeSkeyExtended);
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
             {
                 var skeyCbor = new TextEnvelope(
-                    PaymentExtendedSKeyJsonTypeField,
-                    PaymentSKeyJsonDescriptionField,
-                    KeyUtils.BuildCborHexPayload(paymentSkey.BuildExtendedSkeyWithVerificationKeyBytes()));
+                    StakeExtendedSKeyJsonTypeField,
+                    StakeSKeyJsonDescriptionField,
+                    KeyUtils.BuildCborHexPayload(stakeSkey.BuildExtendedSkeyWithVerificationKeyBytes()));
                 await File.WriteAllTextAsync(SigningKeyFile, JsonSerializer.Serialize(skeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
             {
+                // cardano-cli compatibility requires us to use non-extended verification keys
                 var vkeyCbor = new TextEnvelope(
-                    PaymentExtendedVKeyJsonTypeField,
-                    PaymentVKeyJsonDescriptionField,
-                    KeyUtils.BuildCborHexPayload(paymentVkey.BuildExtendedVkeyBytes()));
+                    StakeVKeyJsonTypeField,
+                    StakeVKeyJsonDescriptionField,
+                    KeyUtils.BuildCborHexPayload(stakeVkey.Key)); 
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCbor, SerialiserOptions), ct).ConfigureAwait(false);
             }
             return result;
@@ -67,7 +68,7 @@ public class DerivePaymentKeyCommand : ICommand
 
     private (
         bool isValid, 
-        WordLists wordList, 
+        WordLists derivedWordList, 
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();

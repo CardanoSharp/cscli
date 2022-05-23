@@ -37,12 +37,10 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Set release outputs
+      - name: Set release params 
         id: release-params
         run: | 
-          VERSION_TAG=$(git describe --tags --abbrev=0)
-          RELEASE_NAME="cscli-$VERSION_TAG-${{ matrix.target }}"
-          echo "::set-output name=release_name::$RELEASE_NAME"
+          echo "::set-output name=release_name::cscli-$(git describe --tags --abbrev=0)-${{ matrix.target }}"
 
       - name: Build
         shell: bash

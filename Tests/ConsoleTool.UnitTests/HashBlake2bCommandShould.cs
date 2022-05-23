@@ -1,4 +1,4 @@
-﻿using Cscli.ConsoleTool.Commands;
+﻿using Cscli.ConsoleTool.Crypto;
 using FluentAssertions;
 using Xunit;
 

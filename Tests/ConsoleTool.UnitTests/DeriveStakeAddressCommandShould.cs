@@ -1,4 +1,4 @@
-﻿using Cscli.ConsoleTool.Commands;
+﻿using Cscli.ConsoleTool.Wallet;
 using FluentAssertions;
 using Xunit;
 
@@ -20,13 +20,13 @@ public class DeriveStakeAddressCommandShould
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
 
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
-        executionResult.Result.Should().Be("Invalid option --network-tag must be either testnet or mainnet");
+        executionResult.Result.Should().Be("Invalid option --network must be either testnet or mainnet");
     }
 
     [Theory]
@@ -53,7 +53,7 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -98,7 +98,7 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -125,7 +125,7 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -154,7 +154,7 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -182,7 +182,7 @@ public class DeriveStakeAddressCommandShould
             Mnemonic = mnemonic,
             Language = language,
             AccountIndex = accountIndex,
-            NetworkTag = networkTag,
+            Network = networkTag,
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -209,7 +209,7 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             AddressIndex = addressIndex
         };
 
@@ -238,12 +238,12 @@ public class DeriveStakeAddressCommandShould
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
         };
         var englishSpecificCommand = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
             Language = "English"
         };
 
@@ -287,13 +287,13 @@ public class DeriveStakeAddressCommandShould
         {
             Language = language,
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
         };
         var englishSpecificCommand = new DeriveStakeAddressCommand()
         {
             Language = language,
             Mnemonic = mnemonic,
-            NetworkTag = networkTag,
+            Network = networkTag,
             AccountIndex = 0,
             AddressIndex = 0,
         };
@@ -356,14 +356,14 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
         };
         var emptyPassSpecificCommand = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             Passphrase = "",
-            NetworkTag = networkTag,
+            Network = networkTag,
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -407,7 +407,7 @@ public class DeriveStakeAddressCommandShould
             Mnemonic = mnemonic,
             Language = language,
             Passphrase = passPhrase,
-            NetworkTag = networkTag
+            Network = networkTag
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -456,7 +456,7 @@ public class DeriveStakeAddressCommandShould
         {
             Mnemonic = mnemonic,
             Language = language,
-            NetworkTag = networkTag,
+            Network = networkTag,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
         };

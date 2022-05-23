@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace Cscli.ConsoleTool;
 
@@ -31,7 +32,8 @@ public static class Constants
     public static readonly JsonSerializerOptions SerialiserOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
     // Commandline args switch mappings
     public static Dictionary<string, string> SwitchMappings => new()
@@ -45,7 +47,9 @@ public static class Constants
         { "--stake-account-index", "stakeAccountIndex" },
         { "--stake-address-index", "stakeAddressIndex" },
         { "--payment-address-type", "paymentAddressType" },
-        { "--network-tag", "networkTag" },
+        { "--stake-address", "stakeAddress" },
+        { "--cbor-hex", "cborHex" },
+        { "--tx-id", "txId" },
         //{ "--output-format", "outputFormat" },
     };
 }

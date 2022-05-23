@@ -2,7 +2,7 @@
 using CardanoSharp.Wallet.Extensions;
 using System.Collections.Immutable;
 
-namespace Cscli.ConsoleTool.Commands;
+namespace Cscli.ConsoleTool.Crypto;
 
 public class HashBlake2bCommand : ICommand
 {
