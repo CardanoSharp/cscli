@@ -1,14 +1,19 @@
 # cscli
 
 ## Goals
-A cross-platform CLI for building and interacting with [Cardano](https://developers.cardano.org/) wallet primitives (i.e. recovery-phrases, keys, addresses and transactions) 
-using .NET native types built on top of [CardanoSharp](https://github.com/CardanoSharp/cardanosharp-wallet).
+A lightweight cross-platform CLI for [Cardano](https://developers.cardano.org/) using .NET native types and cryptographic libraries built on top of [CardanoSharp](https://github.com/CardanoSharp/cardanosharp-wallet) and [Koios](https://api.koios.rest/). It supports the following features out of the box:
+ - Building and serialising wallet primitives (i.e. recovery-phrases, keys, addresses and transactions) 
+ - Live querying of accounts, addresses, transactions and native assets across both Testnet and Mainnet networks
+ - Submitting transactions to the Testnet or Mainnet network
+ - Cryptographic and encoding transformations (blake2b, bech32, etc.)
 
+Why would you use `cscli` in addition to `cardano-cli`, `cardano-address`, `cardano-wallet` and a host of other tools?
 ### Advantages
- - Easy recovery-phrase (aka mnemonic) based key and address derivation for [Hierarchical Deterministic (HD) wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), perfect for cold key/address/tx management and storage
+ - Simple installation and powerful commands with **no dependencies** on a local full node or other tools/sdks
+ - Easy recovery-phrase (aka mnemonic) based key and address derivation for [Hierarchical Deterministic (HD) wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), perfect for offline management
  - [Passphrase](https://vault12.com/securemycrypto/crypto-security-basics/what-is-a-passphrase/passphrases-increase-your-protection-and-your-risk) support for additional root key security
- - International multi-language support for [recovery-phrases](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
- - Generates compatible outputs for `cardano-cli` and `cardano-addresses` without any additional dependencies
+ - [International multi-language](https://github.com/CardanoSharp/cardanosharp-wallet/tree/main/CardanoSharp.Wallet/Words) support for [recovery-phrases](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
+ - Generates compatible outputs for `cardano-cli`, `cardano-address` and `cardano-wallet`
 
 ## Installation
 
@@ -37,13 +42,13 @@ dotnet restore
 dotnet build --no-restore -c Release
 dotnet test --no-build -c Release
 dotnet publish --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -c Release -o release --nologo 
-.\release\CsCli.ConsoleTool.exe
+.\release\CsCli.ConsoleTool.exe wallet recovery-phrase generate
 ```
 
 Or directly building and running with `dotnet run`
 ```console
 cd Src/ConsoleTool
-dotnet run --version
+dotnet run wallet recovery-phrase generate
 ```
 
 Or build, test and install the global tool based on local source
@@ -52,7 +57,7 @@ dotnet restore
 dotnet build --no-restore
 dotnet test --no-build
 dotnet pack --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Release
-dotnet tool install --global --add-source ./nupkg cscli --version 0.0.6-local-branch.1
+dotnet tool install --global --add-source ./nupkg cscli --version 0.0.7-local-branch.1
 ```
 </details>
 
@@ -64,35 +69,35 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.0.6-local-br
 ```console
 $ cscli --help
 cscli v0.0.7
-A cross-platform tool for building and interacting with Cardano wallet primitives (i.e. recovery-phrases, keys, addresses and transactions).
-Please see https://github.com/CardanoSharp/cscli from more detailed documentation.
+A lightweight cross-platform tool for building and serialising Cardano wallet entities (i.e. recovery-phrases, keys, addresses and transactions), querying the chain and submitting transactions to the testnet or mainnet networks. Please refer to https://github.com/CardanoSharp/cscli for further documentation.
 
 USAGE: cscli (OPTION | COMMAND)
 
-Available options:
+Options:
     -v, --version   Show the cscli version
     -h, --help      Show this help text
 
 Wallet commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"]
-    wallet key stake derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallet key payment derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallet key policy derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--policy-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallet address stake derive --recovery-phrase "<string>" --network <network> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>]
-    wallet address payment derive --recovery-phrase "<string>"  --network <network> --payment-address-type <payment-address-type> [--language <language>] [--passphrase "<string>"] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
+    wallet key stake derive --recovery-phrase "<string>" [--account-index <index>] [--address-index <index>]
+    wallet key payment derive --recovery-phrase "<string>" [--account-index <index>] [--address-index <index>]
+    wallet key policy derive --recovery-phrase "<string>" [--policy-index <index>] 
+    wallet address stake derive --recovery-phrase "<string>" --network <network> [--account-index <index>] [--address-index <index>]
+    wallet address payment derive --recovery-phrase "<string>" --network <network> --payment-address-type <payment-address-type> [--account-index <index>] [--address-index <index>] [--stake-account-index <index>] [--stake-address-index <index>]
 
 Query commands:
     query tip --network <network>
     query protocol-parameters --network <network>
-    query info account --network <network> --stake-address <bech32_stake_address>
-    query asset account --network <network> --stake-address <bech32_stake_address>
-    query info address --network <network> --address <bech32_payment_address>
+    query info account --network <network> [--stake-address <stake_address>][--address <payment_base_address>]
+    query asset account --network <network> --stake-address <stake_address>
+    query info address --network <network> --address <payment_address>
+    query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
     transaction submit --network <network> --cbor-hex <hex_string>
 
-Encoding/Crypto Commands:
+Encoding/Cryptography Commands:
     bech32 encode --value <hex_string> --prefix <string>
     bech32 decode --value <bech32_string>
     blake2b hash --value <hex_string> [--length <digest_length>]
@@ -111,6 +116,15 @@ Arguments:
 $ cscli wallet recovery-phrase generate | tee phrase.prv
 more enjoy seminar food bench online render dry essence indoor crazy page eight fragile mango zoo burger exhibit crouch drop rocket property alter uphold
 ```
+
+<details>
+  <summary>Generating a recovery phrase in Spanish</summary>
+
+```console
+$ cscli wallet recovery-phrase generate --language spanish | tee phrase.es.prv
+solución aborto víspera puma molino ático ética feroz hacer orador salero baba carbón lonja texto sanción sobre pasar iris masa vacuna diseño pez playa
+```
+</details>
 
 ### Derive Root Key
 ```console
@@ -148,6 +162,26 @@ $ cat pay_0_0.vkey
   "type": "PaymentExtendedVerificationKeyShelley_ed25519_bip32",
   "description": "Payment Verification Key",
   "cborHex": "5840de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa2fc8083013ea2bf3a68de08a59346e129d7bd858b290f408d65cbaa97c09d1cf"
+}
+```
+</details>
+<details>
+  <summary>Payment Key from Spanish recovery-phrase with custom passphrase</summary>
+
+```console
+$ cscli wallet key payment derive --language spanish --recovery-phrase "$(cat phrase.es.prv)" --passphrase "/\\/\\`/ |\\|4/\\/\\3 !5 02`//\\/\\4|\\||)!45, |<!|\\|9 0|= |<!|\\|95" --signing-key-file pay_0_0.es.skey --verification-key-file pay_0_0.es.vkey | tee pay_0_0.es.xsk
+addr_xsk15pt6dccwyy2jjgmv9gxszjyzc6kchhas2dr9q6ky0xpwz4679e2t5qu0yehpmg7xr3sc3wkcyagujlk2euwl0007w68wcfdm7ajl2tzkqve7vmqds5sf38syns3u2wey05yeh70p9m5n05kftku30uqjlqy0gjh2
+$ cat pay_0_0.es.skey
+{
+  "type": "PaymentExtendedSigningKeyShelley_ed25519_bip32",
+  "description": "Payment Signing Key",
+  "cborHex": "5880a057a6e30e211529236c2a0d014882c6ad8bdfb05346506ac47982e1575e2e54ba038f266e1da3c61c6188bad82751c97ecacf1df7bdfe768eec25bbf765f52ca592e0a3f8f0be44c9d65c0ac5347206b32b73ed45ba4e704014c269e2560db9560333e66c0d8520989e049c23c53b247d099bf9e12ee937d2c95db917f012f8"
+}
+$ cat pay_0_0.es.vkey
+{
+  "type": "PaymentExtendedVerificationKeyShelley_ed25519_bip32",
+  "description": "Payment Verification Key",
+  "cborHex": "5840a592e0a3f8f0be44c9d65c0ac5347206b32b73ed45ba4e704014c269e2560db9560333e66c0d8520989e049c23c53b247d099bf9e12ee937d2c95db917f012f8"
 }
 ```
 </details>
@@ -201,6 +235,14 @@ $ cscli wallet address stake derive --recovery-phrase "$(cat phrase.prv)" --netw
 stake1u87phtdn9shvp39c44elyfdduuqg7wz072vs0vjvc20hvaqym7xan
 ```
 </details>
+<details>
+  <summary>Stake Address from Spanish recovery-phrase with custom passphrase</summary>
+
+```console
+$ cscli wallet address stake derive --language spanish --recovery-phrase "$(cat phrase.es.prv)" --passphrase "/\\/\\`/ |\\|4/\\/\\3 !5 02`//\\/\\4|\\||)!45, |<!|\\|9 0|= |<!|\\|95" --network testnet | tee stake_0_0.es.addr
+stake_test1uztkvps54v3yrwvxhvfz9uph8g6e2zd8jcg2cyss45g7xqclj4scq
+```
+</details>
 
 ### Derive Payment Enterprise Address
 ```console
@@ -214,6 +256,7 @@ addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w
 $ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type enterprise --network mainnet --account-index 1387 --address-index 12 | tee pay_1387_12.addr
 addr1vy3y89nnzdqs4fmqv49fmpqw24hjheen3ce7tch082hh6xcc8pzd9
 ```
+
 </details>
 
 ### Derive Payment Base Address
@@ -227,6 +270,14 @@ addr1qy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqzupvkzyt42349mnkhgu8ghqzgtsqv
 ```console
 $ cscli wallet address payment derive --recovery-phrase "$(cat phrase.prv)" --payment-address-type base --network mainnet --account-index 1387 --address-index 12 --stake-account-index 968 --stake-address-index 83106 | tee pay_1387_12_968_83106.addr
 addr1qy3y89nnzdqs4fmqv49fmpqw24hjheen3ce7tch082hh6x7nwwgg06dngunf9ea4rd7mu9084sd3km6z56rqd7e04ylslhzn9h
+```
+</details>
+<details>
+  <summary>Payment Base Address from Spanish recovery-phrase with custom passphrase</summary>
+
+```console
+$ cscli wallet address payment derive --language spanish --recovery-phrase "$(cat phrase.es.prv)" --passphrase "/\\/\\`/ |\\|4/\\/\\3 !5 02`//\\/\\4|\\||)!45, |<!|\\|9 0|= |<!|\\|95" --network testnet --payment-address-type base | tee pay_0_0_0_0.es.addr
+addr_test1qpvttg5263dnutj749k5dcr35yk5mr94fxx0q2zs2xeuxq5hvcrpf2ezgxucdwcjytcrww34j5y609ss4sfpptg3uvpsxmcdtf
 ```
 </details>
 
@@ -264,34 +315,124 @@ $ cat policy_0.vkey
 ```
 </details>
 
-### Query Tip Command
+### Submit Transaction
+```console
+$ cscli transaction submit --network testnet --cbor-hex 84a600818258207f1d24706e65b3eaef608d6ba5adf8b2bf69254bbd1e1532fa7c601a1d6aca3d000d8001828258390058b5a28ad45b3e2e5ea96d46e071a12d4d8cb5498cf0285051b3c30297660614ab2241b986bb1222f0373a359509a79610ac1210ad11e3031a05f5e10082581d60f3a76db98805ebfb391d8a7fa176e0a4da4d20955c47a5d35936353c1a35a23dbb021a0002ab45031a03831a6f0e80a1008182582047a69a1a41541c00a1e62ab8d78c1870e4f04c0507530b90c7dfde2a144d0cfa58406f50cd131250768a3b707e5eb5797e1dc519157e8c7ac27a72ac472fb546bc4604d3b51b2460e4517e28aea5fd0d19ddf8d95d9bf223e59f0306db0a7794d40af5f6
+5c9f1456a2f7cdf30c12d569ede3f298b377115a63dc0cef791e692dbe4be26b
+```
+
+### Query Tip
 ```console
 $ cscli query tip --network mainnet
-
+{
+  "hash": "ae5514780cb47a920cd219a4635a54c9ce517a89c65889325c1fd6d166cfdcaa",
+  "epoch_no": 339,
+  "abs_slot": 61499734,
+  "epoch_slot": 414934,
+  "block_no": 7271096,
+  "block_time": "2022-05-20T17:00:25"
+}
 ```
 
-### Query Protocol Parameters Command
+### Query Protocol Parameters
 ```console
 $ cscli query protocol-parameters --network mainnet
-
+{
+  "epoch_no": 339,
+  "min_fee_a": 44,
+  "min_fee_b": 155381,
+  ...
+  "coins_per_utxo_word": 34482
+}    
 ```
 
-### Query Account Info Command
+### Query Account Info
 ```console
-$ cscli query info account --network testnet --stake-address $(cat stake_0_0.addr)
+$ cscli query info account --network mainnet --stake-address stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250
+[
+  {
+    "status": "registered",
+    "delegated_pool": "pool14wk2m2af7y4gk5uzlsmsunn7d9ppldvcxxa5an9r5ywek8330fg",
+    "total_balance": "1126364036992",
+    "utxo": "1120067931255",
+    "rewards": "90668729339",
+    "withdrawals": "84372623602",
+    "rewards_available": "6296105737",
+    "reserves": "0",
+    "treasury": "0"
+  }
+]
+```
+<details>
+  <summary>Query Account Info of Payment Address (requires base address)</summary>
 
+```console
+$ cscli query info account --network mainnet --address addr1q9r4307pqxq93fh554yvfssha46atz7h8waha568d8ddvnktwkkz3tg57qd9knlsfyhlgjuxpyxhl09u2w8f4l20hk2q7dt678
+[
+  {
+    "status": "registered",
+    "delegated_pool": "pool1ddg6t2h9kj6lqlec4ncjs945lzj43m3ggrgdhf5sgzhtygpkznz",
+    "total_balance": "7031456885",
+    "utxo": "7019386794",
+    "rewards": "56497309",
+    "withdrawals": "44427218",
+    "rewards_available": "12070091",
+    "reserves": "0",
+    "treasury": "0"
+  }
+]
+```
+</details>
+
+### Query Account Asset 
+```console
+$ cscli query asset account --network testnet --stake-address $(cat stake_0_0.es.addr)
+[
+  {
+    "asset_policy": "540f107c7a3df20d2111a41c3bc407cce3e63c10c8dd673d51a02c22",
+    "asset_name": "COND1",
+    "quantity": "1"
+  }
+]
+```
+<details>
+  <summary>Query Account Asset of Payment Address (requires base address)</summary>
+
+```console
+$ cscli query asset account --network testnet --address $(cat pay_0_0_0_0.es.addr)
+[
+  {
+    "asset_policy": "540f107c7a3df20d2111a41c3bc407cce3e63c10c8dd673d51a02c22",
+    "asset_name": "COND1",
+    "quantity": "1"
+  }
+]
+```
+</details>
+
+### Query Address Info 
+```console
+$ cscli query info address --network testnet --address $(cat pay_0_0_0_0.es.addr)
+{
+  "balance": "1001344798",
+  "stake_address": "stake_test1uztkvps54v3yrwvxhvfz9uph8g6e2zd8jcg2cyss45g7xqclj4scq",
+  "utxo_set": [ ... ]
+}
 ```
 
-### Query Account Asset Command
+### Query Transaction Info 
 ```console
-$ cscli query asset account --network testnet --stake-address $(cat stake_0_0.addr)
-
-```
-
-### Query Address Info Command
-```console
-$ cscli query info address --network testnet --address $(cat payment_0_0_0_0.addr)
-
+$ cscli query info transaction --network testnet --txid 4fe73db7e345f6853ade214b0779d5db51f9a4b5e296198d3cb84b7b707e7d34
+[
+  {
+    "tx_hash": "4fe73db7e345f6853ade214b0779d5db51f9a4b5e296198d3cb84b7b707e7d34",
+    "block_hash": "e96c400f303d2f30f7b49761b1c541b5a29b43ddb28268a1f179b2877f828aad",
+    ...
+    "inputs": [ ... ],
+    "outputs": [ ... ],
+    ...
+  }
+]
 ```
 
 ### Bech32 Decode
@@ -308,9 +449,9 @@ addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w
 
 ### Blake2b Hash
 ```console
-$ cscli blake2b hash --length 224 --value 1872bc5ecc95b419de3f72544a6656ceb9a813755544618bb6b4dcc230ed9721 
-9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01
+$ cscli blake2b hash --length 224 --value de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa  
+282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600
 ```
 
 ## Contributing
-Please see [CONTRIBUTING.md](./CONTRIBUTING.md)
+Please see [CONTRIBUTING.md](./CONTRIBUTING.md) 
