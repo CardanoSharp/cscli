@@ -57,7 +57,7 @@ dotnet restore
 dotnet build --no-restore
 dotnet test --no-build
 dotnet pack --no-build Src/ConsoleTool/CsCli.ConsoleTool.csproj -o nupkg -c Release
-dotnet tool install --global --add-source ./nupkg cscli --version 0.0.7-local-branch.1
+dotnet tool install --global --add-source ./nupkg cscli --version 0.1.0-local-branch.1
 ```
 </details>
 
@@ -68,7 +68,7 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.0.7-local-br
 ### Overview and Help
 ```console
 $ cscli --help
-cscli v0.0.7
+cscli v0.1.0
 A lightweight cross-platform tool for building and serialising Cardano wallet entities (i.e. recovery-phrases, keys, addresses and transactions), querying the chain and submitting transactions to the testnet or mainnet networks. Please refer to https://github.com/CardanoSharp/cscli for further documentation.
 
 USAGE: cscli (OPTION | COMMAND)
