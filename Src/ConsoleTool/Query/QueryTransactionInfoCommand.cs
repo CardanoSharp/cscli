@@ -1,7 +1,5 @@
 ﻿using CardanoSharp.Koios.Sdk;
-using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
-using CardanoSharp.Wallet.Models.Addresses;
 using Cscli.ConsoleTool.Koios;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;

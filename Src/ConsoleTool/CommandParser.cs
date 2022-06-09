@@ -60,6 +60,7 @@ public static class CommandParser
             "wallet key policy derive" => BuildCommand<DerivePolicyKeyCommand>(args),
             "wallet address payment derive" => BuildCommand<DerivePaymentAddressCommand>(args),
             "wallet address stake derive" => BuildCommand<DeriveStakeAddressCommand>(args),
+            "wallet key verification derive" or "wallet key public derive" => BuildCommand<ConvertVerificationKeyCommand>(args),
             _ => new ShowInvalidArgumentCommand(intent)
         };
 
