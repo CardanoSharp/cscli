@@ -55,6 +55,7 @@ public static class CommandParser
         {
             "wallet recovery-phrase generate" => BuildCommand<GenerateMnemonicCommand>(args),
             "wallet key root derive" => BuildCommand<DeriveRootKeyCommand>(args),
+            "wallet key account derive" => BuildCommand<DeriveAccountKeyCommand>(args),
             "wallet key payment derive" => BuildCommand<DerivePaymentKeyCommand>(args),
             "wallet key stake derive" => BuildCommand<DeriveStakeKeyCommand>(args),
             "wallet key policy derive" => BuildCommand<DerivePolicyKeyCommand>(args),

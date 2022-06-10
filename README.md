@@ -130,13 +130,13 @@ solución aborto víspera puma molino ático ética feroz hacer orador saler
 
 ### Derive Root Key
 ```console
-$ cscli wallet key root derive --recovery-phrase "$(cat phrase.en.prv)" | tee acct_0.en.xsk
+$ cscli wallet key root derive --recovery-phrase "$(cat phrase.en.prv)" | tee root.en.xsk
 root_xsk12qpr53a6r7dpjpu2mr6zh96vp4whx2td4zccmplq3am6ph6z4dga6td8nph4qpcnlkdcjkd96p83t23mplvh2w42n6yc3urav8qgph3d9az6lc0px7xq7sau4r4dsfp9h0syfkhge8e6muhd69vz9j6fggdhgd4e
 ```
 
 ### Derive Account Key
 ```console
-$ cscli wallet key account derive --recovery-phrase "$(cat phrase.en.prv)" | tee root.en.xsk
+$ cscli wallet key account derive --recovery-phrase "$(cat phrase.en.prv)" | tee acct_0.en.xsk
 acct_xsk13pfkzdyzuagmsquy0xjvszdxdjt84x49yrmvt2f3z8ndp6zz4dgka03j3ctm4gne9s5gullvjd7kynxxkny4qwyuuup2mcjfztctswdu3zp4s3ps5dskaq929vrp6cw8z3u77x7mymgntjw46f4l9kh3mcvg78y9
 ```
 
