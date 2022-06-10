@@ -145,7 +145,7 @@ acct_xsk13pfkzdyzuagmsquy0xjvszdxdjt84x49yrmvt2f3z8ndp6zz4dgka03j3ctm4gne9s5gull
 
 ```console
 $ cscli wallet key account derive --recovery-phrase "$(cat phrase.en.prv)" --account-index 96884067 | tee acct_96884067.en.xsk
-acct_xsk1kzjky39hv28q30qecg46f3cag3nwsjnnvn5uf0jtkrsxau2z4dgssyrv8jfwdh6frfkd0hskhszcf98xskje0c6ttcnz7k2cwdmc62uv7k6w7nwdcngkwn0semehjsdaajlv2nr5c0rg077dnsyjwxm05vhkuqet
+acct_xsk1vzcpqwahy0asxuua4gswzjagmt5awjepy9clhmvtr8tgpejz4dglkfl7zhunx0dcrvljtmgcx59yzv728wlxllp646qudhgkuaj3xycu4pkysaaau0lm4z2s8t2yum7nyfn99e3xxrwgaz5yt367r8638uetazlu
 ```
 </details>
 
@@ -335,9 +335,24 @@ $ cat policy_0.vkey
 
 ### Convert Verification Key 
 ```console
-$ cscli wallet key verification convert --signing-key $(cat pay_0_0.en.xsk)
-TODO;
+$ cscli wallet key verification convert --signing-key $(cat pay_0_0.en.xsk) | tee pay_0_0.en.xvk
+addr_xvk1m62sxsn8t8apscjx2l6mejfj7wpzpmy7e6ex9yru4uk3nzmwp74zljqgxqf752ln56x7pzjex3hp98tmmpvt9y85prt9ew4f0syarncveq5jl
 ```
+
+<details>
+  <summary>Verification Key with cardano-cli Output Key Files</summary>
+
+```console
+$ cscli wallet key verification convert --signing-key $(cat stake_0_0.en.xsk) --verification-key-file stake_0_0.en.vkey | tee stake_0_0.en.xvk
+stake_xvk1r0v9a3ca9kxwqxqp8qcsnqa2llaytp2gdkc4w67rskc2udg9vtn2qqvj2gum2unwxyet3f2e3yzw4ujgk6yxdpzsm0gjl6lpa0sj0mg4tq9sj
+$ cat stake_0_0.en.vkey
+{
+  "type": "StakeVerificationKeyShelley_ed25519",
+  "description": "Stake Verification Key",
+  "cborHex": "58201bd85ec71d2d8ce0180138310983aafffa4585486db1576bc385b0ae350562e6"
+}
+```
+</details>
 
 ### Submit Transaction
 ```console

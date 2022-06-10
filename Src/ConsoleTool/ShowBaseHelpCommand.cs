@@ -21,7 +21,7 @@ Options:
 Wallet commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""]
-    wallet key account derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <index>]
+    wallet key account derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>]
     wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
     wallet key policy derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--policy-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
