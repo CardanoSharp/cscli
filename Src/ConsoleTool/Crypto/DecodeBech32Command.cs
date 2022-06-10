@@ -23,7 +23,7 @@ public class DecodeBech32Command : ICommand
         try
         {
             var hex = Bech32
-                .Decode(Value, out var ver, out var prefix)
+                .Decode(Value, out _, out _)
                 .ToStringHex();
             var result = CommandResult.Success(hex);
             return ValueTask.FromResult(result);

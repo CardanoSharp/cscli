@@ -2,15 +2,21 @@
 using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Wallet;
 
-public class DeriveRootKeyCommand : ICommand
+public class DeriveAccountKeyCommand : ICommand
 {
     public string? Mnemonic { get; init; }
     public string Language { get; init; } = DefaultMnemonicLanguage;
     public string Passphrase { get; init; } = string.Empty;
+    public int AccountIndex { get; init; } = 0;
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
@@ -30,15 +36,23 @@ public class DeriveRootKeyCommand : ICommand
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 $"Invalid option --recovery-phrase must have the following word count ({string.Join(", ", ValidMnemonicSizes)})"));
         }
+        if (AccountIndex < 0 || AccountIndex > MaxDerivationPathIndex)
+        {
+            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
+                $"Invalid option --account-index must be between 0 and {MaxDerivationPathIndex}"));
+        }
 
         var mnemonicService = new MnemonicService();
         try
         {
             var rootPrvKey = mnemonicService.Restore(Mnemonic, wordlist)
                 .GetRootKey(Passphrase);
-            var rootKeyExtendedBytes = rootPrvKey.BuildExtendedSkeyBytes();
-            var bech32ExtendedRootKey = Bech32.Encode(rootKeyExtendedBytes, RootExtendedSigningKeyBech32Prefix);
-            return ValueTask.FromResult(CommandResult.Success(bech32ExtendedRootKey));
+            var accountSkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'");
+            var accountVkey = accountSkey.GetPublicKey(false);
+            var accountSkeyExtendedBytes = accountSkey.BuildExtendedSkeyBytes();
+            var bech32AccountkeyExtended = Bech32.Encode(accountSkeyExtendedBytes, AccountExtendedSigningKeyBech32Prefix);
+            var result = CommandResult.Success(bech32AccountkeyExtended);
+            return ValueTask.FromResult(result);
         }
         catch (ArgumentException ex)
         {

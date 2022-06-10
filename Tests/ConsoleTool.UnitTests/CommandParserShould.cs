@@ -93,6 +93,32 @@ public class CommandParserShould
 
     [Theory]
     [InlineData(
+        "wallet key account derive --recovery-phrase {MNEMONIC}",
+        "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
+        Constants.DefaultMnemonicLanguage,
+        "", 0)]
+    [InlineData(
+        "wallet key account derive --recovery-phrase {MNEMONIC} --passphrase screenfuryidentifyworldsailarenadevoteonlygas --language Italian --account-index 1234567",
+        "svagare sprecare dirupo scandalo pedonale midollo indagine oste proroga fessura partire snervato pulsante eremita poesia esito esofago coltivato affisso cravatta lombare pupazzo colore spruzzo",
+        "Italian",
+        "screenfuryidentifyworldsailarenadevoteonlygas", 1234567)]
+    public void ParseArgs_Correctly_To_DeriveAccountCommand_When_Options_Are_Valid(
+        string flatArgs, string expectedMnemonic, string expectedLanguage, string expectedPassPhrase, int expectedAccountIndex)
+    {
+        var args = GenerateArgs(flatArgs, expectedMnemonic);
+
+        var command = CommandParser.ParseArgsToCommand(args);
+
+        var acctKeyCommand = (DeriveAccountKeyCommand)command;
+        command.Should().BeOfType<DeriveAccountKeyCommand>();
+        acctKeyCommand.Mnemonic.Should().Be(expectedMnemonic);
+        acctKeyCommand.Language.Should().Be(expectedLanguage);
+        acctKeyCommand.Passphrase.Should().Be(expectedPassPhrase);
+        acctKeyCommand.AccountIndex.Should().Be(expectedAccountIndex);
+    }
+
+    [Theory]
+    [InlineData(
         "wallet key payment derive --recovery-phrase {MNEMONIC}",
         "repeat jazz magnet finger sunny gaze shuffle deputy feel forget decline parent immune actor anchor funny avocado source replace setup grace best inflict capable",
         Constants.DefaultMnemonicLanguage,
@@ -169,6 +195,22 @@ public class CommandParserShould
         stakeKeyCommand.Passphrase.Should().Be(expectedPassPhrase);
         stakeKeyCommand.AccountIndex.Should().Be(expectedAccountIndex);
         stakeKeyCommand.AddressIndex.Should().Be(expectedAddressIndex);
+    }
+
+    [Theory]
+    [InlineData(
+        "wallet key verification convert --signing-key addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw",
+        "addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw", null)]
+    [InlineData(
+        "wallet key verification convert --signing-key policy_sk1trt3shjrd4gy70q4m2ejgjgsdzwej4whc4r2trrcwedlpm6z4dglxl4nycrd8fptxrkye3tl3q29euxlqj7zndk9cfg4tskqlnp90uqwjqz02 --verification-key-file pay.vkey",
+        "policy_sk1trt3shjrd4gy70q4m2ejgjgsdzwej4whc4r2trrcwedlpm6z4dglxl4nycrd8fptxrkye3tl3q29euxlqj7zndk9cfg4tskqlnp90uqwjqz02", "pay.vkey")]
+    public void ParseArgs_Correctly_To_ConvertVerificationKeyCommand_When_Options_Are_Valid(
+        string args, string expectedSigningKey, string expectedVerificationKeyFile)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+        command.Should().BeOfType<ConvertVerificationKeyCommand>();
+        ((ConvertVerificationKeyCommand)command).SigningKey.Should().Be(expectedSigningKey);
+        ((ConvertVerificationKeyCommand)command).VerificationKeyFile.Should().Be(expectedVerificationKeyFile);
     }
 
     [Theory]

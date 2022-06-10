@@ -9,9 +9,14 @@ public static class Constants
     public const int DefaultMnemonicCount = 24;
     public const int MaxDerivationPathIndex = Int32.MaxValue; // 2^31 - 1
     // Bech32 Prefixes https://cips.cardano.org/cips/cip5/
-    public const string RootKeyExtendedBech32Prefix = "root_xsk";
-    public const string PaymentSigningKeyBech32Prefix = "addr_xsk";
-    public const string StakeSigningKeyBech32Prefix = "stake_xsk";
+    public const string RootExtendedSigningKeyBech32Prefix = "root_xsk";
+    public const string RootSigningKeyBech32Prefix = "root_sk";
+    public const string AccountExtendedSigningKeyBech32Prefix = "acct_xsk";
+    public const string AccountSigningKeyBech32Prefix = "acct_sk";
+    public const string PaymentExtendedSigningKeyBech32Prefix = "addr_xsk";
+    public const string PaymentSigningKeyBech32Prefix = "addr_sk";
+    public const string StakeExtendedSigningKeyBech32Prefix = "stake_xsk";
+    public const string StakeSigningKeyBech32Prefix = "stake_sk";
     public const string PolicySigningKeyBech32Prefix = "policy_sk";
     // JSON CBOR text envelopes from cardano-cli
     public const string PaymentSKeyJsonTypeField = "PaymentSigningKeyShelley_ed25519";
@@ -50,6 +55,7 @@ public static class Constants
         { "--stake-address", "stakeAddress" },
         { "--cbor-hex", "cborHex" },
         { "--tx-id", "txId" },
+        { "--signing-key", "signingKey" },
         //{ "--output-format", "outputFormat" },
     };
 }

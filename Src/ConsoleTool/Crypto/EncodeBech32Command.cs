@@ -18,8 +18,8 @@ public class EncodeBech32Command : ICommand
         try
         {
             var rawBytesValue = Convert.FromHexString(Value);
-            var hex = Bech32.Encode(rawBytesValue, Prefix);
-            var result = CommandResult.Success(hex);
+            var bech32Value = Bech32.Encode(rawBytesValue, Prefix);
+            var result = CommandResult.Success(bech32Value);
             return ValueTask.FromResult(result);
         }
         catch (FormatException ex)

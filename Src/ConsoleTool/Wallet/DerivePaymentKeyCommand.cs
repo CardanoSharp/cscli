@@ -29,12 +29,12 @@ public class DerivePaymentKeyCommand : ICommand
         var mnemonicService = new MnemonicService();
         try
         {
-            var rootKey = mnemonicService.Restore(Mnemonic, wordList)
+            var rootPrvKey = mnemonicService.Restore(Mnemonic, wordList)
                 .GetRootKey(Passphrase);
-            var paymentSkey = rootKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}");
+            var paymentSkey = rootPrvKey.Derive($"m/1852'/1815'/{AccountIndex}'/0/{AddressIndex}");
             var paymentVkey = paymentSkey.GetPublicKey(false);
             var paymentSkeyExtendedBytes = paymentSkey.BuildExtendedSkeyBytes();
-            var bech32PaymentSkeyExtended = Bech32.Encode(paymentSkeyExtendedBytes, PaymentSigningKeyBech32Prefix);
+            var bech32PaymentSkeyExtended = Bech32.Encode(paymentSkeyExtendedBytes, PaymentExtendedSigningKeyBech32Prefix);
             var result = CommandResult.Success(bech32PaymentSkeyExtended);
             // Write output to CBOR JSON file outputs if optional file paths are supplied
             if (!string.IsNullOrWhiteSpace(SigningKeyFile))
