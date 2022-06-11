@@ -1,15 +1,18 @@
 ﻿namespace Cscli.ConsoleTool;
 
-public record struct Utxo(string TxHash, int OutputIndex, TokenBundle TokenBundle);
+public record struct NativeAssetValue(string PolicyId, string AssetName, ulong Quantity);
 
-public record struct TokenBundle(long LovelaceValue, NativeAssetValue[] NativeAssets);
+public record struct AggregateValue(ulong Lovelaces, NativeAssetValue[] NativeAssets);
 
-public record struct NativeAssetValue(string PolicyId, string AssetNameHex, long Quantity);
+public record struct PendingTransactionOutput(string Address, AggregateValue Value);
 
-public record WalletInfo(AccountInfo[] Accounts);
-
-public record AccountInfo(string StakeAddress, string PaymentAddress, Utxo[] Utxos);
-
-public record AddressInfo(string PaymentAddress, string? StakeAddress, Utxo[] Utxos);
+public record UnspentTransactionOutput(string TxHash, uint OutputIndex, AggregateValue Value)
+{
+    public override int GetHashCode() => ToString().GetHashCode();
+    public override string ToString() => $"{TxHash}_{OutputIndex}";
+    bool IEquatable<UnspentTransactionOutput>.Equals(UnspentTransactionOutput? other)
+        => other != null && TxHash == other.TxHash && OutputIndex == other.OutputIndex;
+    public ulong Lovelaces => Value.Lovelaces;
+}
 
 public record TextEnvelope(string? Type, string? Description, string? CborHex);
