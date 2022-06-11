@@ -65,8 +65,14 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var fee = tx.CalculateFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
         txBodyBuilder.SetFee(fee);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
-        // var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
-        return CommandResult.Success(tx.Serialize().ToStringHex());
+        var txCborBytes = tx.Serialize();
+        // For Tx submission uncomment the below segment
+        //var txClient = BackendGateway.GetBackendClient<ITransactionClient>(networkType);
+        //using var stream = new MemoryStream(txCborBytes);
+        //var txHash = await txClient.Submit(stream).Content;
+        //var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
+        //txHash should be the same as txId
+        return CommandResult.Success(txCborBytes.ToStringHex());
     }
 
     private static (
