@@ -22,7 +22,10 @@ public class QueryTipCommand : ICommand
         try
         {
             var chainTip = await networkClient.GetChainTip().ConfigureAwait(false);
-            var json = JsonSerializer.Serialize(chainTip.First(), SerialiserOptions);
+            if (!chainTip.IsSuccessStatusCode || chainTip.Content == null)
+                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+
+            var json = JsonSerializer.Serialize(chainTip.Content.First(), SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)

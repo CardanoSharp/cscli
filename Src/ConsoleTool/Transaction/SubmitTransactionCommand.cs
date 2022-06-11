@@ -22,8 +22,11 @@ public class SubmitTransactionCommand : ICommand
         try
         {
             using var stream = new MemoryStream(txCborBytes);
-            var txHash = await txClient.Submit(stream).ConfigureAwait(false); 
-            return CommandResult.Success(txHash);
+            var txHashResponse = await txClient.Submit(stream).ConfigureAwait(false);
+            if (!txHashResponse.IsSuccessStatusCode || txHashResponse.Content == null)
+                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+
+            return CommandResult.Success(txHashResponse.Content);
         }
         catch (Exception ex)
         {

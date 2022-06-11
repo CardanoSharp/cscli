@@ -38,6 +38,9 @@ Query commands:
     query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
+    BETA: transaction view --cbor-hex <hex_string>
+    BETA: transaction simple-payment build --from <address> --network <network> --to <address> --amount <ada_amount> [--message <message>] [--out-file <output_path>] [--signing-key <bech32_skey>] [--utxo-management <utxo_mgmt>]
+    BETA: transaction sign --signing-key <bech32_skey> --cbor-hex <hex_string>
     transaction submit --network <network> --cbor-hex <hex_string>
 
 Encoding/Crypto Commands:
@@ -52,6 +55,7 @@ Arguments:
     <network> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
     <digest_length> ::= 160 | 224 | 256 | 512
+    <utxo_mgmt> ::= advanced_split | consolidate 
 ";
         return ValueTask.FromResult(CommandResult.Success(helpText));
     }

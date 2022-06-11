@@ -2,11 +2,6 @@
 using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Wallet;

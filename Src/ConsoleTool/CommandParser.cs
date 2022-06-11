@@ -80,6 +80,7 @@ public static class CommandParser
     private static ICommand ParseTransactionCommands(string intent, string[] args) =>
        intent switch
        {
+           "transaction simple-payment build" => BuildCommand<BuildSimplePaymentTransactionCommand>(args),
            "transaction submit" => BuildCommand<SubmitTransactionCommand>(args),
            _ => new ShowInvalidArgumentCommand(intent)
        };
