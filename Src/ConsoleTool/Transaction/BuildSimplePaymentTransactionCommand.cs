@@ -15,10 +15,12 @@ namespace Cscli.ConsoleTool.Transaction;
 public class BuildSimplePaymentTransactionCommand : ICommand
 {
     public string? From{ get; init; } // Address Bech32
-    public string? SigningKey { get; init; } // Payment Signing Key Bech32
+    public string? SigningKey { get; init; } // Payment Signing Key Bech32 for From Address
     public string? To{ get; init; } // Address Bech32
     public ulong Lovelaces { get; init; }
     public string? Message { get; init; }
+    public string? OutFile { get; init; }
+    public string? FromAddressSigningKey { get; init; }
     public string? Network { get; init; }
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
