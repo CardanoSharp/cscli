@@ -8,6 +8,7 @@ using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Keys;
 using CardanoSharp.Wallet.TransactionBuilding;
+using CardanoSharp.Wallet.Utilities;
 using Cscli.ConsoleTool.Koios;
 
 namespace Cscli.ConsoleTool.Transaction;
@@ -19,19 +20,18 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     public string? To{ get; init; } // Address Bech32
     public ulong Lovelaces { get; init; }
     public string? Message { get; init; }
-    public string? OutFile { get; init; }
-    public string? FromAddressSigningKey { get; init; }
     public string? Network { get; init; }
+    public bool Submit { get; set; }
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        if (!Enum.TryParse<NetworkType>(Network, ignoreCase: true, out var networkType))
+        var (isValid, network, errors) = Validate();
+        if (!isValid)
         {
-            return CommandResult.FailureInvalidOptions($"Invalid option --network must be either testnet or mainnet");
+            return CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors));
         }
-        // TODO: Other validation e.g. FromAddress, FromAddressSigningKey, ToAddress, Lovelaces amount
 
-        (var epochClient, var networkClient, var addressClient) = GetKoiosClients(networkType);
+        (var epochClient, var networkClient, var addressClient) = GetKoiosClients(network);
         var tip = (await networkClient.GetChainTip()).Content.First();
         var protocolParams = (await epochClient.GetProtocolParameters(tip.Epoch.ToString())).Content.First();
         var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content;
@@ -66,13 +66,82 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         txBodyBuilder.SetFee(fee);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
         var txCborBytes = tx.Serialize();
-        // For Tx submission uncomment the below segment
-        //var txClient = BackendGateway.GetBackendClient<ITransactionClient>(networkType);
-        //using var stream = new MemoryStream(txCborBytes);
-        //var txHash = await txClient.Submit(stream).Content;
-        //var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
-        //txHash should be the same as txId
+        if (Submit)
+        {
+            var txClient = BackendGateway.GetBackendClient<ITransactionClient>(network);
+            using var stream = new MemoryStream(txCborBytes);
+            var txHash = (await txClient.Submit(stream)).Content;
+            var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
+            return CommandResult.Success(txHash ?? throw new ApplicationException($"Trasaction submission result is null but should be {txId}"));
+        }
         return CommandResult.Success(txCborBytes.ToStringHex());
+    }
+
+    private (
+        bool isValid,
+        NetworkType derivedNetworkType,
+        IReadOnlyCollection<string> validationErrors) Validate()
+    {
+        var validationErrors = new List<string>();
+        if (!Enum.TryParse<NetworkType>(Network, ignoreCase: true, out var networkType))
+        {
+            validationErrors.Add("Invalid option --network must be either testnet or mainnet");
+        }
+
+        if (string.IsNullOrWhiteSpace(From))
+        {
+            validationErrors.Add("Invalid option --from address is required");
+        }
+        else if (!Bech32.IsValid(From))
+        {
+            validationErrors.Add("Invalid option --from address is not valid");
+        }
+        else
+        {
+            var fromAddress = new Address(From);
+            if (networkType != fromAddress.NetworkType || !fromAddress.Prefix.StartsWith("addr"))
+            {
+                validationErrors.Add(
+                    $"Invalid option --from address is not valid for the network {networkType}");
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(To))
+        {
+            validationErrors.Add("Invalid option --to address is required");
+        }
+        else if (!Bech32.IsValid(To))
+        {
+            validationErrors.Add("Invalid option --to address is not valid");
+        }
+        else
+        {
+            var toAddress = new Address(To);
+            if (networkType != toAddress.NetworkType || !toAddress.Prefix.StartsWith("addr"))
+            {
+                validationErrors.Add(
+                    $"Invalid option --to address is not valid for the network {networkType}");
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(SigningKey))
+        {
+            validationErrors.Add("Invalid option --signing-key is required");
+        }
+        else if (!Bech32.IsValid(SigningKey))
+        {
+            validationErrors.Add("Invalid option --signing-key is not a valid signing key");
+        }
+        else
+        {
+            _ = Bech32.Decode(SigningKey, out _, out var signingKeyPrefix);
+            if (signingKeyPrefix != "addr_xsk" && signingKeyPrefix != "addr_sk" && signingKeyPrefix != "addr_shared_sk")
+            {
+                validationErrors.Add(
+                "Invalid option --signing-key is not a valid payment signing key");
+            }
+        }
+        return (!validationErrors.Any(), networkType, validationErrors);
     }
 
     private static (

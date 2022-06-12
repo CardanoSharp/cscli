@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Cscli.ConsoleTool": {
-      "commandName": "Project",
-      "commandLineArgs": "transaction simple-payment build --network testnet --from addr_test1vz93vkgv8kg5lralfmspl92c039hlu7y3vpjrccpcjg3l7qzflgnf --to addr_test1vp59gv3fpka4476t4708r4dcsqzc935hh8kwt4lsud6k2ec8wcsc2 --lovelaces 100000000 --signing-key addr_xsk14pk3nuzdatf63r0msuj93487a5uk5e7h7m8l4khc02kkw7zkrpqchu228lxu5q7dvv57dl9nymn2vuy5gu9zsln2wrcv6w628ekk22vl6htg204n4y6aevylyczd9fsrs03jhmq80x3wn6k38z2xqrgjd5rp8p39"
+      "commandName": "Project"
     }
   }
 }
