@@ -1,4 +1,7 @@
-﻿namespace Cscli.ConsoleTool.Transaction;
+﻿using CardanoSharp.Wallet.Encoding;
+using CardanoSharp.Wallet.Models.Keys;
+
+namespace Cscli.ConsoleTool.Transaction;
 
 public static class TxUtils
 {
@@ -94,5 +97,11 @@ public static class TxUtils
             * (fixedUtxoEntryWithoutValueSizeWords + valueSizeWords + dataHashSizeWords);
 
         return (ulong)minUtxoLovelace;
+    }
+
+    public static PrivateKey GetPrivateKeyFromBech32SigningKey(string bech32EncodedSigningKey)
+    {
+        var keyBytes = Bech32.Decode(bech32EncodedSigningKey, out _, out _);
+        return new PrivateKey(keyBytes[..64], keyBytes[64..]);
     }
 }

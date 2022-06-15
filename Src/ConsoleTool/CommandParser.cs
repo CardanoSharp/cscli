@@ -82,6 +82,8 @@ public static class CommandParser
        {
            "transaction simple-payment build" => BuildCommand<BuildSimplePaymentTransactionCommand>(args),
            "transaction submit" => BuildCommand<SubmitTransactionCommand>(args),
+           "transaction view" => BuildCommand<ViewTransactionCommand>(args),
+           "transaction sign" => BuildCommand<SignTransactionCommand>(args),
            _ => new ShowInvalidArgumentCommand(intent)
        };
 

@@ -51,7 +51,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces);
         txBodyBuilder.AddOutput(new Address(From), txChangeOutput.Lovelaces);
         // Witnesses
-        var paymentSkey = GetPrivateKeyFromBech32SigningKey(SigningKey);
+        var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
         var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(674, BuildMessageMetadata(Message));
         var witnesses = TransactionWitnessSetBuilder.Create
             .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
@@ -182,12 +182,6 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                 .Sum();
         }
         return sourceAddressUtxos.Select(utxo => utxo.Value).Sum();
-    }
-
-    private static PrivateKey GetPrivateKeyFromBech32SigningKey(string bech32EncodedSigningKey)
-    {
-        var keyBytes = Bech32.Decode(bech32EncodedSigningKey, out _, out _);
-        return new PrivateKey(keyBytes[..64], keyBytes[64..]);
     }
 
     private static IDictionary<string, object> BuildMessageMetadata(string? message)

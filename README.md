@@ -98,6 +98,9 @@ Query commands:
 
 Transaction Commands:
     transaction submit --network <network> --cbor-hex <hex_string>
+    BETA: transaction simple-payment build --network <network> --from <address> --to <address> --amount <ada_amount> [--signing-key <bech32_skey>] [--submit (true | false)] [--message <message>] [--out-file <output_path>] 
+    BETA: transaction view --cbor-hex <hex_string>
+    BETA: transaction sign --signing-key <bech32_skey> --cbor-hex <hex_string>
 
 Encoding/Cryptography Commands:
     bech32 encode --value <hex_string> --prefix <string>
