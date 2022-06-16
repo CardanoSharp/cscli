@@ -26,7 +26,7 @@ public class SubmitTransactionCommand : ICommand
             if (!txHashResponse.IsSuccessStatusCode || txHashResponse.Content == null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 
-            return CommandResult.Success(txHashResponse.Content);
+            return CommandResult.Success(txHashResponse.Content.TrimStart('"').TrimEnd('"'));
         }
         catch (Exception ex)
         {

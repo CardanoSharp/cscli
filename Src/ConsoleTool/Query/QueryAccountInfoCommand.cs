@@ -28,7 +28,10 @@ public class QueryAccountInfoCommand : ICommand
         try
         {
             var accountInfo = await accountClient.GetStakeInformation(stakeAddress.ToString()).ConfigureAwait(false);
-            var json = JsonSerializer.Serialize(accountInfo, SerialiserOptions);
+            if (!accountInfo.IsSuccessStatusCode || accountInfo.Content == null)
+                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+
+            var json = JsonSerializer.Serialize(accountInfo.Content, SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)

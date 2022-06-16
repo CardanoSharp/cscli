@@ -15,7 +15,7 @@ public class QueryAddressInfoCommand : ICommand
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, networkType, errors) = Validate();
+        var (isValid, networkType, address, errors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
@@ -25,10 +25,11 @@ public class QueryAddressInfoCommand : ICommand
         var addressClient = BackendGateway.GetBackendClient<IAddressClient>(networkType);
         try
         {
-#pragma warning disable CS8604 // Possible null reference warning suppressed because of validation above
-            var addressInfo = await addressClient.GetAddressInformation(Address).ConfigureAwait(false);
-#pragma warning restore CS8604 
-            var json = JsonSerializer.Serialize(addressInfo, SerialiserOptions);
+            var addressInfo = (await addressClient.GetAddressInformation(address.ToString()).ConfigureAwait(false));
+            if (!addressInfo.IsSuccessStatusCode || addressInfo.Content == null)
+                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+
+            var json = JsonSerializer.Serialize(addressInfo.Content, SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)
@@ -40,6 +41,7 @@ public class QueryAddressInfoCommand : ICommand
     private (
         bool isValid,
         NetworkType derivedNetworkType,
+        Address address,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
@@ -59,6 +61,6 @@ public class QueryAddressInfoCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --address {Address} is invalid for {Network}");
         }
-        return (!validationErrors.Any(), networkType, validationErrors);
+        return (!validationErrors.Any(), networkType, address, validationErrors);
     }
 }

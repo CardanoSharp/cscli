@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Cscli.ConsoleTool": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "query info address --network testnet --address addr_test1vz93vkgv8kg5lralfmspl92c039hlu7y3vpjrccpcjg3l7qzflgnf"
     }
   }
 }
