@@ -49,7 +49,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             txBodyBuilder.AddInput(txInput.TxHash, txInput.OutputIndex);
         }
         txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces);
-        txBodyBuilder.AddOutput(new Address(From), txChangeOutput.Lovelaces);
+        txBodyBuilder.AddOutput(new Address(From), txChangeOutput.Lovelaces, GetTokenBundleBuilder(txChangeOutput.NativeAssets));
         // Witnesses
         var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
         var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(674, BuildMessageMetadata(Message));
@@ -70,7 +70,8 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             var txClient = BackendGateway.GetBackendClient<ITransactionClient>(network);
             using var stream = new MemoryStream(txCborBytes);
-            var txHash = (await txClient.Submit(stream)).Content?.TrimStart('"').TrimEnd('"');
+            var response = (await txClient.Submit(stream));
+            var txHash = response.Content?.TrimStart('"').TrimEnd('"');
             var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
             return CommandResult.Success(txHash ?? throw new ApplicationException($"Trasaction submission result is null but should be {txId}"));
         }
@@ -182,6 +183,19 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                 .Sum();
         }
         return sourceAddressUtxos.Select(utxo => utxo.Value).Sum();
+    }
+
+    private static ITokenBundleBuilder GetTokenBundleBuilder(NativeAssetValue[] nativeAssetValues)
+    {
+        var tokenBuilder = TokenBundleBuilder.Create;
+        foreach (var nativeAssetValue in nativeAssetValues)
+        {
+            tokenBuilder = tokenBuilder.AddToken(
+                nativeAssetValue.PolicyId.HexToByteArray(), 
+                nativeAssetValue.AssetName.HexToByteArray(), 
+                nativeAssetValue.Quantity);
+        }
+        return tokenBuilder;
     }
 
     private static IDictionary<string, object> BuildMessageMetadata(string? message)
