@@ -93,6 +93,9 @@ public class ViewTransactionCommand : ICommand
 
     private static NativeAssetValue[] MapNativeAssets(IDictionary<byte[], NativeAsset> multiAsset)
     {
+        if (multiAsset == null)
+            return Array.Empty<NativeAssetValue>();
+
         return multiAsset.Keys.SelectMany(
             maKey => multiAsset[maKey].Token.Select(
                 mat => new NativeAssetValue(maKey.ToStringHex(), mat.Key.ToStringHex(), mat.Value)))
