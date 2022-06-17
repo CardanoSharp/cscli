@@ -6,26 +6,6 @@ using System.Text.Json;
 
 namespace Cscli.ConsoleTool.Transaction;
 
-public record TxIn(
-    string TransactionId,
-    uint TransactionIndex);
-
-public record TxOut(
-    string Address,
-    AggregateValue Value);
-
-public record TransactionBody(
-    IEnumerable<TxIn> TransactionInputs,
-    IEnumerable<TxOut> TransactionOutputs,
-    IEnumerable<NativeAssetValue> NativeAssets,
-    ulong Fee,
-    uint? Ttl,
-    string MetadataHash,
-    uint? TransactionStartInterval);
-
-public record Transaction(
-    TransactionBody TransactionBody);
-
 public class ViewTransactionCommand : ICommand
 {
     public string? CborHex { get; init; }
@@ -41,8 +21,8 @@ public class ViewTransactionCommand : ICommand
 
         var tx = txCborBytes.DeserializeTransaction();
 
-        var transaction = new Transaction(
-            new TransactionBody(
+        var transaction = new Tx(
+            new TxBody(
                 tx.TransactionBody.TransactionInputs.Select(txI => new TxIn(txI.TransactionId.ToStringHex(), txI.TransactionIndex)).ToArray(),
                 tx.TransactionBody.TransactionOutputs.Select(
                     txO => MapTxOut(txO)).ToArray(),

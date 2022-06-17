@@ -16,3 +16,23 @@ public record UnspentTransactionOutput(string TxHash, uint OutputIndex, Aggregat
 }
 
 public record TextEnvelope(string? Type, string? Description, string? CborHex);
+
+public record TxIn(
+    string TransactionId,
+    uint TransactionIndex);
+
+public record TxOut(
+    string Address,
+    AggregateValue Value);
+
+public record TxBody(
+    IEnumerable<TxIn> TransactionInputs,
+    IEnumerable<TxOut> TransactionOutputs,
+    IEnumerable<NativeAssetValue> NativeAssets,
+    ulong Fee,
+    uint? Ttl,
+    string MetadataHash,
+    uint? TransactionStartInterval);
+
+public record Tx(
+    TxBody TransactionBody);

@@ -70,7 +70,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             var txClient = BackendGateway.GetBackendClient<ITransactionClient>(network);
             using var stream = new MemoryStream(txCborBytes);
-            var txHash = (await txClient.Submit(stream)).Content;
+            var txHash = (await txClient.Submit(stream)).Content?.TrimStart('"').TrimEnd('"');
             var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
             return CommandResult.Success(txHash ?? throw new ApplicationException($"Trasaction submission result is null but should be {txId}"));
         }
