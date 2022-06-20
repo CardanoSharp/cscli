@@ -5,6 +5,10 @@ namespace Cscli.ConsoleTool;
 
 public static class Constants
 {
+    public const int MessageStandardKey = 674;
+    public const int NftStandardKey = 721;
+    public const int NftRoyaltyStandardKey = 777;
+    public const int MaxMetadataStringLength = 64;
     public const string DefaultMnemonicLanguage = "English";
     public const int DefaultMnemonicCount = 24;
     public const int MaxDerivationPathIndex = Int32.MaxValue; // 2^31 - 1

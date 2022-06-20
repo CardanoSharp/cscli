@@ -6,10 +6,10 @@ using CardanoSharp.Wallet.Extensions;
 using CardanoSharp.Wallet.Extensions.Models;
 using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using CardanoSharp.Wallet.Models.Addresses;
-using CardanoSharp.Wallet.Models.Keys;
 using CardanoSharp.Wallet.TransactionBuilding;
 using CardanoSharp.Wallet.Utilities;
 using Cscli.ConsoleTool.Koios;
+using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Transaction;
 
@@ -52,7 +52,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         txBodyBuilder.AddOutput(new Address(From), txChangeOutput.Lovelaces, GetTokenBundleBuilder(txChangeOutput.NativeAssets));
         // Witnesses
         var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
-        var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(674, BuildMessageMetadata(Message));
+        var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message));
         var witnesses = TransactionWitnessSetBuilder.Create
             .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
         // Build full Tx
@@ -200,35 +200,34 @@ public class BuildSimplePaymentTransactionCommand : ICommand
 
     private static IDictionary<string, object> BuildMessageMetadata(string? message)
     {
-        const int maxLength = 64;
         if (string.IsNullOrWhiteSpace(message))
         {
             return new Dictionary<string, object>()
             {
-                {  "msg", "Built using CardanoSharp" }
+                {  "msg", "Built with github.com/CardanoSharp/cscli" }
             };
         }
         return new Dictionary<string, object>
         {
-            {  "msg", message.Length > maxLength ? SplitString(message) : message }
+            {  "msg", message.Length > MaxMetadataStringLength ? SplitString(message) : message }
         };
 
         static string[] SplitString(string? value)
         {
             if (value == null)
                 return Array.Empty<string>();
-            if (value.Length <= maxLength)
+            if (value.Length <= MaxMetadataStringLength)
                 return new[] { value };
 
-            var offsetLength = maxLength - 1;
-            var itemsLength = (value.Length + offsetLength) / maxLength;
+            var offsetLength = MaxMetadataStringLength - 1;
+            var itemsLength = (value.Length + offsetLength) / MaxMetadataStringLength;
             var items = new string[itemsLength];
             for (var i = 0; i < itemsLength; i++)
             {
-                var substringStartIndex = i * maxLength;
-                var substringLength = (substringStartIndex + maxLength) <= value.Length
-                    ? maxLength
-                    : value.Length % maxLength; 
+                var substringStartIndex = i * MaxMetadataStringLength;
+                var substringLength = (substringStartIndex + MaxMetadataStringLength) <= value.Length
+                    ? MaxMetadataStringLength
+                    : value.Length % MaxMetadataStringLength; 
                 var segment = value.Substring(substringStartIndex, substringLength);
                 items[i] = segment;
             }

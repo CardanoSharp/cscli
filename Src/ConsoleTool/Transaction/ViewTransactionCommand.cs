@@ -2,7 +2,6 @@
 using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Transactions;
-using System.Text;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
