@@ -7,11 +7,11 @@ namespace Cscli.ConsoleTool.Transaction;
 public class SignTransactionCommand : ICommand
 {
     public string? CborHex { get; init; }
-    public string? SigningKey { get; init; }
+    public string? SigningKeys { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, txCborBytes, errors) = Validate();
+        var (isValid, txCborBytes, signingKeys, errors) = Validate();
         if (!isValid)
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
@@ -19,13 +19,16 @@ public class SignTransactionCommand : ICommand
         }
 
         var tx = txCborBytes.DeserializeTransaction();
-        var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
-        var paymentVkey = paymentSkey.GetPublicKey();
-        tx.TransactionWitnessSet.VKeyWitnesses.Add(new CardanoSharp.Wallet.Models.Transactions.VKeyWitness
+        foreach (var signingKey in signingKeys)
         {
-            SKey = paymentSkey,
-            VKey = paymentVkey
-        });
+            var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(signingKey);
+            var paymentVkey = paymentSkey.GetPublicKey();
+            tx.TransactionWitnessSet.VKeyWitnesses.Add(new CardanoSharp.Wallet.Models.Transactions.VKeyWitness
+            {
+                SKey = paymentSkey,
+                VKey = paymentVkey
+            });
+        }
         txCborBytes = tx.Serialize();
         return ValueTask.FromResult(CommandResult.Success(txCborBytes.ToStringHex()));
     }
@@ -33,8 +36,11 @@ public class SignTransactionCommand : ICommand
     private (
         bool isValid,
         byte[] txCborBytes,
+        string[] signingKeys,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
+        var txCborBytes = Array.Empty<byte>();
+        var signingKeys = Array.Empty<string>();
         var validationErrors = new List<string>();
         if (string.IsNullOrWhiteSpace(CborHex))
         {
@@ -45,8 +51,7 @@ public class SignTransactionCommand : ICommand
         {
             try
             {
-                var txCborBytes = Convert.FromHexString(CborHex);
-                return (!validationErrors.Any(), txCborBytes, validationErrors);
+                txCborBytes = Convert.FromHexString(CborHex);
             }
             catch (FormatException)
             {
@@ -54,10 +59,21 @@ public class SignTransactionCommand : ICommand
                     $"Invalid option --cbor-hex {CborHex} is not in hexadecimal format");
             }
         }
-        if (string.IsNullOrWhiteSpace(SigningKey))
+        if (string.IsNullOrWhiteSpace(SigningKeys))
         {
-            validationErrors.Add("Invalid option --signing-key is required");
+            validationErrors.Add("Invalid option --signing-keys is required");
         }
-        return (!validationErrors.Any(), Array.Empty<byte>(), validationErrors);
+        else
+        {
+            signingKeys = SigningKeys.Split(',');
+            for (int i = 0; i < signingKeys.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(signingKeys[i]))
+                {
+                    validationErrors.Add($"Invalid option --signing-keys[{i}] is empty or whitespace");
+                }
+            }
+        }
+        return (!validationErrors.Any(), txCborBytes, signingKeys, validationErrors);
     }
 }

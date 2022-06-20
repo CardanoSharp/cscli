@@ -17,13 +17,11 @@ public record UnspentTransactionOutput(string TxHash, uint OutputIndex, Aggregat
 
 public record TextEnvelope(string? Type, string? Description, string? CborHex);
 
-public record TxIn(
-    string TransactionId,
-    uint TransactionIndex);
-
-public record TxOut(
-    string Address,
-    AggregateValue Value);
+public record Tx(
+    bool IsValid,
+    TxBody TransactionBody,
+    TxWitnessSet TransactionWitnessSet,
+    TxAuxData AuxiliaryData);
 
 public record TxBody(
     IEnumerable<TxIn> TransactionInputs,
@@ -34,5 +32,21 @@ public record TxBody(
     string MetadataHash,
     uint? TransactionStartInterval);
 
-public record Tx(
-    TxBody TransactionBody);
+public record TxIn(
+    string TransactionId,
+    uint TransactionIndex);
+
+public record TxOut(
+    string Address,
+    AggregateValue Value);
+
+public record TxWitnessSet(
+    IEnumerable<TxVKeyWitness> VKeyWitnesses,
+    IEnumerable<TxNativeScript> NativeScripts);
+
+public record TxVKeyWitness(string Verificationkey, string SigningKey, string Signature);
+
+public record TxNativeScript(string Type);
+
+public record TxAuxData(Dictionary<int, object> Metadata);
+

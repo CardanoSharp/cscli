@@ -56,6 +56,7 @@ public static class Constants
         { "--cbor-hex", "cborHex" },
         { "--tx-id", "txId" },
         { "--signing-key", "signingKey" },
+        { "--signing-keys", "signingKeys" },
         //{ "--output-format", "outputFormat" },
     };
 }
