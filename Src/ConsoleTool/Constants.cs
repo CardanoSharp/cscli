@@ -19,6 +19,7 @@ public static class Constants
     public const string AccountSigningKeyBech32Prefix = "acct_sk";
     public const string PaymentExtendedSigningKeyBech32Prefix = "addr_xsk";
     public const string PaymentSigningKeyBech32Prefix = "addr_sk";
+    public const string PaymentSharedSigningKeyBech32Prefix = "addr_shared_sk";
     public const string StakeExtendedSigningKeyBech32Prefix = "stake_xsk";
     public const string StakeSigningKeyBech32Prefix = "stake_sk";
     public const string PolicySigningKeyBech32Prefix = "policy_sk";

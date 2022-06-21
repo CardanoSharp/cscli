@@ -52,17 +52,20 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         }
         txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces);
         txBodyBuilder.AddOutput(new Address(From), txChangeOutput.Lovelaces, GetTokenBundleBuilder(txChangeOutput.NativeAssets));
-        // Witnesses
-        var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
+
         var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message));
-        var witnesses = TransactionWitnessSetBuilder.Create
-            .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
-        // Build full Tx
-        var tx = TransactionBuilder.Create
+        var txBuilder = TransactionBuilder.Create
             .SetBody(txBodyBuilder)
-            .SetWitnesses(witnesses)
-            .SetAuxData(auxDataBuilder)
-            .Build();
+            .SetAuxData(auxDataBuilder);
+        // Key Witnesses if signing key is passed in
+        if (!string.IsNullOrWhiteSpace(SigningKey))
+        {
+            var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
+            var witnesses = TransactionWitnessSetBuilder.Create
+                .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
+            txBuilder.SetWitnesses(witnesses);
+        }
+        var tx = txBuilder.Build();
         // Fee Calculation
         var fee = tx.CalculateFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
         txBodyBuilder.SetFee(fee);
@@ -132,21 +135,22 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             }
         }
 
-        if (string.IsNullOrWhiteSpace(SigningKey))
+        if (!string.IsNullOrWhiteSpace(SigningKey))
         {
-            validationErrors.Add("Invalid option --signing-key is required");
-        }
-        else if (!Bech32.IsValid(SigningKey))
-        {
-            validationErrors.Add("Invalid option --signing-key is not a valid signing key");
-        }
-        else
-        {
-            _ = Bech32.Decode(SigningKey, out _, out var signingKeyPrefix);
-            if (signingKeyPrefix != "addr_xsk" && signingKeyPrefix != "addr_sk" && signingKeyPrefix != "addr_shared_sk")
+            if (!Bech32.IsValid(SigningKey))
             {
-                validationErrors.Add(
-                "Invalid option --signing-key is not a valid payment signing key");
+                validationErrors.Add("Invalid option --signing-key is not a valid signing key");
+            }
+            else
+            {
+                _ = Bech32.Decode(SigningKey, out _, out var signingKeyPrefix);
+                if (signingKeyPrefix != PaymentExtendedSigningKeyBech32Prefix 
+                    && signingKeyPrefix != PaymentSigningKeyBech32Prefix 
+                    && signingKeyPrefix != PaymentSharedSigningKeyBech32Prefix)
+                {
+                    validationErrors.Add(
+                    "Invalid option --signing-key is not a valid payment signing key");
+                }
             }
         }
 
