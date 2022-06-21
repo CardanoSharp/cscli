@@ -35,7 +35,7 @@ public class ViewTransactionCommand : ICommand
                 tx.TransactionBody.TransactionStartInterval),
             new TxWitnessSet(
                 tx.TransactionWitnessSet.VKeyWitnesses.Select(
-                    vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.SKey?.Key?.ToStringHex() ?? "", vw.Signature.ToStringHex()))
+                    vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
                 .ToArray(),
                 tx.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
             new TxAuxData(tx.AuxiliaryData.Metadata));

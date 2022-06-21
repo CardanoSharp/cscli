@@ -44,7 +44,7 @@ public record TxWitnessSet(
     IEnumerable<TxVKeyWitness> VKeyWitnesses,
     IEnumerable<TxNativeScript> NativeScripts);
 
-public record TxVKeyWitness(string Verificationkey, string SigningKey, string Signature);
+public record TxVKeyWitness(string Verificationkey, string Signature);
 
 public record TxNativeScript(string Type);
 
