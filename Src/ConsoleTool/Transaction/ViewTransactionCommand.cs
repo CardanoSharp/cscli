@@ -38,7 +38,7 @@ public class ViewTransactionCommand : ICommand
                     vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
                 .ToArray(),
                 tx.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
-            new TxAuxData(tx.AuxiliaryData.Metadata));
+            new TxAuxData(tx.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
 
         var json = JsonSerializer.Serialize(transaction, SerialiserOptions);
 

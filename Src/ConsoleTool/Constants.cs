@@ -35,6 +35,8 @@ public static class Constants
     public const string StakeVKeyJsonTypeField = "StakeVerificationKeyShelley_ed25519";
     public const string StakeExtendedVKeyJsonTypeField = "StakeExtendedVerificationKeyShelley_ed25519_bip32";
     public const string StakeVKeyJsonDescriptionField = "Stake Verification Key";
+    public const string TxAlonzoJsonTypeField = "Tx AlonzoEra";
+
     // Validation constraints
     public static readonly int[] ValidMnemonicSizes = { 9, 12, 15, 18, 21, 24 };
     // Default JSON Serialiser settings
@@ -61,6 +63,7 @@ public static class Constants
         { "--tx-id", "txId" },
         { "--signing-key", "signingKey" },
         { "--signing-keys", "signingKeys" },
+        { "--out-file", "outFile" },
         //{ "--output-format", "outputFormat" },
     };
 }

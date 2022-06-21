@@ -9,19 +9,21 @@ using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.TransactionBuilding;
 using CardanoSharp.Wallet.Utilities;
 using Cscli.ConsoleTool.Koios;
+using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Transaction;
 
 public class BuildSimplePaymentTransactionCommand : ICommand
 {
-    public string? From{ get; init; } // Address Bech32
+    public string? From { get; init; } // Address Bech32
     public string? SigningKey { get; init; } // Payment Signing Key Bech32 for From Address
     public string? To{ get; init; } // Address Bech32
     public ulong Lovelaces { get; init; }
     public string? Message { get; init; }
     public string? Network { get; init; }
-    public bool Submit { get; set; }
+    public bool Submit { get; init; }
+    public string? OutFile { get; init; }
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
@@ -66,6 +68,11 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         txBodyBuilder.SetFee(fee);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
         var txCborBytes = tx.Serialize();
+        if (!string.IsNullOrWhiteSpace(OutFile))
+        {
+            var txTextEnvelope = new TextEnvelope(TxAlonzoJsonTypeField, "", txCborBytes.ToStringHex());
+            await File.WriteAllTextAsync(OutFile, JsonSerializer.Serialize(txTextEnvelope, SerialiserOptions), ct);
+        }
         if (Submit)
         {
             var txClient = BackendGateway.GetBackendClient<ITransactionClient>(network);
@@ -141,6 +148,14 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                 validationErrors.Add(
                 "Invalid option --signing-key is not a valid payment signing key");
             }
+        }
+
+        if (!string.IsNullOrWhiteSpace(OutFile)
+            && Path.IsPathFullyQualified(OutFile)
+            && !Directory.Exists(Path.GetDirectoryName(OutFile)))
+        {
+            validationErrors.Add(
+                $"Invalid option --out-file path {OutFile} does not exist");
         }
         return (!validationErrors.Any(), networkType, validationErrors);
     }
