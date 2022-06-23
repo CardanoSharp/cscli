@@ -33,11 +33,13 @@ public class ViewTransactionCommand : ICommand
                 tx.TransactionBody.Ttl,
                 tx.TransactionBody.MetadataHash,
                 tx.TransactionBody.TransactionStartInterval),
-            new TxWitnessSet(
-                tx.TransactionWitnessSet.VKeyWitnesses.Select(
-                    vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
-                .ToArray(),
-                tx.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
+            tx.TransactionWitnessSet is null 
+                ? new TxWitnessSet(Array.Empty<TxVKeyWitness>(), Array.Empty<TxNativeScript>()) 
+                : new TxWitnessSet(
+                    tx.TransactionWitnessSet.VKeyWitnesses.Select(
+                        vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
+                    .ToArray(),
+                    tx.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
             new TxAuxData(tx.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
 
         var json = JsonSerializer.Serialize(transaction, SerialiserOptions);
@@ -76,7 +78,7 @@ public class ViewTransactionCommand : ICommand
     {
         return new TxOut(
             new Address("addr", txO.Address).ToString(), // TODO: address deserialization based on network
-            new AggregateValue(txO.Value.Coin, MapNativeAssets(txO.Value.MultiAsset).ToArray()));
+            new Balance(txO.Value.Coin, MapNativeAssets(txO.Value.MultiAsset).ToArray()));
     }
 
     private static NativeAssetValue[] MapNativeAssets(IDictionary<byte[], NativeAsset> multiAsset)

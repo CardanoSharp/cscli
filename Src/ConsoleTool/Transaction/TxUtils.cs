@@ -5,7 +5,11 @@ namespace Cscli.ConsoleTool.Transaction;
 
 public static class TxUtils
 {
-    public static AggregateValue Sum(this IEnumerable<AggregateValue> values)
+    public static bool IsZero(this Balance value)
+    {
+        return value.Lovelaces == 0 && value.NativeAssets.Length == 0;
+    }
+    public static Balance Sum(this IEnumerable<Balance> values)
     {
         var lovelaces = 0UL;
         var nativeAssets = new Dictionary<(string PolicyId, string AssetNameHex), ulong>();
@@ -22,12 +26,12 @@ public static class TxUtils
                 nativeAssets.Add((nativeAsset.PolicyId, nativeAsset.AssetName), nativeAsset.Quantity);
             }
         }
-        return new AggregateValue(
+        return new Balance(
             lovelaces,
             nativeAssets.Select(nav => new NativeAssetValue(nav.Key.PolicyId, nav.Key.AssetNameHex, nav.Value)).ToArray());
     }
 
-    public static AggregateValue Subtract(this AggregateValue lhsValue, AggregateValue rhsValue)
+    public static Balance Subtract(this Balance lhsValue, Balance rhsValue)
     {
         static NativeAssetValue SubtractSingleValue(NativeAssetValue lhsValue, NativeAssetValue rhsValue)
         {
@@ -37,7 +41,7 @@ public static class TxUtils
         };
 
         if (rhsValue.NativeAssets.Length == 0)
-            return new AggregateValue(lhsValue.Lovelaces - rhsValue.Lovelaces, lhsValue.NativeAssets);
+            return new Balance(lhsValue.Lovelaces - rhsValue.Lovelaces, lhsValue.NativeAssets);
 
         var missingLhsValues = rhsValue.NativeAssets
             .Where(rna => !lhsValue.NativeAssets
@@ -53,7 +57,7 @@ public static class TxUtils
                     rv => rv.PolicyId == lv.PolicyId && rv.AssetName == lv.AssetName)))
             .Where(na => na.Quantity != 0)
             .ToArray();
-        return new AggregateValue(lhsValue.Lovelaces - rhsValue.Lovelaces, nativeAssets);
+        return new Balance(lhsValue.Lovelaces - rhsValue.Lovelaces, nativeAssets);
     }
 
     public static ulong CalculateMinUtxoLovelace(

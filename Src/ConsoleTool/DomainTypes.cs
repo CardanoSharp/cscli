@@ -2,11 +2,11 @@
 
 public record struct NativeAssetValue(string PolicyId, string AssetName, ulong Quantity);
 
-public record struct AggregateValue(ulong Lovelaces, NativeAssetValue[] NativeAssets);
+public record struct Balance(ulong Lovelaces, NativeAssetValue[] NativeAssets);
 
-public record struct PendingTransactionOutput(string Address, AggregateValue Value);
+public record struct PendingTransactionOutput(string Address, Balance Value);
 
-public record UnspentTransactionOutput(string TxHash, uint OutputIndex, AggregateValue Value)
+public record UnspentTransactionOutput(string TxHash, uint OutputIndex, Balance Value)
 {
     public override int GetHashCode() => ToString().GetHashCode();
     public override string ToString() => $"{TxHash}_{OutputIndex}";
@@ -38,7 +38,7 @@ public record TxIn(
 
 public record TxOut(
     string Address,
-    AggregateValue Value);
+    Balance Value);
 
 public record TxWitnessSet(
     IEnumerable<TxVKeyWitness> VKeyWitnesses,

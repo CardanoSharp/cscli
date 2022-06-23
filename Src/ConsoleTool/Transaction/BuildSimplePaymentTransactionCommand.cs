@@ -19,7 +19,9 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     public string? From { get; init; } // Address Bech32
     public string? SigningKey { get; init; } // Payment Signing Key Bech32 for From Address
     public string? To{ get; init; } // Address Bech32
-    public ulong Lovelaces { get; init; }
+    public ulong Lovelaces { get; init; } // Either Lovelaces or Ada
+    public decimal Ada { get; init; } 
+    public bool SendAll { get; init; }
     public string? Message { get; init; }
     public string? Network { get; init; }
     public bool Submit { get; init; }
@@ -27,7 +29,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, network, errors) = Validate();
+        var (isValid, network, lovelaces, errors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors));
@@ -39,19 +41,25 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content;
         var sourceAddressUtxos = BuildSourceAddressUtxos(sourceAddressInfo.First().UtxoSets);
         var consolidatedInputValue = BuildConsolidatedTxInputValue(sourceAddressUtxos);
-        var txOutput = new PendingTransactionOutput(To, new AggregateValue(Lovelaces, Array.Empty<NativeAssetValue>()));
-        var txChangeOutput = consolidatedInputValue.Subtract(txOutput.Value);
+        var txOutput = SendAll 
+            ? new PendingTransactionOutput(To, consolidatedInputValue)
+            : new PendingTransactionOutput(To, new Balance(lovelaces, Array.Empty<NativeAssetValue>()));
+        var change = consolidatedInputValue.Subtract(txOutput.Value);
         // Build Tx Body
         var txBodyBuilder = TransactionBodyBuilder.Create
             .SetFee(0)
             .SetTtl((uint)tip.AbsSlot + 7200); // 2 hours
-        // Inputs/Outputs
+        // Inputs
         foreach (var txInput in sourceAddressUtxos)
         {
             txBodyBuilder.AddInput(txInput.TxHash, txInput.OutputIndex);
         }
+        // Outputs
         txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces);
-        txBodyBuilder.AddOutput(new Address(From), txChangeOutput.Lovelaces, GetTokenBundleBuilder(txChangeOutput.NativeAssets));
+        if (!change.IsZero())
+        {
+            txBodyBuilder.AddOutput(new Address(From), change.Lovelaces, GetTokenBundleBuilder(change.NativeAssets));
+        }
 
         var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message));
         var txBuilder = TransactionBuilder.Create
@@ -91,6 +99,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     private (
         bool isValid,
         NetworkType derivedNetworkType,
+        ulong lovelaces,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
@@ -135,6 +144,24 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             }
         }
 
+        var lovelaces = 0UL;
+        if (Lovelaces <= 0 && Ada <= 0 && !SendAll)
+        {
+            validationErrors.Add("Invalid options either (--lovelaces | --ada | --send-all) must be supplied");
+        }
+        else if ((Lovelaces > 0 || Ada > 0) && SendAll)
+        {
+            validationErrors.Add("Invalid options only one of (--lovelaces | --ada | --send-all) must be supplied");
+        }
+        else if (Lovelaces > 0 && Lovelaces < 1000000)
+        {
+            validationErrors.Add("Invalid option --lovelaces value must be at least 1000000");
+        }
+        else
+        {
+            lovelaces = (Ada > 0) ? (ulong)(1000000 * Ada) : Lovelaces;
+        }
+
         if (!string.IsNullOrWhiteSpace(SigningKey))
         {
             if (!Bech32.IsValid(SigningKey))
@@ -161,7 +188,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --out-file path {OutFile} does not exist");
         }
-        return (!validationErrors.Any(), networkType, validationErrors);
+        return (!validationErrors.Any(), networkType, lovelaces, validationErrors);
     }
 
     private static (
@@ -179,7 +206,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             .Select(utxo => new UnspentTransactionOutput(
                 utxo.TxHash,
                 utxo.TxIndex,
-                new AggregateValue(
+                new Balance(
                     ulong.Parse(utxo.Value),
                     utxo.AssetList.Select(
                         a => new NativeAssetValue(
@@ -190,7 +217,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             .ToArray();
     }
 
-    private static AggregateValue BuildConsolidatedTxInputValue(
+    private static Balance BuildConsolidatedTxInputValue(
         UnspentTransactionOutput[] sourceAddressUtxos,
         NativeAssetValue[]? nativeAssetsToMint = null)
     {
@@ -198,7 +225,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             return sourceAddressUtxos
                 .Select(utxo => utxo.Value)
-                .Concat(new[] { new AggregateValue(0, nativeAssetsToMint) })
+                .Concat(new[] { new Balance(0, nativeAssetsToMint) })
                 .Sum();
         }
         return sourceAddressUtxos.Select(utxo => utxo.Value).Sum();
