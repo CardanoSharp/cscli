@@ -22,9 +22,17 @@ public class SignTransactionCommand : ICommand
         }
 
         var tx = txCborBytes.DeserializeTransaction();
+        if (tx.TransactionWitnessSet is null)
+        {
+            tx.TransactionWitnessSet = new TransactionWitnessSet
+            {
+                VKeyWitnesses = new List<VKeyWitness>(),
+            };
+        }
+
         foreach (var signingKey in signingKeys)
         {
-            var vKey = signingKey.GetPublicKey();
+            var vKey = signingKey.GetPublicKey(false);
             var keyExistsInWitnessSet = tx.TransactionWitnessSet.VKeyWitnesses.Any(kw => kw.VKey.Key.SequenceEqual(vKey.Key));
             if (!keyExistsInWitnessSet)
             {

@@ -26,7 +26,7 @@ public record Tx(
 public record TxBody(
     IEnumerable<TxIn> TransactionInputs,
     IEnumerable<TxOut> TransactionOutputs,
-    IEnumerable<NativeAssetValue> NativeAssets,
+    IEnumerable<NativeAssetValue> Mint,
     ulong Fee,
     uint? Ttl,
     string MetadataHash,
