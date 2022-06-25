@@ -412,6 +412,45 @@ public class CommandParserShould
         submitTransactionCommand.CborHex.Should().Be(expectedCborHex);
     }
 
+    //[Theory]
+    //[InlineData("transaction view --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
+    //[InlineData("transaction view --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
+    //public void ParseArgs_Correctly_ViewTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
+    //{
+    //    var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+    //    var viewTransactionCommand = (SubmitTransactionCommand)command;
+    //    viewTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
+    //    viewTransactionCommand.Network.Should().Be(expectedNetwork);
+    //    viewTransactionCommand.CborHex.Should().Be(expectedCborHex);
+    //}
+
+    //[Theory]
+    //[InlineData("transaction sign --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
+    //[InlineData("transaction sign --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
+    //public void ParseArgs_Correctly_SignTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
+    //{
+    //    var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+    //    var signTransactionCommand = (SubmitTransactionCommand)command;
+    //    signTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
+    //    signTransactionCommand.Network.Should().Be(expectedNetwork);
+    //    signTransactionCommand.CborHex.Should().Be(expectedCborHex);
+    //}
+
+    //[Theory]
+    //[InlineData("transaction simple-payment build --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
+    //[InlineData("transaction simple-payment build --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
+    //public void ParseArgs_Correctly_BuildSimplePaymentTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
+    //{
+    //    var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+
+    //    var signTransactionCommand = (SubmitTransactionCommand)command;
+    //    signTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
+    //    signTransactionCommand.Network.Should().Be(expectedNetwork);
+    //    signTransactionCommand.CborHex.Should().Be(expectedCborHex);
+    //}
+
     private static string[] GenerateArgs(string flatArgs, string expectedMnemonic)
     {
         var args = flatArgs.Split(' ');

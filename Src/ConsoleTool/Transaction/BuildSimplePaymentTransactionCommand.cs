@@ -44,11 +44,12 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var txOutput = SendAll 
             ? new PendingTransactionOutput(To, consolidatedInputValue)
             : new PendingTransactionOutput(To, new Balance(lovelaces, Array.Empty<NativeAssetValue>()));
-        var change = consolidatedInputValue.Subtract(txOutput.Value);
+        var changeValue = consolidatedInputValue.Subtract(txOutput.Value);
+
         // Build Tx Body
         var txBodyBuilder = TransactionBodyBuilder.Create
             .SetFee(0)
-            .SetTtl((uint)tip.AbsSlot + 7200); // 2 hours
+            .SetTtl((uint)tip.AbsSlot + TtlTipOffsetSlots); 
         // Inputs
         foreach (var txInput in sourceAddressUtxos)
         {
@@ -56,15 +57,18 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         }
         // Outputs
         txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces);
-        if (!change.IsZero())
+        if (!changeValue.IsZero())
         {
-            txBodyBuilder.AddOutput(new Address(From), change.Lovelaces, GetTokenBundleBuilder(change.NativeAssets));
+            txBodyBuilder.AddOutput(new Address(From), changeValue.Lovelaces, GetTokenBundleBuilder(changeValue.NativeAssets));
         }
+        // Metadata
+        var auxDataBuilder = !string.IsNullOrWhiteSpace(Message)
+            ? AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message))
+            : null;
 
-        var auxDataBuilder = AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message));
+        // Build Whole Tx
         var txBuilder = TransactionBuilder.Create
-            .SetBody(txBodyBuilder)
-            .SetAuxData(auxDataBuilder);
+            .SetBody(txBodyBuilder);
         // Key Witnesses if signing key is passed in
         if (!string.IsNullOrWhiteSpace(SigningKey))
         {
@@ -72,6 +76,10 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             var witnesses = TransactionWitnessSetBuilder.Create
                 .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
             txBuilder.SetWitnesses(witnesses);
+        }
+        if (auxDataBuilder is not null)
+        {
+            txBuilder.SetAuxData(auxDataBuilder);
         }
         var tx = txBuilder.Build();
         // Fee Calculation
@@ -90,7 +98,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             using var stream = new MemoryStream(txCborBytes);
             var response = (await txClient.Submit(stream));
             var txHash = response.Content?.TrimStart('"').TrimEnd('"');
-            var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder.Build())).ToStringHex();
+            var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder?.Build())).ToStringHex();
             return CommandResult.Success(txHash ?? throw new ApplicationException($"Trasaction submission result is null but should be {txId}"));
         }
         return CommandResult.Success(txCborBytes.ToStringHex());
@@ -244,15 +252,9 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         return tokenBuilder;
     }
 
-    private static IDictionary<string, object> BuildMessageMetadata(string? message)
+    private static IDictionary<string, object>? BuildMessageMetadata(string? message)
     {
-        if (string.IsNullOrWhiteSpace(message))
-        {
-            return new Dictionary<string, object>()
-            {
-                {  "msg", "Built with github.com/CardanoSharp/cscli" }
-            };
-        }
+        if (string.IsNullOrWhiteSpace(message)) return null;
         return new Dictionary<string, object>
         {
             {  "msg", message.Length > MaxMetadataStringLength ? SplitString(message) : message }

@@ -1,4 +1,5 @@
-﻿using CardanoSharp.Wallet.Extensions;
+﻿using CardanoSharp.Wallet.Enums;
+using CardanoSharp.Wallet.Extensions;
 using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Transactions;
@@ -10,49 +11,54 @@ namespace Cscli.ConsoleTool.Transaction;
 public class ViewTransactionCommand : ICommand
 {
     public string? CborHex { get; init; }
+    public string? Network { get; init; }
 
     public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, txCborBytes, errors) = Validate();
+        var (isValid, network, txCborBytes, errors) = Validate();
         if (!isValid)
         {
             return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
                 string.Join(Environment.NewLine, errors)));
         }
 
-        var tx = txCborBytes.DeserializeTransaction();
-
-        var transaction = new Tx(
-            tx.IsValid,
+        var deSerialisedTransaction = txCborBytes.DeserializeTransaction();
+        var tx = new Tx(
+            deSerialisedTransaction.IsValid,
             new TxBody(
-                tx.TransactionBody.TransactionInputs.Select(txI => new TxIn(txI.TransactionId.ToStringHex(), txI.TransactionIndex)).ToArray(),
-                tx.TransactionBody.TransactionOutputs.Select(
-                    txO => MapTxOut(txO)).ToArray(),
-                MapNativeAssets(tx.TransactionBody.Mint),
-                tx.TransactionBody.Fee,
-                tx.TransactionBody.Ttl,
-                tx.TransactionBody.MetadataHash,
-                tx.TransactionBody.TransactionStartInterval),
-            tx.TransactionWitnessSet is null 
+                deSerialisedTransaction.TransactionBody.TransactionInputs.Select(
+                    txI => new TxIn(txI.TransactionId.ToStringHex(), txI.TransactionIndex)).ToArray(),
+                deSerialisedTransaction.TransactionBody.TransactionOutputs.Select(
+                    txO => MapTxOut(network, txO)).ToArray(),
+                MapNativeAssets(deSerialisedTransaction.TransactionBody.Mint),
+                deSerialisedTransaction.TransactionBody.Fee,
+                deSerialisedTransaction.TransactionBody.Ttl,
+                deSerialisedTransaction.TransactionBody.MetadataHash,
+                deSerialisedTransaction.TransactionBody.TransactionStartInterval),
+            deSerialisedTransaction.TransactionWitnessSet is null 
                 ? new TxWitnessSet(Array.Empty<TxVKeyWitness>(), Array.Empty<TxNativeScript>()) 
                 : new TxWitnessSet(
-                    tx.TransactionWitnessSet.VKeyWitnesses.Select(
+                    deSerialisedTransaction.TransactionWitnessSet.VKeyWitnesses.Select(
                         vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
                     .ToArray(),
-                    tx.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
-            new TxAuxData(tx.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
-
-        var json = JsonSerializer.Serialize(transaction, SerialiserOptions);
-
+                    deSerialisedTransaction.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
+            new TxAuxData(deSerialisedTransaction.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
+        var json = JsonSerializer.Serialize(tx, SerialiserOptions);
         return ValueTask.FromResult(CommandResult.Success(json));
     }
 
     private (
         bool isValid,
+        NetworkType networkType,
         byte[] txCborBytes,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
+        var txCborBytes = Array.Empty<byte>();
+        if (!Enum.TryParse<NetworkType>(Network, ignoreCase: true, out var networkType))
+        {
+            validationErrors.Add("Invalid option --network must be either testnet or mainnet");
+        }
         if (string.IsNullOrWhiteSpace(CborHex))
         {
             validationErrors.Add(
@@ -62,8 +68,7 @@ public class ViewTransactionCommand : ICommand
         {
             try
             {
-                var txCborBytes = Convert.FromHexString(CborHex);
-                return (!validationErrors.Any(), txCborBytes, validationErrors);
+                txCborBytes = Convert.FromHexString(CborHex);
             }
             catch (FormatException)
             {
@@ -71,13 +76,14 @@ public class ViewTransactionCommand : ICommand
                     $"Invalid option --cbor-hex {CborHex} is not in hexadecimal format");
             }
         }
-        return (!validationErrors.Any(), Array.Empty<byte>(), validationErrors);
+        return (!validationErrors.Any(), networkType, txCborBytes, validationErrors);
     }
 
-    private static TxOut MapTxOut(TransactionOutput txO)
+    private static TxOut MapTxOut(NetworkType network, TransactionOutput txO)
     {
+        var addrPrefix = network == NetworkType.Mainnet ? AddressMainnetBech32Prefix : AddressTestnetBech32Prefix;
         return new TxOut(
-            new Address("addr", txO.Address).ToString(), // TODO: address deserialization based on network
+            new Address(addrPrefix, txO.Address).ToString(), 
             new Balance(txO.Value.Coin, MapNativeAssets(txO.Value.MultiAsset).ToArray()));
     }
 
