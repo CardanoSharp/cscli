@@ -68,6 +68,7 @@ public static class Constants
         { "--tx-id", "txId" },
         { "--signing-key", "signingKey" },
         { "--signing-keys", "signingKeys" },
+        { "--send-all", "sendAll" },
         { "--out-file", "outFile" },
         //{ "--output-format", "outputFormat" },
     };

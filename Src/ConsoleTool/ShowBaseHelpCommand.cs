@@ -22,9 +22,9 @@ Wallet commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""]
     wallet key account derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>]
-    wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
-    wallet key policy derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--policy-index <derivation-index>] [--verification-key-file <string>] [--signing-key-file <string>]
+    wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
+    wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
+    wallet key policy derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--policy-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
     wallet key verification convert --signing-key ""<bech32_skey>"" [--verification-key-file <string>]
     wallet address stake derive --recovery-phrase ""<string>"" --network <network> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
     wallet address payment derive --recovery-phrase ""<string>""  --network <network> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
@@ -38,15 +38,15 @@ Query commands:
     query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
+    BETA: transaction simple-payment build --network <network> --from <address> --to <address> (--ada <ada_amount> | --lovelaces <lovelace_amount> | --send-all true) [--signing-key <from_addr_bech32_skey>] [--submit true] [--message ""<string>""] [--out-file <output_path>] 
+    transaction view --network <network> --cbor-hex <hex_string>
+    BETA: transaction sign --cbor-hex <hex_string> --signing-keys <comma_separated_bech32_skeys> [--out-file <output_path>]
     transaction submit --network <network> --cbor-hex <hex_string>
-    BETA: transaction simple-payment build --network <network> --from <address> --to <address> --amount <ada_amount> [--signing-key <bech32_skey>] [--submit (true | false)] [--message <message>] [--out-file <output_path>] 
-    BETA: transaction view --cbor-hex <hex_string>
-    BETA: transaction sign --signing-key <bech32_skey> --cbor-hex <hex_string>
 
 Encoding/Crypto Commands:
     bech32 encode --value <hex_string> --prefix <string>
     bech32 decode --value <bech32_string>
-    blake2b hash --value <hex_string> --length <digest_length> 
+    blake2b hash --value <hex_string> --length <hash_digest_length> 
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
@@ -54,8 +54,7 @@ Arguments:
     <derivation-index> ::= 0(default) | 1 | .. | 2147483647
     <network> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
-    <digest_length> ::= 160 | 224 | 256 | 512
-    <utxo_mgmt> ::= advanced_split | consolidate 
+    <hash_digest_length> ::= 160 | 224 | 256 | 512
 ";
         return ValueTask.FromResult(CommandResult.Success(helpText));
     }

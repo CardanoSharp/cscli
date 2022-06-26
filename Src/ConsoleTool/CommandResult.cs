@@ -23,7 +23,6 @@ public class CommandResult
         Outcome = outcome;
         Result = result;
         Exception = exception;
-
     }
 
     public static CommandResult Success(string result) =>

@@ -28,7 +28,7 @@ public class QueryTransactionInfoCommand : ICommand
             if (!txInfo.IsSuccessStatusCode || txInfo.Content == null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 
-            var json = JsonSerializer.Serialize(txInfo, SerialiserOptions);
+            var json = JsonSerializer.Serialize(txInfo.Content, SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)

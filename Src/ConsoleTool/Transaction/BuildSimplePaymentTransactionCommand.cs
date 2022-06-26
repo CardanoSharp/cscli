@@ -96,10 +96,21 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             var txClient = BackendGateway.GetBackendClient<ITransactionClient>(network);
             using var stream = new MemoryStream(txCborBytes);
-            var response = (await txClient.Submit(stream));
-            var txHash = response.Content?.TrimStart('"').TrimEnd('"');
-            var txId = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder?.Build())).ToStringHex();
-            return CommandResult.Success(txHash ?? throw new ApplicationException($"Trasaction submission result is null but should be {txId}"));
+            var txSubmissionResponse = await txClient.Submit(stream).ConfigureAwait(false);
+            if (!txSubmissionResponse.IsSuccessStatusCode)
+            {
+                if (txSubmissionResponse.Error is null || string.IsNullOrWhiteSpace(txSubmissionResponse.Error.Content))
+                    return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+                return CommandResult.FailureBackend(txSubmissionResponse.Error.Content);
+            }
+            if (txSubmissionResponse.Content is null)
+            {
+                return CommandResult.FailureBackend("Koios transaction submission response did not return a valid transaction ID");
+            }
+            var txId = txSubmissionResponse.Content.TrimStart('"').TrimEnd('"');
+            var txHash = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder?.Build())).ToStringHex();
+            var result = txId == txHash ? txId : $"Submission response tx-id {txId} does not match expected {txHash}";
+            return CommandResult.Success(result);
         }
         return CommandResult.Success(txCborBytes.ToStringHex());
     }

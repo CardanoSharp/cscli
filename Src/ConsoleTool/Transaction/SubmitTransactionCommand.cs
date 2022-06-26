@@ -22,11 +22,18 @@ public class SubmitTransactionCommand : ICommand
         try
         {
             using var stream = new MemoryStream(txCborBytes);
-            var txHashResponse = await txClient.Submit(stream).ConfigureAwait(false);
-            if (!txHashResponse.IsSuccessStatusCode || txHashResponse.Content == null)
-                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
-
-            return CommandResult.Success(txHashResponse.Content.TrimStart('"').TrimEnd('"'));
+            var txSubmissionResponse = await txClient.Submit(stream).ConfigureAwait(false);
+            if (!txSubmissionResponse.IsSuccessStatusCode)
+            {
+                if (txSubmissionResponse.Error is null || string.IsNullOrWhiteSpace(txSubmissionResponse.Error.Content))
+                    return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+                return CommandResult.FailureBackend(txSubmissionResponse.Error.Content);
+            }
+            if (txSubmissionResponse.Content is null)
+            {
+                return CommandResult.FailureBackend("Koios transaction submission response did not return a valid transaction ID");
+            }
+            return CommandResult.Success(txSubmissionResponse.Content.TrimStart('"').TrimEnd('"'));
         }
         catch (Exception ex)
         {

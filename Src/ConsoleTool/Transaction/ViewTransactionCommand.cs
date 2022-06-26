@@ -3,6 +3,7 @@ using CardanoSharp.Wallet.Extensions;
 using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Transactions;
+using CardanoSharp.Wallet.Utilities;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
@@ -23,9 +24,13 @@ public class ViewTransactionCommand : ICommand
         }
 
         var deSerialisedTransaction = txCborBytes.DeserializeTransaction();
+        var txId = HashUtility.Blake2b256(
+            deSerialisedTransaction.TransactionBody.Serialize(deSerialisedTransaction.AuxiliaryData))
+            .ToStringHex();
         var tx = new Tx(
-            deSerialisedTransaction.IsValid,
-            new TxBody(
+            Id: txId,
+            IsValid: deSerialisedTransaction.IsValid,
+            TransactionBody: new TxBody(
                 deSerialisedTransaction.TransactionBody.TransactionInputs.Select(
                     txI => new TxIn(txI.TransactionId.ToStringHex(), txI.TransactionIndex)).ToArray(),
                 deSerialisedTransaction.TransactionBody.TransactionOutputs.Select(
@@ -33,16 +38,16 @@ public class ViewTransactionCommand : ICommand
                 MapNativeAssets(deSerialisedTransaction.TransactionBody.Mint),
                 deSerialisedTransaction.TransactionBody.Fee,
                 deSerialisedTransaction.TransactionBody.Ttl,
-                deSerialisedTransaction.TransactionBody.MetadataHash,
+                deSerialisedTransaction.AuxiliaryData is null ? null : HashUtility.Blake2b256(deSerialisedTransaction.AuxiliaryData.GetCBOR().EncodeToBytes()).ToStringHex(),
                 deSerialisedTransaction.TransactionBody.TransactionStartInterval),
-            deSerialisedTransaction.TransactionWitnessSet is null 
-                ? new TxWitnessSet(Array.Empty<TxVKeyWitness>(), Array.Empty<TxNativeScript>()) 
+            TransactionWitnessSet: deSerialisedTransaction.TransactionWitnessSet is null 
+                ? null
                 : new TxWitnessSet(
                     deSerialisedTransaction.TransactionWitnessSet.VKeyWitnesses.Select(
                         vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
                     .ToArray(),
                     deSerialisedTransaction.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
-            new TxAuxData(deSerialisedTransaction.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
+            AuxiliaryData: new TxAuxData(deSerialisedTransaction.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
         var json = JsonSerializer.Serialize(tx, SerialiserOptions);
         return ValueTask.FromResult(CommandResult.Success(json));
     }

@@ -412,44 +412,60 @@ public class CommandParserShould
         submitTransactionCommand.CborHex.Should().Be(expectedCborHex);
     }
 
-    //[Theory]
-    //[InlineData("transaction view --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
-    //[InlineData("transaction view --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
-    //public void ParseArgs_Correctly_ViewTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
-    //{
-    //    var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+    [Theory]
+    [InlineData("transaction view --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
+    [InlineData("transaction view --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
+    public void ParseArgs_Correctly_ViewTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
 
-    //    var viewTransactionCommand = (SubmitTransactionCommand)command;
-    //    viewTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
-    //    viewTransactionCommand.Network.Should().Be(expectedNetwork);
-    //    viewTransactionCommand.CborHex.Should().Be(expectedCborHex);
-    //}
+        var viewTransactionCommand = (ViewTransactionCommand)command;
+        viewTransactionCommand.Should().BeOfType<ViewTransactionCommand>();
+        viewTransactionCommand.Network.Should().Be(expectedNetwork);
+        viewTransactionCommand.CborHex.Should().Be(expectedCborHex);
+    }
 
-    //[Theory]
-    //[InlineData("transaction sign --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
-    //[InlineData("transaction sign --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
-    //public void ParseArgs_Correctly_SignTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
-    //{
-    //    var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+    [Theory]
+    [InlineData("transaction sign --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01 --signing-keys addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw,policy_sk1trt3shjrd4gy70q4m2ejgjgsdzwej4whc4r2trrcwedlpm6z4dglxl4nycrd8fptxrkye3tl3q29euxlqj7zndk9cfg4tskqlnp90uqwjqz02", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw,policy_sk1trt3shjrd4gy70q4m2ejgjgsdzwej4whc4r2trrcwedlpm6z4dglxl4nycrd8fptxrkye3tl3q29euxlqj7zndk9cfg4tskqlnp90uqwjqz02", null)]
+    [InlineData("transaction sign --signing-keys addr_sk1trt3shjrd4gy70q4m2ejgjgsdzwej4whc4r2trrcwedlpm6z4dglxl4nycrd8fptxrkye3tl3q29euxlqj7zndk9cfg4tskqlnp90uqcgddqj --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600 --outfile tx.txsigned", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "addr_sk1trt3shjrd4gy70q4m2ejgjgsdzwej4whc4r2trrcwedlpm6z4dglxl4nycrd8fptxrkye3tl3q29euxlqj7zndk9cfg4tskqlnp90uqcgddqj", "tx.txsigned")]
+    public void ParseArgs_Correctly_SignTransactionCommand_When_Options_Are_Valid(string args, string expectedCborHex, string expectedSigningKeys, string expectedOutFile)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
 
-    //    var signTransactionCommand = (SubmitTransactionCommand)command;
-    //    signTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
-    //    signTransactionCommand.Network.Should().Be(expectedNetwork);
-    //    signTransactionCommand.CborHex.Should().Be(expectedCborHex);
-    //}
+        var signTransactionCommand = (SignTransactionCommand)command;
+        signTransactionCommand.Should().BeOfType<SignTransactionCommand>();
+        signTransactionCommand.CborHex.Should().Be(expectedCborHex);
+        signTransactionCommand.SigningKeys.Should().Be(expectedSigningKeys);
+        signTransactionCommand.OutFile.Should().Be(expectedOutFile);
+    }
 
-    //[Theory]
-    //[InlineData("transaction simple-payment build --network testnet --cbor-hex 9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01", "testnet", "9df9179beb0ce89f84025e02ae11c18b3003e7690149caa662fafd01")]
-    //[InlineData("transaction simple-payment build --network mainnet --cbor-hex 61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600", "mainnet", "61282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f58600")]
-    //public void ParseArgs_Correctly_BuildSimplePaymentTransactionCommand_When_Options_Are_Valid(string args, string expectedNetwork, string expectedCborHex)
-    //{
-    //    var command = CommandParser.ParseArgsToCommand(args.Split(' '));
+    [Theory]
+    [InlineData("transaction simple-payment build --network testnet --from addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t --to addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3 --ada 2.987654", "testnet", "addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t", null, "addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3", 0, 2.987654, false, null, false, null)]
+    [InlineData("transaction simple-payment build --lovelaces 1234567 --from addr_test1vzjkvymhhj0854kkaawxm9etyz8aq8rhuhsyhhemhh2tv0s69l8h0  --to addr_test1vpcdmuc2rrxu6e8vewrgvdlwhz32h8dqf38yyw20hqacnpsdffx77 --submit true --signing-key addr_xsk1lplvzxsmads66xa9n3869v8jjuyl7zs0pprtrjvuh277mu6z4dgcess2snu9tr26xqsf5cnvafm2xaah43tzrfqpayk085az37dtx0jl6h6v4p75zahdvxj32gy39s0y230u4pw7gc63ayj3aweaqvuj4cdhqk8g --out-file tx.txsigned --network testnet", "testnet", "addr_test1vzjkvymhhj0854kkaawxm9etyz8aq8rhuhsyhhemhh2tv0s69l8h0", "addr_xsk1lplvzxsmads66xa9n3869v8jjuyl7zs0pprtrjvuh277mu6z4dgcess2snu9tr26xqsf5cnvafm2xaah43tzrfqpayk085az37dtx0jl6h6v4p75zahdvxj32gy39s0y230u4pw7gc63ayj3aweaqvuj4cdhqk8g", "addr_test1vpcdmuc2rrxu6e8vewrgvdlwhz32h8dqf38yyw20hqacnpsdffx77", 1234567, 0, false, null, true, "tx.txsigned")]
+    [InlineData("transaction simple-payment build  --network mainnet --from addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w --to addr1v9uuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagmgkpv5 --send-all true --message iou", "mainnet", "addr1vy5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqrukl6w", null, "addr1v9uuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagmgkpv5", 0, 0, true, "iou", false, null)]
+    [InlineData("transaction simple-payment build --from addr1q9uuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aa2upvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvdstd8nlr --to addr1qxjkvymhhj0854kkaawxm9etyz8aq8rhuhsyhhemhh2tv0jupvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvdsxa386f --ada 60 --network mainnet --message maccaslunch --out-file tx.txunsigned", "mainnet", "addr1q9uuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aa2upvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvdstd8nlr", null, "addr1qxjkvymhhj0854kkaawxm9etyz8aq8rhuhsyhhemhh2tv0jupvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvdsxa386f", 0, 60, false, "maccaslunch", false, "tx.txunsigned")]
+    [InlineData("transaction simple-payment build --to addr1q9cdmuc2rrxu6e8vewrgvdlwhz32h8dqf38yyw20hqacnpjupvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvds7ejjnf --from addr1v9cdmuc2rrxu6e8vewrgvdlwhz32h8dqf38yyw20hqacnpskpa63m --lovelaces 2882856190 --message Birthdayprezzie --submit true --out-file bdayprez.txsigned --network mainnet --signing-key addr_xsk1gzza52g80rhqw4gy7z49wf82lcn5qrthrmgpnsr7kun3am2z4dgncv8yagkhfjgknna0074lff7jf6f0ptrwmlr5zj2hky8wsz4gu0eu26emwg2lczjgwkngwnmd39a3jshz76e8yy3lf0rs0kxy8ca39ctajv9q", "mainnet", "addr1v9cdmuc2rrxu6e8vewrgvdlwhz32h8dqf38yyw20hqacnpskpa63m", "addr_xsk1gzza52g80rhqw4gy7z49wf82lcn5qrthrmgpnsr7kun3am2z4dgncv8yagkhfjgknna0074lff7jf6f0ptrwmlr5zj2hky8wsz4gu0eu26emwg2lczjgwkngwnmd39a3jshz76e8yy3lf0rs0kxy8ca39ctajv9q", "addr1q9cdmuc2rrxu6e8vewrgvdlwhz32h8dqf38yyw20hqacnpjupvkzyt42349mnkhgu8ghqzgtsqvzmvu2w675560fvvds7ejjnf", 2882856190, 0, false, "Birthdayprezzie", true, "bdayprez.txsigned")]
+    public void ParseArgs_Correctly_BuildSimplePaymentTransactionCommand_When_Options_Are_Valid(
+        string args, 
+        string expectedNetwork, string expectedFrom, string expectedSigningKey, string expectedTo, 
+        ulong expectedLovelaces, decimal expectedAda, bool expectedSendAll, 
+        string expectedMessage, bool expectedSubmit, string expectedOutFile)
+    {
+        var command = CommandParser.ParseArgsToCommand(args.Split(' '));
 
-    //    var signTransactionCommand = (SubmitTransactionCommand)command;
-    //    signTransactionCommand.Should().BeOfType<SubmitTransactionCommand>();
-    //    signTransactionCommand.Network.Should().Be(expectedNetwork);
-    //    signTransactionCommand.CborHex.Should().Be(expectedCborHex);
-    //}
+        var buildSimpleTxCommand = (BuildSimplePaymentTransactionCommand)command;
+        buildSimpleTxCommand.Should().BeOfType<BuildSimplePaymentTransactionCommand>();
+        buildSimpleTxCommand.Network.Should().Be(expectedNetwork);
+        buildSimpleTxCommand.From.Should().Be(expectedFrom);
+        buildSimpleTxCommand.SigningKey.Should().Be(expectedSigningKey);
+        buildSimpleTxCommand.To.Should().Be(expectedTo);
+        buildSimpleTxCommand.Lovelaces.Should().Be(expectedLovelaces);
+        buildSimpleTxCommand.Ada.Should().Be(expectedAda);
+        buildSimpleTxCommand.SendAll.Should().Be(expectedSendAll);
+        buildSimpleTxCommand.Message.Should().Be(expectedMessage);
+        buildSimpleTxCommand.Submit.Should().Be(expectedSubmit);
+        buildSimpleTxCommand.OutFile.Should().Be(expectedOutFile);
+    }
 
     private static string[] GenerateArgs(string flatArgs, string expectedMnemonic)
     {

@@ -4,6 +4,8 @@ using CardanoSharp.Wallet.Extensions.Models;
 using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using CardanoSharp.Wallet.Models.Keys;
 using CardanoSharp.Wallet.Models.Transactions;
+using System.Text.Json;
+using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Transaction;
 
@@ -11,14 +13,15 @@ public class SignTransactionCommand : ICommand
 {
     public string? CborHex { get; init; }
     public string? SigningKeys { get; init; }
+    public string? OutFile { get; init; }
 
-    public ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
+    public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
         var (isValid, txCborBytes, signingKeys, errors) = Validate();
         if (!isValid)
         {
-            return ValueTask.FromResult(CommandResult.FailureInvalidOptions(
-                string.Join(Environment.NewLine, errors)));
+            return CommandResult.FailureInvalidOptions(
+                string.Join(Environment.NewLine, errors));
         }
 
         var tx = txCborBytes.DeserializeTransaction();
@@ -40,7 +43,12 @@ public class SignTransactionCommand : ICommand
             }
         }
         txCborBytes = tx.Serialize(); // CardanoSharp signs all vkey witnesses upon Serialize()
-        return ValueTask.FromResult(CommandResult.Success(txCborBytes.ToStringHex()));
+        if (!string.IsNullOrWhiteSpace(OutFile))
+        {
+            var txTextEnvelope = new TextEnvelope(TxAlonzoJsonTypeField, "", txCborBytes.ToStringHex());
+            await File.WriteAllTextAsync(OutFile, JsonSerializer.Serialize(txTextEnvelope, SerialiserOptions), ct);
+        }
+        return CommandResult.Success(txCborBytes.ToStringHex());
     }
 
     private (
@@ -88,6 +96,13 @@ public class SignTransactionCommand : ICommand
                 continue;
             }
             signingKeys[i] = TxUtils.GetPrivateKeyFromBech32SigningKey(bech32SigningKeys[i]);
+        }
+        if (!string.IsNullOrWhiteSpace(OutFile)
+            && Path.IsPathFullyQualified(OutFile)
+            && !Directory.Exists(Path.GetDirectoryName(OutFile)))
+        {
+            validationErrors.Add(
+                $"Invalid option --out-file path {OutFile} does not exist");
         }
         return (!validationErrors.Any(), txCborBytes, signingKeys, validationErrors);
     }

@@ -18,18 +18,19 @@ public record UnspentTransactionOutput(string TxHash, uint OutputIndex, Balance 
 public record TextEnvelope(string? Type, string? Description, string? CborHex);
 
 public record Tx(
+    string Id,
     bool IsValid,
     TxBody TransactionBody,
-    TxWitnessSet TransactionWitnessSet,
+    TxWitnessSet? TransactionWitnessSet,
     TxAuxData AuxiliaryData);
 
 public record TxBody(
-    IEnumerable<TxIn> TransactionInputs,
-    IEnumerable<TxOut> TransactionOutputs,
+    IEnumerable<TxIn> Inputs,
+    IEnumerable<TxOut> Outputs,
     IEnumerable<NativeAssetValue> Mint,
     ulong Fee,
     uint? Ttl,
-    string MetadataHash,
+    string? AuxiliaryDataHash,
     uint? TransactionStartInterval);
 
 public record TxIn(
