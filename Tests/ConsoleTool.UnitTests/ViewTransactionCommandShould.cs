@@ -79,4 +79,111 @@ public class ViewTransactionCommandShould
         executionResult.Outcome.Should().Be(CommandOutcome.FailureInvalidOptions);
         executionResult.Result.Should().Be($"Invalid option --cbor-hex {invalidCborHex} is not in hexadecimal format");
     }
+
+    [Theory]
+    [InlineData("84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da0f582a11902a2a1636d73676d74687820666f72206c756e636880", "testnet",
+@"{
+  ""id"": ""be9b3070e17f9f0c3e5477b315a35b9c5be0ec355f6c6bfb4beee42270413a25"",
+  ""isValid"": true,
+  ""transactionBody"": {
+    ""inputs"": [
+      {
+        ""transactionId"": ""dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f92"",
+        ""transactionIndex"": 1
+      }
+    ],
+    ""outputs"": [
+      {
+        ""address"": ""addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3"",
+        ""value"": {
+          ""lovelaces"": 420000000,
+          ""nativeAssets"": []
+        }
+      },
+      {
+        ""address"": ""addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t"",
+        ""value"": {
+          ""lovelaces"": 1559469529,
+          ""nativeAssets"": []
+        }
+      }
+    ],
+    ""mint"": [],
+    ""fee"": 171749,
+    ""ttl"": 61856856,
+    ""auxiliaryDataHash"": ""0088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3d"",
+    ""transactionStartInterval"": null
+  },
+  ""transactionWitnessSet"": null,
+  ""auxiliaryData"": {
+    ""metadata"": {
+      ""674"": {
+        ""msg"": ""thx for lunch""
+      }
+    }
+  }
+}")]
+    [InlineData("84a500818258205853cc86af075cc547a5a20658af54841f37a5832532a704c583ed4f010184a501018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a43e80724021a0002c24d031a03afe00c0758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da10081825820de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa584025f49ad0cb27c0a297ebd2237134be2803b19d11c6e52416d3d7beba130bbc2bd95eb9b7e9e7410d7efcd5c2abd338dd62100d86b26308636335b533873bb508f582a11902a2a1636d73676d74687820666f72206c756e636880", "testnet",
+@"{
+  ""id"": ""03818a7d5875bf67523dea56a37e5654e549f095b55888dc53bbe9ef42824125"",
+  ""isValid"": true,
+  ""transactionBody"": {
+    ""inputs"": [
+      {
+        ""transactionId"": ""5853cc86af075cc547a5a20658af54841f37a5832532a704c583ed4f010184a5"",
+        ""transactionIndex"": 1
+      }
+    ],
+    ""outputs"": [
+      {
+        ""address"": ""addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3"",
+        ""value"": {
+          ""lovelaces"": 420000000,
+          ""nativeAssets"": []
+        }
+      },
+      {
+        ""address"": ""addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t"",
+        ""value"": {
+          ""lovelaces"": 1139279652,
+          ""nativeAssets"": []
+        }
+      }
+    ],
+    ""mint"": [],
+    ""fee"": 180813,
+    ""ttl"": 61857804,
+    ""auxiliaryDataHash"": ""0088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3d"",
+    ""transactionStartInterval"": null
+  },
+  ""transactionWitnessSet"": {
+    ""vKeyWitnesses"": [
+      {
+        ""verificationkey"": ""de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa"",
+        ""signature"": ""25f49ad0cb27c0a297ebd2237134be2803b19d11c6e52416d3d7beba130bbc2bd95eb9b7e9e7410d7efcd5c2abd338dd62100d86b26308636335b533873bb508""
+      }
+    ],
+    ""nativeScripts"": []
+  },
+  ""auxiliaryData"": {
+    ""metadata"": {
+      ""674"": {
+        ""msg"": ""thx for lunch""
+      }
+    }
+  }
+}")]
+    public async Task Execute_Successfully_With_Correct_Json_When_Options_Are_Valid(string cborHex, string network, string expectedJson)
+    {
+        var command = new ViewTransactionCommand()
+        {
+            Network = network,
+            CborHex = cborHex,
+        };
+
+        var executionResult = await command.ExecuteAsync(CancellationToken.None);
+
+        executionResult.Outcome.Should().Be(CommandOutcome.Success);
+        executionResult.Result.Should().Be(expectedJson);
+    }
 }
