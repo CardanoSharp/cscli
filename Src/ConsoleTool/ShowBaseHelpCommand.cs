@@ -18,7 +18,7 @@ Options:
     -v, --version   Show the cscli version
     -h, --help      Show this help text
 
-Wallet commands:
+Wallet Commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""]
     wallet key account derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>]
@@ -29,10 +29,10 @@ Wallet commands:
     wallet address stake derive --recovery-phrase ""<string>"" --network <network> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
     wallet address payment derive --recovery-phrase ""<string>""  --network <network> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
 
-Query commands:
+Query Commands:
     query tip --network <network>
     query protocol-parameters --network <network>
-    query info account --network <network> [--stake-address <stake_address> | --address <payment_base_address>]
+    query info account --network <network> (--stake-address <stake_address> | --address <payment_base_address>)
     query asset account --network <network> --stake-address <stake_address>
     query info address --network <network> --address <payment_address>
     query info transaction --network <network> --tx-id <transaction_id>

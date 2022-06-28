@@ -68,7 +68,7 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.1.0-local-br
 ### Overview and Help
 ```console
 $ cscli --help
-cscli v0.3.0
+cscli v0.4.0
 A lightweight cross-platform tool for building and serialising Cardano wallet entities (i.e. recovery-phrases, keys, addresses and transactions), querying the chain and submitting transactions to the testnet or mainnet networks. Please refer to https://github.com/CardanoSharp/cscli for further documentation.
 
 USAGE: cscli (OPTION | COMMAND)
@@ -77,7 +77,7 @@ Options:
     -v, --version   Show the cscli version
     -h, --help      Show this help text
 
-Wallet commands:
+Wallet Commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"]
     wallet key account derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--account-index <index>]
@@ -88,10 +88,10 @@ Wallet commands:
     wallet address stake derive --recovery-phrase "<string>" --network <network> [--account-index <index>] [--address-index <index>]
     wallet address payment derive --recovery-phrase "<string>" --network <network> --payment-address-type <payment-address-type> [--account-index <index>] [--address-index <index>] [--stake-account-index <index>] [--stake-address-index <index>]
 
-Query commands:
+Query Commands:
     query tip --network <network>
     query protocol-parameters --network <network>
-    query info account --network <network> [--stake-address <stake_address> | --address <payment_base_address>]
+    query info account --network <network> (--stake-address <stake_address> | --address <payment_base_address>)
     query asset account --network <network> --stake-address <stake_address>
     query info address --network <network> --address <payment_address>
     query info transaction --network <network> --tx-id <transaction_id>

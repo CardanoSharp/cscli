@@ -173,11 +173,11 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             validationErrors.Add("Invalid options only one of (--lovelaces | --ada | --send-all) must be supplied");
         }
-        else if (Lovelaces == 0 && Ada < 1)
+        else if (!SendAll && Lovelaces == 0 && Ada < 1)
         {
             validationErrors.Add("Invalid option --ada value must be at least 1");
         }
-        else if (Ada == 0 && Lovelaces < 1000000)
+        else if (!SendAll && Ada == 0 && Lovelaces < 1000000)
         {
             validationErrors.Add("Invalid option --lovelaces value must be at least 1000000");
         }
