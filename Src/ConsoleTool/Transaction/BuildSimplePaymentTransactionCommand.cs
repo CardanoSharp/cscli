@@ -57,7 +57,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             txBodyBuilder.AddInput(txInput.TxHash, txInput.OutputIndex);
         }
         // Outputs
-        txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces);
+        txBodyBuilder.AddOutput(new Address(txOutput.Address), txOutput.Value.Lovelaces, GetTokenBundleBuilder(txOutput.Value.NativeAssets));
         if (!changeValue.IsZero())
         {
             txBodyBuilder.AddOutput(new Address(From), changeValue.Lovelaces, GetTokenBundleBuilder(changeValue.NativeAssets));
