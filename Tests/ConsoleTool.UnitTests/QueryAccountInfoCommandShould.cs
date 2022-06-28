@@ -15,11 +15,11 @@ public class QueryAccountInfoCommandShould
     [InlineData("mainet")]
     [InlineData("mainnetwork")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Network_Is_Not_Valid(
-        string networkTag)
+        string network)
     {
         var command = new QueryAccountInfoCommand()
         {
-            Network = networkTag,
+            Network = network,
             StakeAddress = "stake1uxwlj9umavxw38uyqf0q9ts3cx9nqql8dyq5nj4xvta06qg8t55dn",
         };
 

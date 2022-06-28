@@ -16,40 +16,41 @@ namespace Cscli.ConsoleTool.Transaction;
 
 public class BuildSimplePaymentTransactionCommand : ICommand
 {
+    public string? Network { get; init; }
     public string? From { get; init; } // Address Bech32
     public string? SigningKey { get; init; } // Payment Signing Key Bech32 for From Address
     public string? To{ get; init; } // Address Bech32
-    public ulong Lovelaces { get; init; } // Either Lovelaces or Ada
+    public ulong Lovelaces { get; init; } // Value comes from one of either Lovelaces | Ada | SendAll=true
     public decimal Ada { get; init; } 
     public bool SendAll { get; init; }
-    public string? Message { get; init; }
-    public string? Network { get; init; }
-    public bool Submit { get; init; }
-    public string? OutFile { get; init; }
+    public uint Ttl { get; set; } // Slot for transaction expiry
+    public string? Message { get; init; } // Onchain Metadata 674 standard
+    public bool Submit { get; init; } // Submits Transaction to Koios node
+    public string? OutFile { get; init; } // cardano-cli compatible transaction file (signed only)
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
         var (isValid, network, lovelaces, errors) = Validate();
-        if (!isValid)
-        {
-            return CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors));
-        }
+        if (!isValid) return CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors));
 
         (var epochClient, var networkClient, var addressClient) = GetKoiosClients(network);
         var tip = (await networkClient.GetChainTip()).Content.First();
         var protocolParams = (await epochClient.GetProtocolParameters(tip.Epoch.ToString())).Content.First();
         var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content;
+        if (!sourceAddressInfo.Any()) return CommandResult.FailureBackend("--from address has no utxos");
         var sourceAddressUtxos = BuildSourceAddressUtxos(sourceAddressInfo.First().UtxoSets);
         var consolidatedInputValue = BuildConsolidatedTxInputValue(sourceAddressUtxos);
         var txOutput = SendAll 
             ? new PendingTransactionOutput(To, consolidatedInputValue)
             : new PendingTransactionOutput(To, new Balance(lovelaces, Array.Empty<NativeAssetValue>()));
+        if (consolidatedInputValue.Lovelaces < txOutput.Value.Lovelaces) return CommandResult.FailureBackend($"--from address has insufficient balance ({consolidatedInputValue.Lovelaces}) to pay {txOutput.Value.Lovelaces}");
         var changeValue = consolidatedInputValue.Subtract(txOutput.Value);
+        var ttl = Ttl > 0 ? Ttl : (uint)tip.AbsSlot + TtlTipOffsetSlots;
 
         // Build Tx Body
         var txBodyBuilder = TransactionBodyBuilder.Create
             .SetFee(0)
-            .SetTtl((uint)tip.AbsSlot + TtlTipOffsetSlots); 
+            .SetTtl(ttl);
         // Inputs
         foreach (var txInput in sourceAddressUtxos)
         {
@@ -109,7 +110,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             }
             var txId = txSubmissionResponse.Content.TrimStart('"').TrimEnd('"');
             var txHash = HashUtility.Blake2b256(tx.TransactionBody.Serialize(auxDataBuilder?.Build())).ToStringHex();
-            var result = txId == txHash ? txId : $"Submission response tx-id {txId} does not match expected {txHash}";
+            var result = txId == txHash ? txId : $"Submission response tx-id: {txId} does not match expected: {txHash}";
             return CommandResult.Success(result);
         }
         return CommandResult.Success(txCborBytes.ToStringHex());
@@ -141,7 +142,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             if (networkType != fromAddress.NetworkType || !fromAddress.Prefix.StartsWith("addr"))
             {
                 validationErrors.Add(
-                    $"Invalid option --from address is not valid for the network {networkType}");
+                    $"Invalid option --from address is not valid for the network {networkType.ToString().ToLower()}");
             }
         }
 
@@ -159,24 +160,28 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             if (networkType != toAddress.NetworkType || !toAddress.Prefix.StartsWith("addr"))
             {
                 validationErrors.Add(
-                    $"Invalid option --to address is not valid for the network {networkType}");
+                    $"Invalid option --to address is not valid for the network {networkType.ToString().ToLower()}");
             }
         }
 
         var lovelaces = 0UL;
-        if (Lovelaces <= 0 && Ada <= 0 && !SendAll)
+        if (Lovelaces == 0 && Ada == 0 && !SendAll)
         {
             validationErrors.Add("Invalid options either (--lovelaces | --ada | --send-all) must be supplied");
         }
-        else if ((Lovelaces > 0 || Ada > 0) && SendAll)
+        else if ((Lovelaces > 0 && SendAll) || (Ada > 0 && SendAll) || (Lovelaces > 0 && Ada > 0))
         {
             validationErrors.Add("Invalid options only one of (--lovelaces | --ada | --send-all) must be supplied");
         }
-        else if (Lovelaces > 0 && Lovelaces < 1000000)
+        else if (Lovelaces == 0 && Ada < 1)
+        {
+            validationErrors.Add("Invalid option --ada value must be at least 1");
+        }
+        else if (Ada == 0 && Lovelaces < 1000000)
         {
             validationErrors.Add("Invalid option --lovelaces value must be at least 1000000");
         }
-        else
+        else // Use lovelaces as the main output variable
         {
             lovelaces = (Ada > 0) ? (ulong)(1000000 * Ada) : Lovelaces;
         }
@@ -198,6 +203,11 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                     "Invalid option --signing-key is not a valid payment signing key");
                 }
             }
+        }
+
+        if (Ttl > 0 && Ttl < 4492800)
+        {
+            validationErrors.Add("Invalid option --ttl slot cannot occur before the Shelley HFC event");
         }
 
         if (!string.IsNullOrWhiteSpace(OutFile)

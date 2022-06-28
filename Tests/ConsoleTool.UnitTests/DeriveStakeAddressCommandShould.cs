@@ -15,12 +15,12 @@ public class DeriveStakeAddressCommandShould
     [InlineData("mainet")]
     [InlineData("mainnetwork")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Valid_But_Network_Is_Invalid(
-        string networkTag)
+        string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -47,13 +47,13 @@ public class DeriveStakeAddressCommandShould
     [InlineData("ChineseSimplified", "", "Testnet")]
     [InlineData("ChineseSimplified", "", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Not_Supplied_And_Network_Is_Valid(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -92,13 +92,13 @@ public class DeriveStakeAddressCommandShould
     [InlineData("Italian", "fuggente", "Mainnet")]
     [InlineData("ChineseSimplified", "厉", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Not_Of_Valid_Length(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -119,13 +119,13 @@ public class DeriveStakeAddressCommandShould
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("aenglish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Language_Is_Not_Supported(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -148,13 +148,13 @@ public class DeriveStakeAddressCommandShould
     [InlineData("French", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     [InlineData("ChineseSimplified", "danseur prouesse sauvage exquis cirque endosser saumon cintrer ratisser rompre pièce achat opinion cloporte orageux", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Words_Are_Invalid_For_Language_Word_List(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -175,14 +175,14 @@ public class DeriveStakeAddressCommandShould
     [InlineData(-80765454, "Italian", "exigente pioneiro garrafa tarja genial dominado aclive tradutor fretar", "Mainnet")]
     [InlineData(-12, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Account_Index_Is_Out_Of_Bounds(
-        int accountIndex, string language, string mnemonic, string networkTag)
+        int accountIndex, string language, string mnemonic, string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             AccountIndex = accountIndex,
-            Network = networkTag,
+            Network = network,
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -203,13 +203,13 @@ public class DeriveStakeAddressCommandShould
     [InlineData(-10, "Japanese", "りけん ぞんび こんすい たまる めだつ すんぽう つまらない せつりつ けんない", "Mainnet")]
     [InlineData(-2147483647, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Address_Index_Is_Out_Of_Bounds(
-        int addressIndex, string language, string mnemonic, string networkTag)
+        int addressIndex, string language, string mnemonic, string network)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             AddressIndex = addressIndex
         };
 
@@ -233,17 +233,17 @@ public class DeriveStakeAddressCommandShould
     [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Mainnet",
         "stake1u94mrky84ssrphkhd777mdhl8gjs65pcv46wscrjz97xxfq923z5g")]
     public async Task Derive_Correct_Bech32_Extended_Stake_Address_Defaulting_To_English_When_Passphrase_And_Language_Are_Not_Supplied_And_Mnemonic_Is_Valid_English(
-        string mnemonic, string networkTag, string expectedBech32Key)
+        string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
         };
         var englishSpecificCommand = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
             Language = "English"
         };
 
@@ -281,19 +281,19 @@ public class DeriveStakeAddressCommandShould
     [InlineData("ChineseSimplified", "驻 歇 职 熙 盐 剪 带 泰 轴 枯 奥 兵 曰 桂 导 睡 抵 宁 容 读 幻 悉 默 新", "Mainnet",
         "stake1u8k98s0grl47evvjj7kdfd267rn3fw97luvhsa3vp452q4gtkzlue")]
     public async Task Derive_Correct_Bech32_Extended_Payment_Signing_Key_Defaulting_To_Zeroth_Indexes_When_Account_Or_Address_Index_Are_Not_Supplied_And_Mnemonic_Is_Valid_For_Language(
-        string language, string mnemonic, string networkTag, string expectedBech32Key)
+        string language, string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Language = language,
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
         };
         var englishSpecificCommand = new DeriveStakeAddressCommand()
         {
             Language = language,
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
             AccountIndex = 0,
             AddressIndex = 0,
         };
@@ -350,20 +350,20 @@ public class DeriveStakeAddressCommandShould
         "ChineseSimplified", "胁 粒 了 对 拆 端 泼 由 烈 苏 筹 如 技 防 厚", "Mainnet",
         "stake1uygc7j3js4jlneneckjl2xhpj2hy7xuk90h3t8cfrt4nq7qgqclme")]
     public async Task Derive_Correct_Bech32_Stake_Address_Defaulting_To_Empty_Passphrase_When_Passphrase_Is_Not_Supplied_And_Mnemonic_Is_Valid_For_Language(
-        string language, string mnemonic, string networkTag, string expectedBech32Key)
+        string language, string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
         };
         var emptyPassSpecificCommand = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             Passphrase = "",
-            Network = networkTag,
+            Network = network,
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -400,14 +400,14 @@ public class DeriveStakeAddressCommandShould
     [InlineData("AhkYZ!!*ng@x56#cN5wE83ugz9JD8Xju#fm3De9AWKYCyDSDZE", "Japanese", "あまい るいさい はづき になう ことがら ふしぎ がっさん えんそく きうい みかん うんどう いだく せっけん にってい とおい", "Mainnet",
         "stake1uxn4wausnh3w7nhh8ve6d7m5j84rh53xsvw00rzqa8cp9sqh003zx")]
     public async Task Derive_Correct_Bech32_Stake_Address_When_Passphrase_And_Language_Are_Supplied_And_Mnemonic_Is_Valid_For_Language(
-        string passPhrase, string language, string mnemonic, string networkTag, string expectedBech32Key)
+        string passPhrase, string language, string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             Passphrase = passPhrase,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -450,13 +450,13 @@ public class DeriveStakeAddressCommandShould
     [InlineData(2147483647, 2147483647, "English", "fitness juice ankle box prepare gallery purse narrow miracle next soccer category", "Mainnet",
         "stake1uxekeny55vzsq5hhm5kppz0nyggs6vtul0uaztjltq2scjsa0k5gn")]
     public async Task Derive_Correct_Bech32_Extended_Stake_Address_When_Account_And_Address_Index_Is_Supplied_And_Mnemonic_Is_Valid_For_Language(
-        int accountIndex, int addressIndex, string language, string mnemonic, string networkTag, string expectedBech32Key)
+        int accountIndex, int addressIndex, string language, string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DeriveStakeAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
         };

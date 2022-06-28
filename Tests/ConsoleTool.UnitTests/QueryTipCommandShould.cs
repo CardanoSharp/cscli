@@ -15,11 +15,11 @@ public class QueryTipCommandShould
     [InlineData("mainet")]
     [InlineData("mainnetwork")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Network_Is_Not_Valid(
-        string networkTag)
+        string network)
     {
         var command = new QueryTipCommand()
         {
-            Network = networkTag,
+            Network = network,
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);

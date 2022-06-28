@@ -18,13 +18,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("test", "Enterprise")]
     [InlineData("Mainet", "Enterprise")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_NetworkTag_Is_Invalid(
-        string networkTag, string paymentAddressType)
+        string network, string paymentAddressType)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
             PaymentAddressType = paymentAddressType,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -51,13 +51,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("entorprise", "Mainnet")]
     [InlineData("Delegating", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Type_Is_Invalid(
-        string paymentAddressType, string networkTag)
+        string paymentAddressType, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug",
             PaymentAddressType = paymentAddressType,
-            Network = networkTag
+            Network = network
         };
 
         var executionResult = await command.ExecuteAsync(CancellationToken.None);
@@ -84,13 +84,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("ChineseSimplified", "", "Testnet")]
     [InlineData("ChineseSimplified", "", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Not_Supplied_Deriving_Enterprise_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
         };
 
@@ -118,13 +118,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("ChineseSimplified", "", "Testnet")]
     [InlineData("ChineseSimplified", "", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Not_Supplied_Deriving_Base_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
         };
 
@@ -164,13 +164,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("Italian", "fuggente", "Mainnet")]
     [InlineData("ChineseSimplified", "厉", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Not_Of_Valid_Length_Deriving_Enterprise_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
         };
 
@@ -210,13 +210,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("Italian", "fuggente", "Mainnet")]
     [InlineData("ChineseSimplified", "厉", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Mnemonic_Is_Not_Of_Valid_Length_Deriving_Base_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
         };
 
@@ -238,13 +238,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("aenglish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Language_Is_Not_Supported_Deriving_Enterprise_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
         };
 
@@ -266,13 +266,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("Klingon", "shoe follow blossom remain learn venue harvest fossil found", "Mainnet")]
     [InlineData("anglish", "rapid limit bicycle embrace speak column spoil casino become evolve unknown worry letter team laptop unknown false elbow bench analyst dilemma engage pulse plug", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Language_Is_Not_Supported_Deriving_Base_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
         };
 
@@ -296,13 +296,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("French", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     [InlineData("ChineseSimplified", "danseur prouesse sauvage exquis cirque endosser saumon cintrer ratisser rompre pièce achat opinion cloporte orageux", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Words_Are_Invalid_For_Language_Word_List_Deriving_Enterprise_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
         };
 
@@ -326,13 +326,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData("French", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     [InlineData("ChineseSimplified", "danseur prouesse sauvage exquis cirque endosser saumon cintrer ratisser rompre pièce achat opinion cloporte orageux", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Words_Are_Invalid_For_Language_Word_List_Deriving_Base_Address_Type(
-        string language, string mnemonic, string networkTag)
+        string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
         };
 
@@ -354,14 +354,14 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-80765454, "Italian", "exigente pioneiro garrafa tarja genial dominado aclive tradutor fretar", "Mainnet")]
     [InlineData(-12, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Account_Index_Is_Out_Of_Bounds_Deriving_Enterprise_Address_Type(
-        int accountIndex, string language, string mnemonic, string networkTag)
+        int accountIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             AccountIndex = accountIndex,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
         };
 
@@ -383,14 +383,14 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-80765454, "Italian", "exigente pioneiro garrafa tarja genial dominado aclive tradutor fretar", "Mainnet")]
     [InlineData(-12, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Account_Index_Is_Out_Of_Bounds_Deriving_Base_Address_Type(
-        int accountIndex, string language, string mnemonic, string networkTag)
+        int accountIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             AccountIndex = accountIndex,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
         };
 
@@ -412,13 +412,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-10, "Japanese", "りけん ぞんび こんすい たまる めだつ すんぽう つまらない せつりつ けんない", "Mainnet")]
     [InlineData(-2147483647, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Address_Index_Is_Out_Of_Bounds_Deriving_Enterprise_Address_Type(
-        int addressIndex, string language, string mnemonic, string networkTag)
+        int addressIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             AddressIndex = addressIndex,
             PaymentAddressType = "Enterprise",
         };
@@ -441,13 +441,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-10, "Japanese", "りけん ぞんび こんすい たまる めだつ すんぽう つまらない せつりつ けんない", "Mainnet")]
     [InlineData(-2147483647, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Address_Index_Is_Out_Of_Bounds_Deriving_Base_Address_Type(
-        int addressIndex, string language, string mnemonic, string networkTag)
+        int addressIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             AddressIndex = addressIndex,
             PaymentAddressType = "Base",
         };
@@ -470,14 +470,14 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-80765454, "Italian", "exigente pioneiro garrafa tarja genial dominado aclive tradutor fretar", "Mainnet")]
     [InlineData(-12, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Stake_Account_Index_Is_Out_Of_Bounds_Deriving_Enterprise_Address_Type(
-        int accountIndex, string language, string mnemonic, string networkTag)
+        int accountIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             StakeAccountIndex = accountIndex,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
         };
 
@@ -499,14 +499,14 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-80765454, "Italian", "exigente pioneiro garrafa tarja genial dominado aclive tradutor fretar", "Mainnet")]
     [InlineData(-12, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Stake_Account_Index_Is_Out_Of_Bounds_Deriving_Base_Address_Type(
-        int accountIndex, string language, string mnemonic, string networkTag)
+        int accountIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
             StakeAccountIndex = accountIndex,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
         };
 
@@ -528,13 +528,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-10, "Japanese", "りけん ぞんび こんすい たまる めだつ すんぽう つまらない せつりつ けんない", "Mainnet")]
     [InlineData(-2147483647, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Stake_Address_Index_Is_Out_Of_Bounds_Deriving_Enterprise_Address_Type(
-        int addressIndex, string language, string mnemonic, string networkTag)
+        int addressIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             StakeAddressIndex = addressIndex,
             PaymentAddressType = "Enterprise",
         };
@@ -557,13 +557,13 @@ public class DerivePaymentAddressCommandShould
     [InlineData(-10, "Japanese", "りけん ぞんび こんすい たまる めだつ すんぽう つまらない せつりつ けんない", "Mainnet")]
     [InlineData(-2147483647, "ChineseSimplified", "趋 富 吸 献 树 吾 秒 举 火 侦 佛 疑 机 察 统", "Mainnet")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Stake_Address_Index_Is_Out_Of_Bounds_Deriving_Base_Address_Type(
-        int addressIndex, string language, string mnemonic, string networkTag)
+        int addressIndex, string language, string mnemonic, string network)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
             Language = language,
-            Network = networkTag,
+            Network = network,
             StakeAddressIndex = addressIndex,
             PaymentAddressType = "Base",
         };
@@ -584,18 +584,18 @@ public class DerivePaymentAddressCommandShould
     [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Mainnet",
         "addr1vxxha8wnyley93q3g8xu49un3rcfa8cn72p9fhlexvusm8c5ngczk")]
     public async Task Derive_Correct_Bech32_Extended_Payment_Enterprise_Address_Defaulting_To_English_When_Passphrase_And_Language_Are_Not_Supplied_And_Mnemonic_Is_Valid_English(
-        string mnemonic, string networkTag, string expectedBech32Key)
+        string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise"
         };
         var englishSpecificCommand = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Enterprise",
             Language = "English",
         };
@@ -618,18 +618,18 @@ public class DerivePaymentAddressCommandShould
     [InlineData("since cook close prosper slush luggage observe neglect fit arm twelve grief evolve illegal seven destroy joke hand useless knee silent wasp protect purity", "Mainnet",
         "addr1qxxha8wnyley93q3g8xu49un3rcfa8cn72p9fhlexvusm8mtk8vg0tpqxr0dwmaaakm07w39p4grset5aps8yytuvvjqydaar7")]
     public async Task Derive_Correct_Bech32_Extended_Payment_Base_Address_Defaulting_To_English_When_Passphrase_And_Language_Are_Not_Supplied_And_Mnemonic_Is_Valid_English(
-        string mnemonic, string networkTag, string expectedBech32Key)
+        string mnemonic, string network, string expectedBech32Key)
     {
         var command = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base"
         };
         var englishSpecificCommand = new DerivePaymentAddressCommand()
         {
             Mnemonic = mnemonic,
-            Network = networkTag,
+            Network = network,
             PaymentAddressType = "Base",
             Language = "English",
         };
@@ -661,7 +661,7 @@ public class DerivePaymentAddressCommandShould
     public async Task Derive_Correct_Bech32_Extended_Payment_Enterprise_Address_When_All_Properties_Are_Valid(
         int accountIndex, int addressIndex, 
         string language, string mnemonic, 
-        string passPhrase, string networkTag, 
+        string passPhrase, string network, 
         string expectedBech32Key)
     {
         var command = new DerivePaymentAddressCommand()
@@ -670,7 +670,7 @@ public class DerivePaymentAddressCommandShould
             Language = language,
             Passphrase = passPhrase,
             PaymentAddressType = "Enterprise",
-            Network = networkTag,
+            Network = network,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
         };
@@ -716,7 +716,7 @@ public class DerivePaymentAddressCommandShould
         int accountIndex, int addressIndex,
         int stakeAccountIndex, int stakeAddressIndex,
         string language, string mnemonic, 
-        string passPhrase, string networkTag, 
+        string passPhrase, string network, 
         string expectedBech32Key)
     {
         var command = new DerivePaymentAddressCommand()
@@ -725,7 +725,7 @@ public class DerivePaymentAddressCommandShould
             Language = language,
             Passphrase = passPhrase,
             PaymentAddressType = "Base",
-            Network = networkTag,
+            Network = network,
             AccountIndex = accountIndex,
             AddressIndex = addressIndex,
             StakeAccountIndex = stakeAccountIndex,

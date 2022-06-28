@@ -97,9 +97,9 @@ Query commands:
     query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
-    BETA: transaction simple-payment build --network <network> --from <address> --to <address> (--ada <ada_amount> | --lovelaces <lovelace_amount> | --send-all true) [--signing-key <from_addr_payment_key>] [--submit true] [--message "<string>"] [--out-file <output_path>] 
+    BETA: transaction simple-payment build --network <network> --from <address> --to <address> (--ada <ada_amount> | --lovelaces <lovelace_amount> | --send-all true) [--ttl <slot_no>] [--signing-key <from_addr_payment_key>] [--submit true] [--message "<string>"] [--out-file <output_path>] 
     transaction view --network <network> --cbor-hex <hex_string>
-    BETA: transaction sign --cbor-hex <hex_string> --signing-keys <comma_separated_bech32_skeys> [--out-file <output_path>]
+    transaction sign --cbor-hex <hex_string> --signing-keys <comma_separated_bech32_skeys> [--out-file <output_path>]
     transaction submit --network <network> --cbor-hex <hex_string>
 
 Encoding/Cryptography Commands:
@@ -443,7 +443,7 @@ $ cscli transaction sign --signing-keys addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9ru
 
 ### Submit Transaction
 ```console
-$ cscli transaction submit --network testnet --cbor-hex 84a600818258207f1d24706e65b3eaef608d6ba5adf8b2bf69254bbd1e1532fa7c601a1d6aca3d000d8001828258390058b5a28ad45b3e2e5ea96d46e071a12d4d8cb5498cf0285051b3c30297660614ab2241b986bb1222f0373a359509a79610ac1210ad11e3031a05f5e10082581d60f3a76db98805ebfb391d8a7fa176e0a4da4d20955c47a5d35936353c1a35a23dbb021a0002ab45031a03831a6f0e80a1008182582047a69a1a41541c00a1e62ab8d78c1870e4f04c0507530b90c7dfde2a144d0cfa58406f50cd131250768a3b707e5eb5797e1dc519157e8c7ac27a72ac472fb546bc4604d3b51b2460e4517e28aea5fd0d19ddf8d95d9bf223e59f0306db0a7794d40af5f6
+$ cscli transaction submit --network testnet --cbor-hex 84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da10081825820de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa5840d856197bc4f4cb62439ea9c2781e9764855685c3809364ef759b1926047d7bb326fecf2ee1144c5d49cf2f53feb432fa1af30e00d8d69c4145e6494fd1979a0cf582a11902a2a1636d73676d74687820666f72206c756e636880
 5c9f1456a2f7cdf30c12d569ede3f298b377115a63dc0cef791e692dbe4be26b
 ```
 
@@ -451,12 +451,12 @@ $ cscli transaction submit --network testnet --cbor-hex 84a600818258207f1d24706e
 ```console
 $ cscli query tip --network mainnet
 {
-  "hash": "bc0e501e50c42ed6d2964e418b0a626d6026f86d7c205c27fe5b96cb34d36ad9",
-  "epoch_no": 343,
-  "abs_slot": 63207567,
-  "epoch_slot": 394767,
-  "block_no": 7353437,
-  "block_time": "2022-06-09T11:24:18"
+  "hash": "cff749d596281c59f7f6c50eb7a8ede766397dd7d943701210ddd32c677e19ef",
+  "epoch_no": 347,
+  "abs_slot": 64835901,
+  "epoch_slot": 295101,
+  "block_no": 7431004,
+  "block_time": "2022-06-28T07:43:12"
 }
 ```
 
@@ -464,7 +464,7 @@ $ cscli query tip --network mainnet
 ```console
 $ cscli query protocol-parameters --network mainnet
 {
-  "epoch_no": 343,
+  "epoch_no": 347,
   "min_fee_a": 44,
   "min_fee_b": 155381,
   ...

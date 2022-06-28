@@ -15,11 +15,11 @@ public class QueryTransactionInfoCommandShould
     [InlineData("mainet")]
     [InlineData("mainnetwork")]
     public async Task Execute_Unsuccessfully_With_FailureInvalidOptions_When_Network_Is_Not_Valid(
-        string networkTag)
+        string network)
     {
         var command = new QueryTransactionInfoCommand()
         {
-            Network = networkTag,
+            Network = network,
             TxId = "421734e5c8e5be24d788da2defeb9005516c20eb7d3ddef2140e836d20282a2a",
         };
 
