@@ -106,6 +106,10 @@ public static class TxUtils
     public static PrivateKey GetPrivateKeyFromBech32SigningKey(string bech32EncodedSigningKey)
     {
         var keyBytes = Bech32.Decode(bech32EncodedSigningKey, out _, out _);
-        return new PrivateKey(keyBytes[..64], keyBytes[64..]);
+        // Extended signing key "*_xsk" 64 bytes key + 32 bytes chain-code (optional)
+        // or non-extended "*_sk" 32 bytes key
+        return keyBytes.Length >= 64
+            ? new PrivateKey(keyBytes[..64], keyBytes[64..])
+            : new PrivateKey(keyBytes[..32], Array.Empty<byte>());
     }
 }

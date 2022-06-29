@@ -16,13 +16,13 @@ namespace Cscli.ConsoleTool.Transaction;
 
 public class BuildSimplePaymentTransactionCommand : ICommand
 {
-    public string? Network { get; init; }
+    public string? Network { get; init; } // testnet | mainnet
     public string? From { get; init; } // Address Bech32
     public string? SigningKey { get; init; } // Payment Signing Key Bech32 for From Address
     public string? To{ get; init; } // Address Bech32
-    public ulong Lovelaces { get; init; } // Value comes from one of either Lovelaces | Ada | SendAll=true
+    public ulong Lovelaces { get; init; } // Output values comes from one of either (Lovelaces | Ada | SendAll=true)
     public decimal Ada { get; init; } 
-    public bool SendAll { get; init; }
+    public bool SendAll { get; init; } = false; 
     public uint Ttl { get; set; } // Slot for transaction expiry
     public string? Message { get; init; } // Onchain Metadata 674 standard
     public bool Submit { get; init; } // Submits Transaction to Koios node
@@ -31,19 +31,26 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
         var (isValid, network, lovelaces, errors) = Validate();
-        if (!isValid) return CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors));
+        if (!isValid || From is null || To is null) 
+            return CommandResult.FailureInvalidOptions(string.Join(Environment.NewLine, errors));
 
         (var epochClient, var networkClient, var addressClient) = GetKoiosClients(network);
-        var tip = (await networkClient.GetChainTip()).Content.First();
-        var protocolParams = (await epochClient.GetProtocolParameters(tip.Epoch.ToString())).Content.First();
-        var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content;
-        if (!sourceAddressInfo.Any()) return CommandResult.FailureBackend("--from address has no utxos");
-        var sourceAddressUtxos = BuildSourceAddressUtxos(sourceAddressInfo.First().UtxoSets);
+        var tip = (await networkClient.GetChainTip()).Content?.FirstOrDefault();
+        if (tip is null) return CommandResult.FailureBackend("Unable to get chain tip");
+        var protocolParams = (await epochClient.GetProtocolParameters(tip.Epoch.ToString())).Content?.FirstOrDefault();
+        if (protocolParams is null) return CommandResult.FailureBackend("Unable to get protocol parameters");
+        var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content?.FirstOrDefault();
+        if (sourceAddressInfo is null) 
+            return CommandResult.FailureBackend($"Unable to get address info for --from address ${From}");
+        if (sourceAddressInfo.UtxoSets is null || !sourceAddressInfo.UtxoSets.Any())
+            return CommandResult.FailureBackend("--from address has no utxos");
+        var sourceAddressUtxos = BuildSourceAddressUtxos(sourceAddressInfo.UtxoSets);
         var consolidatedInputValue = BuildConsolidatedTxInputValue(sourceAddressUtxos);
         var txOutput = SendAll 
             ? new PendingTransactionOutput(To, consolidatedInputValue)
             : new PendingTransactionOutput(To, new Balance(lovelaces, Array.Empty<NativeAssetValue>()));
-        if (consolidatedInputValue.Lovelaces < txOutput.Value.Lovelaces) return CommandResult.FailureBackend($"--from address has insufficient balance ({consolidatedInputValue.Lovelaces}) to pay {txOutput.Value.Lovelaces}");
+        if (consolidatedInputValue.Lovelaces < txOutput.Value.Lovelaces) 
+            return CommandResult.FailureBackend($"--from address has insufficient balance ({consolidatedInputValue.Lovelaces}) to pay {txOutput.Value.Lovelaces}");
         var changeValue = consolidatedInputValue.Subtract(txOutput.Value);
         var ttl = Ttl > 0 ? Ttl : (uint)tip.AbsSlot + TtlTipOffsetSlots;
 
@@ -233,15 +240,15 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     {
         return addressUtxoSet
             .Select(utxo => new UnspentTransactionOutput(
-                utxo.TxHash,
+                utxo.TxHash ?? "n/a",
                 utxo.TxIndex,
                 new Balance(
-                    ulong.Parse(utxo.Value),
+                    ulong.Parse(utxo.Value ?? "0"),
                     utxo.AssetList.Select(
                         a => new NativeAssetValue(
-                            a.PolicyId,
-                            a.AssetName,
-                            ulong.Parse(a.Quantity)))
+                            a.PolicyId ?? "n/a",
+                            a.AssetName ?? "n/a",
+                            ulong.Parse(a.Quantity ?? "0")))
                     .ToArray())))
             .ToArray();
     }
