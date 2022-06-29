@@ -18,7 +18,7 @@ public class QueryAccountAssetCommand : ICommand
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
         var (isValid, networkType, stakeAddress, errors) = Validate();
-        if (!isValid || stakeAddress == null)
+        if (!isValid || stakeAddress is null)
         {
             return CommandResult.FailureInvalidOptions(
                 string.Join(Environment.NewLine, errors));
@@ -28,7 +28,7 @@ public class QueryAccountAssetCommand : ICommand
         try
         {
             var assets = await accountClient.GetStakeAssets(stakeAddress.ToString()).ConfigureAwait(false);
-            if (!assets.IsSuccessStatusCode || assets.Content == null)
+            if (!assets.IsSuccessStatusCode || assets.Content is null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 
             var json = JsonSerializer.Serialize(assets.Content, SerialiserOptions);

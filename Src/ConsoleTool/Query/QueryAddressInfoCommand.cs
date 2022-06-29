@@ -26,7 +26,7 @@ public class QueryAddressInfoCommand : ICommand
         try
         {
             var addressInfo = (await addressClient.GetAddressInformation(address.ToString()).ConfigureAwait(false));
-            if (!addressInfo.IsSuccessStatusCode || addressInfo.Content == null)
+            if (!addressInfo.IsSuccessStatusCode || addressInfo.Content is null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 
             var json = JsonSerializer.Serialize(addressInfo.Content, SerialiserOptions);

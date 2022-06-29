@@ -257,7 +257,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         UnspentTransactionOutput[] sourceAddressUtxos,
         NativeAssetValue[]? nativeAssetsToMint = null)
     {
-        if (nativeAssetsToMint != null && nativeAssetsToMint.Length > 0)
+        if (nativeAssetsToMint is not null && nativeAssetsToMint.Length > 0)
         {
             return sourceAddressUtxos
                 .Select(utxo => utxo.Value)
@@ -290,7 +290,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
 
         static string[] SplitString(string? value)
         {
-            if (value == null)
+            if (value is null)
                 return Array.Empty<string>();
             if (value.Length <= MaxMetadataStringLength)
                 return new[] { value };

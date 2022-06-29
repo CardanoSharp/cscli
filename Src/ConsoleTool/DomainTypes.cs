@@ -11,7 +11,7 @@ public record UnspentTransactionOutput(string TxHash, uint OutputIndex, Balance 
     public override int GetHashCode() => ToString().GetHashCode();
     public override string ToString() => $"{TxHash}_{OutputIndex}";
     bool IEquatable<UnspentTransactionOutput>.Equals(UnspentTransactionOutput? other)
-        => other != null && TxHash == other.TxHash && OutputIndex == other.OutputIndex;
+        => other is not null && TxHash == other.TxHash && OutputIndex == other.OutputIndex;
     public ulong Lovelaces => Value.Lovelaces;
 }
 

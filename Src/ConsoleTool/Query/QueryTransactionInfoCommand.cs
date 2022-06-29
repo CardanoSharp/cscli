@@ -25,7 +25,7 @@ public class QueryTransactionInfoCommand : ICommand
         {
             var txInfo = await transactionClient.GetTransactionInformation(
                 new GetTransactionRequest { TxHashes = new List<string>{ txId } }).ConfigureAwait(false);
-            if (!txInfo.IsSuccessStatusCode || txInfo.Content == null)
+            if (!txInfo.IsSuccessStatusCode || txInfo.Content is null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 
             var json = JsonSerializer.Serialize(txInfo.Content, SerialiserOptions);

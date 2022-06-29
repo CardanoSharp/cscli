@@ -45,7 +45,7 @@ public class ConvertVerificationKeyCommand : ICommand
         if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
         {
             var vkeyCborTextEnvelope = BuildTextEnvelope(sKeyPrefix, verificationKey);
-            if (vkeyCborTextEnvelope != null)
+            if (vkeyCborTextEnvelope is not null)
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCborTextEnvelope, SerialiserOptions), ct).ConfigureAwait(false);
         }
 

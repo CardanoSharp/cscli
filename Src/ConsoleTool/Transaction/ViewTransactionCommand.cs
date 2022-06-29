@@ -23,31 +23,31 @@ public class ViewTransactionCommand : ICommand
                 string.Join(Environment.NewLine, errors)));
         }
 
-        var deSerialisedTransaction = txCborBytes.DeserializeTransaction();
-        var txId = HashUtility.Blake2b256(
-            deSerialisedTransaction.TransactionBody.Serialize(deSerialisedTransaction.AuxiliaryData))
-            .ToStringHex();
+        var deSerialisedTx = txCborBytes.DeserializeTransaction();
+        var txId = deSerialisedTx.TransactionWitnessSet is null
+            ? "n/a"
+            : HashUtility.Blake2b256(deSerialisedTx.TransactionBody.Serialize(deSerialisedTx.AuxiliaryData)).ToStringHex();
         var tx = new Tx(
             Id: txId,
-            IsValid: deSerialisedTransaction.IsValid,
+            IsValid: deSerialisedTx.IsValid,
             TransactionBody: new TxBody(
-                deSerialisedTransaction.TransactionBody.TransactionInputs.Select(
+                deSerialisedTx.TransactionBody.TransactionInputs.Select(
                     txI => new TxIn(txI.TransactionId.ToStringHex(), txI.TransactionIndex)).ToArray(),
-                deSerialisedTransaction.TransactionBody.TransactionOutputs.Select(
+                deSerialisedTx.TransactionBody.TransactionOutputs.Select(
                     txO => MapTxOut(network, txO)).ToArray(),
-                MapNativeAssets(deSerialisedTransaction.TransactionBody.Mint),
-                deSerialisedTransaction.TransactionBody.Fee,
-                deSerialisedTransaction.TransactionBody.Ttl,
-                deSerialisedTransaction.AuxiliaryData is null ? null : HashUtility.Blake2b256(deSerialisedTransaction.AuxiliaryData.GetCBOR().EncodeToBytes()).ToStringHex(),
-                deSerialisedTransaction.TransactionBody.TransactionStartInterval),
-            TransactionWitnessSet: deSerialisedTransaction.TransactionWitnessSet is null 
+                MapNativeAssets(deSerialisedTx.TransactionBody.Mint),
+                deSerialisedTx.TransactionBody.Fee,
+                deSerialisedTx.TransactionBody.Ttl,
+                deSerialisedTx.AuxiliaryData is null ? null : HashUtility.Blake2b256(deSerialisedTx.AuxiliaryData.GetCBOR().EncodeToBytes()).ToStringHex(),
+                deSerialisedTx.TransactionBody.TransactionStartInterval),
+            TransactionWitnessSet: deSerialisedTx.TransactionWitnessSet is null 
                 ? null
                 : new TxWitnessSet(
-                    deSerialisedTransaction.TransactionWitnessSet.VKeyWitnesses.Select(
+                    deSerialisedTx.TransactionWitnessSet.VKeyWitnesses.Select(
                         vw => new TxVKeyWitness(vw.VKey.Key.ToStringHex(), vw.Signature.ToStringHex()))
                     .ToArray(),
-                    deSerialisedTransaction.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
-            AuxiliaryData: new TxAuxData(deSerialisedTransaction.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
+                    deSerialisedTx.TransactionWitnessSet.NativeScripts.Select(MapNativeScript).ToArray()),
+            AuxiliaryData: new TxAuxData(deSerialisedTx.AuxiliaryData?.Metadata ?? new Dictionary<int, object>()));
         var json = JsonSerializer.Serialize(tx, SerialiserOptions);
         return ValueTask.FromResult(CommandResult.Success(json));
     }
@@ -94,7 +94,7 @@ public class ViewTransactionCommand : ICommand
 
     private static NativeAssetValue[] MapNativeAssets(IDictionary<byte[], NativeAsset> multiAsset)
     {
-        if (multiAsset == null)
+        if (multiAsset is null)
             return Array.Empty<NativeAssetValue>();
 
         return multiAsset.Keys.SelectMany(
@@ -105,24 +105,24 @@ public class ViewTransactionCommand : ICommand
 
     private static TxNativeScript MapNativeScript(NativeScript nativeScript)
     {
-        if (nativeScript == null)
+        if (nativeScript is null)
             return new TxNativeScript("");
 
         return new TxNativeScript(BuildNativeScriptString(nativeScript));
 
         static string BuildNativeScriptString(NativeScript ns)
         {
-            if (ns.ScriptPubKey != null)
+            if (ns.ScriptPubKey is not null)
                 return $"PubKey({ns.ScriptPubKey.KeyHash.ToStringHex()})";
-            if (ns.InvalidAfter != null)
+            if (ns.InvalidAfter is not null)
                 return $"InvalidAfter({ns.InvalidAfter.After})";
-            if (ns.InvalidBefore != null)
+            if (ns.InvalidBefore is not null)
                 return $"InvalidBefore({ns.InvalidBefore.Before})";
-            if (ns.ScriptNofK != null)
+            if (ns.ScriptNofK is not null)
                 return $"NofK({ns.ScriptNofK.N}of{ns.ScriptNofK.NativeScripts.Count}[{string.Join(',',ns.ScriptNofK.NativeScripts.Select(BuildNativeScriptString))}])";
-            if (ns.ScriptAny != null)
+            if (ns.ScriptAny is not null)
                 return $"Any([{string.Join(',', ns.ScriptAny.NativeScripts.Select(BuildNativeScriptString))}])";
-            if (ns.ScriptAll != null)
+            if (ns.ScriptAll is not null)
                 return $"All([{string.Join(',', ns.ScriptAll.NativeScripts.Select(BuildNativeScriptString))}])";
             return "";
         }
