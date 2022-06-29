@@ -31,7 +31,7 @@ public class ConvertVerificationKeyCommand : ICommand
             return CommandResult.FailureInvalidOptions(
                 "Invalid option --sigining-key is not in bech32 format - please see https://cips.cardano.org/cips/cip5/");
 
-        var signingKeyBytes = Bech32.Decode(SigningKey, out _, out var sKeyPrefix);
+        _ = Bech32.Decode(SigningKey, out _, out var sKeyPrefix);
         if (!SupportedSigningKeyPrefixes.Contains(sKeyPrefix))
             return CommandResult.FailureInvalidOptions(
                 $"Invalid option --sigining-key with prefix '{sKeyPrefix}' is not supported");
