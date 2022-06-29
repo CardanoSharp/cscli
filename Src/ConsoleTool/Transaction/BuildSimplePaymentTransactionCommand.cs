@@ -38,19 +38,20 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var tip = (await networkClient.GetChainTip()).Content?.FirstOrDefault();
         if (tip is null) return CommandResult.FailureBackend("Unable to get chain tip");
         var protocolParams = (await epochClient.GetProtocolParameters(tip.Epoch.ToString())).Content?.FirstOrDefault();
-        if (protocolParams is null) return CommandResult.FailureBackend("Unable to get protocol parameters");
+        if (protocolParams is null) 
+            return CommandResult.FailureBackend("Unable to get protocol parameters");
         var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content?.FirstOrDefault();
         if (sourceAddressInfo is null) 
             return CommandResult.FailureBackend($"Unable to get address info for --from address ${From}");
         if (sourceAddressInfo.UtxoSets is null || !sourceAddressInfo.UtxoSets.Any())
-            return CommandResult.FailureBackend("--from address has no utxos");
+            return CommandResult.FailureInvalidOptions("--from address has no utxos");
         var sourceAddressUtxos = BuildSourceAddressUtxos(sourceAddressInfo.UtxoSets);
         var consolidatedInputValue = BuildConsolidatedTxInputValue(sourceAddressUtxos);
         var txOutput = SendAll 
             ? new PendingTransactionOutput(To, consolidatedInputValue)
             : new PendingTransactionOutput(To, new Balance(lovelaces, Array.Empty<NativeAssetValue>()));
         if (consolidatedInputValue.Lovelaces < txOutput.Value.Lovelaces) 
-            return CommandResult.FailureBackend($"--from address has insufficient balance ({consolidatedInputValue.Lovelaces}) to pay {txOutput.Value.Lovelaces}");
+            return CommandResult.FailureInvalidOptions($"--from address has insufficient balance ({consolidatedInputValue.Lovelaces}) to pay {txOutput.Value.Lovelaces}");
         var changeValue = consolidatedInputValue.Subtract(txOutput.Value);
         var ttl = Ttl > 0 ? Ttl : (uint)tip.AbsSlot + TtlTipOffsetSlots;
 
