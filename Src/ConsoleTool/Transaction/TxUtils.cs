@@ -9,6 +9,7 @@ public static class TxUtils
     {
         return value.Lovelaces == 0 && value.NativeAssets.Length == 0;
     }
+
     public static Balance Sum(this IEnumerable<Balance> values)
     {
         var lovelaces = 0UL;
