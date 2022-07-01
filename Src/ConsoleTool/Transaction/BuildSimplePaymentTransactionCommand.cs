@@ -45,8 +45,8 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             return CommandResult.FailureBackend($"Unable to get address info for --from address ${From}");
         if (sourceAddressInfo.UtxoSets is null || !sourceAddressInfo.UtxoSets.Any())
             return CommandResult.FailureInvalidOptions("--from address has no utxos");
-        var sourceAddressUtxos = BuildSourceAddressUtxos(sourceAddressInfo.UtxoSets);
-        var consolidatedInputValue = BuildConsolidatedTxInputValue(sourceAddressUtxos);
+        var sourceAddressUtxos = MapSourceAddressUtxos(sourceAddressInfo.UtxoSets);
+        var consolidatedInputValue = MapConsolidatedTxInputValue(sourceAddressUtxos);
         var txOutput = SendAll 
             ? new PendingTransactionOutput(To, consolidatedInputValue)
             : new PendingTransactionOutput(To, new Balance(lovelaces, Array.Empty<NativeAssetValue>()));
@@ -56,9 +56,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var ttl = Ttl > 0 ? Ttl : (uint)tip.AbsSlot + TtlTipOffsetSlots;
 
         // Build Tx Body
-        var txBodyBuilder = TransactionBodyBuilder.Create
-            .SetFee(0)
-            .SetTtl(ttl);
+        var txBodyBuilder = TransactionBodyBuilder.Create.SetTtl(ttl);
         // Inputs
         foreach (var txInput in sourceAddressUtxos)
         {
@@ -70,14 +68,8 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             txBodyBuilder.AddOutput(new Address(From), changeValue.Lovelaces, GetTokenBundleBuilder(changeValue.NativeAssets));
         }
-        // Metadata
-        var auxDataBuilder = !string.IsNullOrWhiteSpace(Message)
-            ? AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message))
-            : null;
-
         // Build Whole Tx
-        var txBuilder = TransactionBuilder.Create
-            .SetBody(txBodyBuilder);
+        var txBuilder = TransactionBuilder.Create.SetBody(txBodyBuilder);
         // Key Witnesses if signing key is passed in
         if (!string.IsNullOrWhiteSpace(SigningKey))
         {
@@ -86,14 +78,17 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                 .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
             txBuilder.SetWitnesses(witnesses);
         }
+        // Metadata
+        var auxDataBuilder = !string.IsNullOrWhiteSpace(Message)
+            ? AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message))
+            : null;
         if (auxDataBuilder is not null)
         {
             txBuilder.SetAuxData(auxDataBuilder);
         }
         var tx = txBuilder.Build();
         // Fee Calculation
-        var fee = tx.CalculateFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
-        txBodyBuilder.SetFee(fee);
+        var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
         var txCborBytes = tx.Serialize();
         if (!string.IsNullOrWhiteSpace(OutFile))
@@ -237,7 +232,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         BackendGateway.GetBackendClient<INetworkClient>(network),
         BackendGateway.GetBackendClient<IAddressClient>(network));
 
-    private static UnspentTransactionOutput[] BuildSourceAddressUtxos(IEnumerable<AddressUtxoSet> addressUtxoSet)
+    private static UnspentTransactionOutput[] MapSourceAddressUtxos(IEnumerable<AddressUtxoSet> addressUtxoSet)
     {
         return addressUtxoSet
             .Select(utxo => new UnspentTransactionOutput(
@@ -254,7 +249,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             .ToArray();
     }
 
-    private static Balance BuildConsolidatedTxInputValue(
+    private static Balance MapConsolidatedTxInputValue(
         UnspentTransactionOutput[] sourceAddressUtxos,
         NativeAssetValue[]? nativeAssetsToMint = null)
     {
