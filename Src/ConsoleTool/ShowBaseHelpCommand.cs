@@ -24,9 +24,11 @@ Wallet Commands:
     wallet key account derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>]
     wallet key stake derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
     wallet key payment derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
+    wallet key change derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
     wallet key policy derive --recovery-phrase ""<string>"" [--language <language>] [--passphrase ""<string>""] [--policy-index <derivation-index>] [--verification-key-file <output_path>] [--signing-key-file <output_path>]
     wallet key verification convert --signing-key ""<bech32_skey>"" [--verification-key-file <string>]
     wallet address stake derive --recovery-phrase ""<string>"" --network <network> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>]
+    wallet address change derive --recovery-phrase ""<string>""  --network <network> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
     wallet address payment derive --recovery-phrase ""<string>""  --network <network> --payment-address-type <payment-address-type> [--language <language>] [--passphrase ""<string>""] [--account-index <derivation-index>] [--address-index <derivation-index>] [--stake-account-index <derivation-index>] [--stake-address-index <derivation-index>]
 
 Query Commands:

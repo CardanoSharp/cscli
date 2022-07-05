@@ -56,7 +56,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var ttl = Ttl > 0 ? Ttl : (uint)tip.AbsSlot + TtlTipOffsetSlots;
 
         // Build Tx Body
-        var txBodyBuilder = TransactionBodyBuilder.Create.SetTtl(ttl);
+        var txBodyBuilder = TransactionBodyBuilder.Create.SetTtl(ttl).SetFee(protocolParams.MinFeeB.Value);
         // Inputs
         foreach (var txInput in sourceAddressUtxos)
         {
