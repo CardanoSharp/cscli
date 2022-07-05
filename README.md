@@ -68,7 +68,7 @@ dotnet tool install --global --add-source ./nupkg cscli --version 0.1.0-local-br
 ### Overview and Help
 ```console
 $ cscli --help
-cscli v0.3.0
+cscli v0.4.0
 A lightweight cross-platform tool for building and serialising Cardano wallet entities (i.e. recovery-phrases, keys, addresses and transactions), querying the chain and submitting transactions to the testnet or mainnet networks. Please refer to https://github.com/CardanoSharp/cscli for further documentation.
 
 USAGE: cscli (OPTION | COMMAND)
@@ -77,7 +77,7 @@ Options:
     -v, --version   Show the cscli version
     -h, --help      Show this help text
 
-Wallet commands:
+Wallet Commands:
     wallet recovery-phrase generate --size <size> [--language <language>]
     wallet key root derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"]
     wallet key account derive --recovery-phrase "<string>" [--language <language>] [--passphrase "<string>"] [--account-index <index>]
@@ -88,21 +88,24 @@ Wallet commands:
     wallet address stake derive --recovery-phrase "<string>" --network <network> [--account-index <index>] [--address-index <index>]
     wallet address payment derive --recovery-phrase "<string>" --network <network> --payment-address-type <payment-address-type> [--account-index <index>] [--address-index <index>] [--stake-account-index <index>] [--stake-address-index <index>]
 
-Query commands:
+Query Commands:
     query tip --network <network>
     query protocol-parameters --network <network>
-    query info account --network <network> [--stake-address <stake_address> | --address <payment_base_address>]
+    query info account --network <network> (--stake-address <stake_address> | --address <payment_base_address>)
     query asset account --network <network> --stake-address <stake_address>
     query info address --network <network> --address <payment_address>
     query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
+    BETA: transaction simple-payment build --network <network> --from <address> --to <address> (--ada <ada_amount> | --lovelaces <lovelace_amount> | --send-all true) [--ttl <slot_no>] [--signing-key <from_addr_payment_key>] [--submit true] [--message "<string>"] [--out-file <output_path>] 
+    transaction view --network <network> --cbor-hex <hex_string>
+    transaction sign --cbor-hex <hex_string> --signing-keys <comma_separated_bech32_skeys> [--out-file <output_path>]
     transaction submit --network <network> --cbor-hex <hex_string>
 
 Encoding/Cryptography Commands:
     bech32 encode --value <hex_string> --prefix <string>
     bech32 decode --value <bech32_string>
-    blake2b hash --value <hex_string> [--length <digest_length>]
+    blake2b hash --value <hex_string> [--length <hash_digest_length>]
 
 Arguments:
     <size> ::= 9 | 12 | 15 | 18 | 21 | 24(default)
@@ -110,7 +113,7 @@ Arguments:
     <derivation-index> ::= 0(default) | 1 | .. | 2147483647
     <network> ::= testnet | mainnet
     <payment-address-type> ::= enterprise | base
-    <digest_length> ::= 160 | 224(default) | 256 | 512
+    <hash_digest_length> ::= 160 | 224(default) | 256 | 512
 ```
 
 ### Generate Recovery Phrase
@@ -354,9 +357,93 @@ $ cat stake_0_0.en.vkey
 ```
 </details>
 
+### Build Simple Payment Transaction
+```console
+$ cscli transaction simple-payment build --network testnet --from addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t --to addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3 --ada 420 --message "thx for lunch"
+84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da0f582a11902a2a1636d73676d74687820666f72206c756e636880
+```
+
+<details>
+  <summary>Build and Submit Signed Simple Payment</summary>
+
+```console
+$ cscli transaction simple-payment build --submit true --signing-key addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw --network testnet --from addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t --to addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3 --ada 420 --message "thx for lunch"
+5853cc86af075cc547a5a20658af54841f37a5832532a704c583ed4f010184a5
+```
+</details>
+
+<details>
+  <summary>Build Signed Simple Payment Tx with cardano-cli Output File</summary>
+
+```console
+$ cscli transaction simple-payment build --out-file tx.txsigned --signing-key addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw --network testnet --from addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t --to addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3 --ada 420 --message "thx for lunch"
+84a500818258205853cc86af075cc547a5a20658af54841f37a5832532a704c583ed4f010184a501018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a43e80724021a0002c24d031a03afe00c0758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da10081825820de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa584025f49ad0cb27c0a297ebd2237134be2803b19d11c6e52416d3d7beba130bbc2bd95eb9b7e9e7410d7efcd5c2abd338dd62100d86b26308636335b533873bb508f582a11902a2a1636d73676d74687820666f72206c756e636880
+$ cat tx.txsigned
+{
+  "type": "Tx AlonzoEra",
+  "description": "",
+  "cborHex": "84a500818258205853cc86af075cc547a5a20658af54841f37a5832532a704c583ed4f010184a501018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a43e80724021a0002c24d031a03afe00c0758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da10081825820de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa584025f49ad0cb27c0a297ebd2237134be2803b19d11c6e52416d3d7beba130bbc2bd95eb9b7e9e7410d7efcd5c2abd338dd62100d86b26308636335b533873bb508f582a11902a2a1636d73676d74687820666f72206c756e636880"
+}
+```
+</details>
+
+### View Transaction
+```console
+$ cscli transaction view --network testnet --cbor-hex 84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da0f582a11902a2a1636d73676d74687820666f72206c756e636880
+{
+  "id": "be9b3070e17f9f0c3e5477b315a35b9c5be0ec355f6c6bfb4beee42270413a25",
+  "isValid": true,
+  "transactionBody": {
+    "inputs": [
+      {
+        "transactionId": "dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f92",
+        "transactionIndex": 1
+      }
+    ],
+    "outputs": [
+      {
+        "address": "addr_test1vpuuxlat45yxvtsk44y4pmwk854z4v9k879yfe99q3g3aagqqzar3",
+        "value": {
+          "lovelaces": 420000000,
+          "nativeAssets": []
+        }
+      },
+      {
+        "address": "addr_test1vq5zuhh9685fup86syuzmu3e6eengzv8t46mfqxg086cvqqc5zr4t",
+        "value": {
+          "lovelaces": 1559469529,
+          "nativeAssets": []
+        }
+      }
+    ],
+    "mint": [],
+    "fee": 171749,
+    "ttl": 61856856,
+    "auxiliaryDataHash": "0088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3d",
+    "transactionStartInterval": null
+  },
+  "transactionWitnessSet": null,
+  "auxiliaryData": {
+    "metadata": {
+      "674": {
+        "msg": "thx for lunch"
+      }
+    }
+  }
+}
+```
+
+### Sign Transaction
+
+```console
+$ cscli transaction sign --signing-keys addr_xsk1fzw9r482t0ekua7rcqewg3k8ju5d9run4juuehm2p24jtuzz4dg4wpeulnqhualvtx9lyy7u0h9pdjvmyhxdhzsyy49szs6y8c9zwfp0eqyrqyl290e6dr0q3fvngmsjn4aask9jjr6q34juh25hczw3euust0dw --network testnet --cbor-hex 84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da0f582a11902a2a1636d73676d74687820666f72206c756e636880
+84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da10081825820de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa5840d856197bc4f4cb62439ea9c2781e9764855685c3809364ef759b1926047d7bb326fecf2ee1144c5d49cf2f53feb432fa1af30e00d8d69c4145e6494fd1979a0cf582a11902a2a1636d73676d74687820666f72206c756e636880
+```
+
+
 ### Submit Transaction
 ```console
-$ cscli transaction submit --network testnet --cbor-hex 84a600818258207f1d24706e65b3eaef608d6ba5adf8b2bf69254bbd1e1532fa7c601a1d6aca3d000d8001828258390058b5a28ad45b3e2e5ea96d46e071a12d4d8cb5498cf0285051b3c30297660614ab2241b986bb1222f0373a359509a79610ac1210ad11e3031a05f5e10082581d60f3a76db98805ebfb391d8a7fa176e0a4da4d20955c47a5d35936353c1a35a23dbb021a0002ab45031a03831a6f0e80a1008182582047a69a1a41541c00a1e62ab8d78c1870e4f04c0507530b90c7dfde2a144d0cfa58406f50cd131250768a3b707e5eb5797e1dc519157e8c7ac27a72ac472fb546bc4604d3b51b2460e4517e28aea5fd0d19ddf8d95d9bf223e59f0306db0a7794d40af5f6
+$ cscli transaction submit --network testnet --cbor-hex 84a50081825820dcfe996519321071430c812525393f431d75208428852491e9c0c6788dad5f9201018282581d6079c37fabad08662e16ad4950edd63d2a2ab0b63f8a44e4a504511ef51a1908b10082581d60282e5ee5d1e89e04fa81382df239d6733409875d75b480c879f586001a5cf39dd9021a00029ee5031a03afdc580758200088270ea98923127ef4c2e05b665b81b5a6c9fca1582eed1171ba17648f7b3da10081825820de9503426759fa18624657f5bcc932f38220ec9eceb262907caf2d198b6e0faa5840d856197bc4f4cb62439ea9c2781e9764855685c3809364ef759b1926047d7bb326fecf2ee1144c5d49cf2f53feb432fa1af30e00d8d69c4145e6494fd1979a0cf582a11902a2a1636d73676d74687820666f72206c756e636880
 5c9f1456a2f7cdf30c12d569ede3f298b377115a63dc0cef791e692dbe4be26b
 ```
 
@@ -364,12 +451,12 @@ $ cscli transaction submit --network testnet --cbor-hex 84a600818258207f1d24706e
 ```console
 $ cscli query tip --network mainnet
 {
-  "hash": "bc0e501e50c42ed6d2964e418b0a626d6026f86d7c205c27fe5b96cb34d36ad9",
-  "epoch_no": 343,
-  "abs_slot": 63207567,
-  "epoch_slot": 394767,
-  "block_no": 7353437,
-  "block_time": "2022-06-09T11:24:18"
+  "hash": "cff749d596281c59f7f6c50eb7a8ede766397dd7d943701210ddd32c677e19ef",
+  "epoch_no": 347,
+  "abs_slot": 64835901,
+  "epoch_slot": 295101,
+  "block_no": 7431004,
+  "block_time": "2022-06-28T07:43:12"
 }
 ```
 
@@ -377,7 +464,7 @@ $ cscli query tip --network mainnet
 ```console
 $ cscli query protocol-parameters --network mainnet
 {
-  "epoch_no": 343,
+  "epoch_no": 347,
   "min_fee_a": 44,
   "min_fee_b": 155381,
   ...

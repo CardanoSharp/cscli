@@ -1,6 +1,7 @@
 ﻿using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Extensions.Models;
 using CardanoSharp.Wallet.Models.Keys;
+using Cscli.ConsoleTool.Transaction;
 using System.Text.Json;
 using static Cscli.ConsoleTool.Constants;
 
@@ -30,12 +31,12 @@ public class ConvertVerificationKeyCommand : ICommand
             return CommandResult.FailureInvalidOptions(
                 "Invalid option --sigining-key is not in bech32 format - please see https://cips.cardano.org/cips/cip5/");
 
-        var signingKeyBytes = Bech32.Decode(SigningKey, out _, out var sKeyPrefix);
+        _ = Bech32.Decode(SigningKey, out _, out var sKeyPrefix);
         if (!SupportedSigningKeyPrefixes.Contains(sKeyPrefix))
             return CommandResult.FailureInvalidOptions(
                 $"Invalid option --sigining-key with prefix '{sKeyPrefix}' is not supported");
 
-        var signingKey = new PrivateKey(signingKeyBytes[..64], signingKeyBytes[64..]);
+        var signingKey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
         var verificationKey = signingKey.GetPublicKey(false);
         
         var vKeyPrefix = sKeyPrefix.Replace("sk", "vk");
@@ -45,7 +46,7 @@ public class ConvertVerificationKeyCommand : ICommand
         if (!string.IsNullOrWhiteSpace(VerificationKeyFile))
         {
             var vkeyCborTextEnvelope = BuildTextEnvelope(sKeyPrefix, verificationKey);
-            if (vkeyCborTextEnvelope != null)
+            if (vkeyCborTextEnvelope is not null)
                 await File.WriteAllTextAsync(VerificationKeyFile, JsonSerializer.Serialize(vkeyCborTextEnvelope, SerialiserOptions), ct).ConfigureAwait(false);
         }
 

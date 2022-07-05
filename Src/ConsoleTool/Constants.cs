@@ -5,6 +5,10 @@ namespace Cscli.ConsoleTool;
 
 public static class Constants
 {
+    public const int MessageStandardKey = 674;
+    public const int NftStandardKey = 721;
+    public const int NftRoyaltyStandardKey = 777;
+    public const int MaxMetadataStringLength = 64;
     public const string DefaultMnemonicLanguage = "English";
     public const int DefaultMnemonicCount = 24;
     public const int MaxDerivationPathIndex = Int32.MaxValue; // 2^31 - 1
@@ -15,9 +19,12 @@ public static class Constants
     public const string AccountSigningKeyBech32Prefix = "acct_sk";
     public const string PaymentExtendedSigningKeyBech32Prefix = "addr_xsk";
     public const string PaymentSigningKeyBech32Prefix = "addr_sk";
+    public const string PaymentSharedSigningKeyBech32Prefix = "addr_shared_sk";
     public const string StakeExtendedSigningKeyBech32Prefix = "stake_xsk";
     public const string StakeSigningKeyBech32Prefix = "stake_sk";
     public const string PolicySigningKeyBech32Prefix = "policy_sk";
+    public const string AddressMainnetBech32Prefix = "addr";
+    public const string AddressTestnetBech32Prefix = "addr_test";
     // JSON CBOR text envelopes from cardano-cli
     public const string PaymentSKeyJsonTypeField = "PaymentSigningKeyShelley_ed25519";
     public const string PaymentExtendedSKeyJsonTypeField = "PaymentExtendedSigningKeyShelley_ed25519_bip32";
@@ -31,6 +38,10 @@ public static class Constants
     public const string StakeVKeyJsonTypeField = "StakeVerificationKeyShelley_ed25519";
     public const string StakeExtendedVKeyJsonTypeField = "StakeExtendedVerificationKeyShelley_ed25519_bip32";
     public const string StakeVKeyJsonDescriptionField = "Stake Verification Key";
+    public const string TxAlonzoJsonTypeField = "Tx AlonzoEra";
+    // Transaction Building constants
+    public const uint TtlTipOffsetSlots = 7200; // 2 hours
+
     // Validation constraints
     public static readonly int[] ValidMnemonicSizes = { 9, 12, 15, 18, 21, 24 };
     // Default JSON Serialiser settings
@@ -56,6 +67,9 @@ public static class Constants
         { "--cbor-hex", "cborHex" },
         { "--tx-id", "txId" },
         { "--signing-key", "signingKey" },
+        { "--signing-keys", "signingKeys" },
+        { "--send-all", "sendAll" },
+        { "--out-file", "outFile" },
         //{ "--output-format", "outputFormat" },
     };
 }

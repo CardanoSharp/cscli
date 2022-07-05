@@ -13,7 +13,7 @@ public class QueryTransactionInfoCommand : ICommand
 
     public async ValueTask<CommandResult> ExecuteAsync(CancellationToken ct)
     {
-        var (isValid, networkType, errors) = Validate();
+        var (isValid, networkType, txId, errors) = Validate();
         if (!isValid)
         {
             return CommandResult.FailureInvalidOptions(
@@ -23,11 +23,12 @@ public class QueryTransactionInfoCommand : ICommand
         var transactionClient = BackendGateway.GetBackendClient<ITransactionClient>(networkType);
         try
         {
-#pragma warning disable CS8604 // Possible null reference warning suppressed because of validation above
             var txInfo = await transactionClient.GetTransactionInformation(
-                new GetTransactionRequest { TxHashes = new List<string>{ TxId } }).ConfigureAwait(false);
-#pragma warning restore CS8604
-            var json = JsonSerializer.Serialize(txInfo, SerialiserOptions);
+                new GetTransactionRequest { TxHashes = new List<string>{ txId } }).ConfigureAwait(false);
+            if (!txInfo.IsSuccessStatusCode || txInfo.Content is null)
+                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+
+            var json = JsonSerializer.Serialize(txInfo.Content, SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)
@@ -39,6 +40,7 @@ public class QueryTransactionInfoCommand : ICommand
     private (
         bool isValid,
         NetworkType derivedNetworkType,
+        string txId,
         IReadOnlyCollection<string> validationErrors) Validate()
     {
         var validationErrors = new List<string>();
@@ -52,6 +54,6 @@ public class QueryTransactionInfoCommand : ICommand
             validationErrors.Add(
                 $"Invalid option --tx-id is required");
         }
-        return (!validationErrors.Any(), networkType, validationErrors);
+        return (!validationErrors.Any(), networkType, TxId ?? "", validationErrors);
     }
 }

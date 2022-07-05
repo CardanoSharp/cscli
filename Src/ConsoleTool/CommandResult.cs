@@ -6,6 +6,7 @@ public enum CommandOutcome
     FailureInvalidOptions,
     FailureTimedOut,
     FailureCancelled,
+    FailureBackend,
     FailureUnhandledException,
 }
 
@@ -22,7 +23,6 @@ public class CommandResult
         Outcome = outcome;
         Result = result;
         Exception = exception;
-
     }
 
     public static CommandResult Success(string result) =>
@@ -36,6 +36,9 @@ public class CommandResult
 
     public static CommandResult FailureCancelled(string result) =>
         new(CommandOutcome.FailureCancelled, result);
+
+    public static CommandResult FailureBackend(string result) =>
+        new(CommandOutcome.FailureBackend, result);
 
     public static CommandResult FailureUnhandledException(string result, Exception ex) =>
         new(CommandOutcome.FailureUnhandledException, result, ex);

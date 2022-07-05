@@ -22,7 +22,10 @@ public class QueryProtocolParametersCommand : ICommand
         try
         {
             var protocolParams = await epochClient.GetProtocolParameters(null, limit:1).ConfigureAwait(false);
-            var json = JsonSerializer.Serialize(protocolParams.First(), SerialiserOptions);
+            if (!protocolParams.IsSuccessStatusCode || protocolParams.Content is null)
+                return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
+
+            var json = JsonSerializer.Serialize(protocolParams.Content.First(), SerialiserOptions);
             return CommandResult.Success(json);
         }
         catch (Exception ex)
