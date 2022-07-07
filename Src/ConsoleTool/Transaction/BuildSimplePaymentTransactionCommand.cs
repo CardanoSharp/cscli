@@ -24,6 +24,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     public decimal Ada { get; init; } 
     public bool SendAll { get; init; } = false; 
     public uint Ttl { get; set; } // Slot for transaction expiry
+    public uint? MockWitnessCount { get; set; } // Slot for transaction expiry
     public string? Message { get; init; } // Onchain Metadata 674 standard
     public bool Submit { get; init; } // Submits Transaction to Koios node
     public string? OutFile { get; init; } // cardano-cli compatible transaction file (signed only)
@@ -70,14 +71,26 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         }
         // Build Whole Tx
         var txBuilder = TransactionBuilder.Create.SetBody(txBodyBuilder);
+        
+        // Initiate Witness Builder
+        var witnesses = TransactionWitnessSetBuilder.Create;
+        
         // Key Witnesses if signing key is passed in
         if (!string.IsNullOrWhiteSpace(SigningKey))
         {
             var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
-            var witnesses = TransactionWitnessSetBuilder.Create
-                .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
-            txBuilder.SetWitnesses(witnesses);
+            witnesses.AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
         }
+        
+        // Add Mock Witnesses
+        if (MockWitnessCount.HasValue)
+        {
+            witnesses.MockVKeyWitness(MockWitnessCount.Value);
+        }
+        
+        if(witnesses.Build().VKeyWitnesses.Any())
+            txBuilder.SetWitnesses(witnesses);
+        
         // Metadata
         var auxDataBuilder = !string.IsNullOrWhiteSpace(Message)
             ? AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message))

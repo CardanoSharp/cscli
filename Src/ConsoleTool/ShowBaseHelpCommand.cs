@@ -40,7 +40,7 @@ Query Commands:
     query info transaction --network <network> --tx-id <transaction_id>
 
 Transaction Commands:
-    BETA: transaction simple-payment build --network <network> --from <address> --to <address> (--ada <ada_amount> | --lovelaces <lovelace_amount> | --send-all true) [--ttl <slot_no>] [--signing-key <from_addr_payment_key>] [--submit true] [--message ""<string>""] [--out-file <output_path>] 
+    BETA: transaction simple-payment build --network <network> --from <address> --to <address> (--ada <ada_amount> | --lovelaces <lovelace_amount> | --send-all true) [--ttl <slot_no>] [--mock-witness-cnt <mock_witness_cnt>] [--signing-key <from_addr_payment_key>] [--submit true] [--message ""<string>""] [--out-file <output_path>] 
     transaction view --network <network> --cbor-hex <hex_string>
     transaction sign --cbor-hex <hex_string> --signing-keys <comma_separated_bech32_skeys> [--out-file <output_path>]
     transaction submit --network <network> --cbor-hex <hex_string>
