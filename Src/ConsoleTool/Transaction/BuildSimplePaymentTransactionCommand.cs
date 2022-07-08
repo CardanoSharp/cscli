@@ -24,7 +24,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     public decimal Ada { get; init; } 
     public bool SendAll { get; init; } = false; 
     public uint Ttl { get; set; } // Slot for transaction expiry
-    public uint? MockWitnessCount { get; set; } // Slot for transaction expiry
+    public int? MockWitnessCount { get; set; } // Slot for transaction expiry
     public string? Message { get; init; } // Onchain Metadata 674 standard
     public bool Submit { get; init; } // Submits Transaction to Koios node
     public string? OutFile { get; init; } // cardano-cli compatible transaction file (signed only)
@@ -103,6 +103,20 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         // Fee Calculation
         var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
+        
+        // Remove Mocks
+        if (MockWitnessCount.HasValue)
+        {
+            var initialCount = tx.TransactionWitnessSet.VKeyWitnesses.Count; 
+            for (var i = initialCount - 1;
+                 i >= initialCount - MockWitnessCount.Value;
+                 i--)
+            {
+                tx.TransactionWitnessSet.VKeyWitnesses.Remove(
+                    tx.TransactionWitnessSet.VKeyWitnesses.ToList()[i]);
+            }
+        }
+        
         var txCborBytes = tx.Serialize();
         if (!string.IsNullOrWhiteSpace(OutFile))
         {
