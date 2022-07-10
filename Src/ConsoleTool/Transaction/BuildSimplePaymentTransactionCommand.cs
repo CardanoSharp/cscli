@@ -107,16 +107,13 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         // Remove Mocks
         if (MockWitnessCount.HasValue)
         {
-            var initialCount = tx.TransactionWitnessSet.VKeyWitnesses.Count; 
-            for (var i = initialCount - 1;
-                 i >= initialCount - MockWitnessCount.Value;
-                 i--)
+            var mockedWitnesses = tx.TransactionWitnessSet.VKeyWitnesses.Where(x => x.IsMock);
+            foreach (var mockedWitness in mockedWitnesses)
             {
-                tx.TransactionWitnessSet.VKeyWitnesses.Remove(
-                    tx.TransactionWitnessSet.VKeyWitnesses.ToList()[i]);
+                tx.TransactionWitnessSet.VKeyWitnesses.Remove(mockedWitness);
             }
         }
-        
+
         var txCborBytes = tx.Serialize();
         if (!string.IsNullOrWhiteSpace(OutFile))
         {
