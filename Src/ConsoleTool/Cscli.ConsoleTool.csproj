@@ -32,7 +32,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="CardanoSharp.Koios.Sdk" Version="5.0.2" />
-		<PackageReference Include="CardanoSharp.Wallet" Version="2.10.1" />
+		<PackageReference Include="CardanoSharp.Wallet" Version="2.10.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />

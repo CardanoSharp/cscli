@@ -99,20 +99,12 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             txBuilder.SetAuxData(auxDataBuilder);
         }
+        
         var tx = txBuilder.Build();
+        
         // Fee Calculation
         var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
-        
-        // Remove Mocks
-        if (MockWitnessCount.HasValue)
-        {
-            var mockedWitnesses = tx.TransactionWitnessSet.VKeyWitnesses.Where(x => x.IsMock);
-            foreach (var mockedWitness in mockedWitnesses)
-            {
-                tx.TransactionWitnessSet.VKeyWitnesses.Remove(mockedWitness);
-            }
-        }
 
         var txCborBytes = tx.Serialize();
         if (!string.IsNullOrWhiteSpace(OutFile))
