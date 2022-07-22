@@ -71,25 +71,15 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         }
         // Build Whole Tx
         var txBuilder = TransactionBuilder.Create.SetBody(txBodyBuilder);
-        
-        // Initiate Witness Builder
-        var witnesses = TransactionWitnessSetBuilder.Create;
-        
+
         // Key Witnesses if signing key is passed in
         if (!string.IsNullOrWhiteSpace(SigningKey))
         {
             var paymentSkey = TxUtils.GetPrivateKeyFromBech32SigningKey(SigningKey);
-            witnesses.AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
-        }
-        
-        // Add Mock Witnesses
-        if (MockWitnessCount.HasValue)
-        {
-            witnesses.MockVKeyWitness(MockWitnessCount.Value);
-        }
-        
-        if(witnesses.Build().VKeyWitnesses.Any())
+            var witnesses = TransactionWitnessSetBuilder.Create
+                .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
             txBuilder.SetWitnesses(witnesses);
+        }
         
         // Metadata
         var auxDataBuilder = !string.IsNullOrWhiteSpace(Message)
@@ -103,7 +93,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var tx = txBuilder.Build();
         
         // Fee Calculation
-        var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
+        var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB, MockWitnessCount ?? 0);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
 
         var txCborBytes = tx.Serialize();
