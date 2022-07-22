@@ -1,6 +1,5 @@
 ﻿using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Models.Keys;
-using CardanoSharp.Wallet.Models.Transactions;
 
 namespace Cscli.ConsoleTool.Transaction;
 

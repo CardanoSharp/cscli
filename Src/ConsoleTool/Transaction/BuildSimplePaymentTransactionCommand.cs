@@ -71,7 +71,6 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         }
         // Build Whole Tx
         var txBuilder = TransactionBuilder.Create.SetBody(txBodyBuilder);
-
         // Key Witnesses if signing key is passed in
         if (!string.IsNullOrWhiteSpace(SigningKey))
         {
@@ -80,7 +79,6 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                 .AddVKeyWitness(paymentSkey.GetPublicKey(false), paymentSkey);
             txBuilder.SetWitnesses(witnesses);
         }
-        
         // Metadata
         var auxDataBuilder = !string.IsNullOrWhiteSpace(Message)
             ? AuxiliaryDataBuilder.Create.AddMetadata(MessageStandardKey, BuildMessageMetadata(Message))
@@ -89,13 +87,10 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         {
             txBuilder.SetAuxData(auxDataBuilder);
         }
-        
         var tx = txBuilder.Build();
-        
         // Fee Calculation
         var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB, MockWitnessCount ?? 0);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
-
         var txCborBytes = tx.Serialize();
         if (!string.IsNullOrWhiteSpace(OutFile))
         {
