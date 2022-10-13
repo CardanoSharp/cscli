@@ -10,6 +10,7 @@ using CardanoSharp.Wallet.TransactionBuilding;
 using CardanoSharp.Wallet.Utilities;
 using Cscli.ConsoleTool.Koios;
 using System.Text.Json;
+using CardanoSharp.Wallet.Models.Transactions;
 using static Cscli.ConsoleTool.Constants;
 
 namespace Cscli.ConsoleTool.Transaction;
@@ -24,6 +25,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
     public decimal Ada { get; init; } 
     public bool SendAll { get; init; } = false; 
     public uint Ttl { get; set; } // Slot for transaction expiry
+    public int? MockWitnessCount { get; set; } // Slot for transaction expiry
     public string? Message { get; init; } // Onchain Metadata 674 standard
     public bool Submit { get; init; } // Submits Transaction to Koios node
     public string? OutFile { get; init; } // cardano-cli compatible transaction file (signed only)
@@ -87,8 +89,10 @@ public class BuildSimplePaymentTransactionCommand : ICommand
             txBuilder.SetAuxData(auxDataBuilder);
         }
         var tx = txBuilder.Build();
+        if(MockWitnessCount is not null && MockWitnessCount > 0)
+            tx.TransactionWitnessSet = new TransactionWitnessSet();
         // Fee Calculation
-        var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB);
+        var fee = tx.CalculateAndSetFee(protocolParams.MinFeeA, protocolParams.MinFeeB, MockWitnessCount ?? 0);
         tx.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
         var txCborBytes = tx.Serialize();
         if (!string.IsNullOrWhiteSpace(OutFile))

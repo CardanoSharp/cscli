@@ -70,6 +70,7 @@ public static class Constants
         { "--signing-keys", "signingKeys" },
         { "--send-all", "sendAll" },
         { "--out-file", "outFile" },
+        { "--mock-witness-count", "mockWitnessCount"}
         //{ "--output-format", "outputFormat" },
     };
 }
