@@ -1,4 +1,4 @@
-﻿using CardanoSharp.Koios.Sdk;
+﻿using CardanoSharp.Koios.Client;
 using CardanoSharp.Wallet;
 using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
@@ -27,7 +27,12 @@ public class QueryAccountInfoCommand : ICommand
         var accountClient = BackendGateway.GetBackendClient<IAccountClient>(networkType);
         try
         {
-            var accountInfo = await accountClient.GetStakeInformation(stakeAddress.ToString()).ConfigureAwait(false);
+            var accountInfo = await accountClient
+                .GetAccountInformation(
+                    new AccountBulkRequest()
+                    {
+                        StakeAddresses = new string[] { stakeAddress.ToString() }
+                    }).ConfigureAwait(false);
             if (!accountInfo.IsSuccessStatusCode || accountInfo.Content is null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 

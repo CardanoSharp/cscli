@@ -1,4 +1,4 @@
-﻿using CardanoSharp.Koios.Sdk;
+﻿using CardanoSharp.Koios.Client;
 using CardanoSharp.Wallet.Enums;
 using Cscli.ConsoleTool.Koios;
 using System.Text.Json;

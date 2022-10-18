@@ -1,4 +1,4 @@
-﻿using CardanoSharp.Koios.Sdk;
+﻿using CardanoSharp.Koios.Client;
 using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Models.Addresses;
@@ -25,7 +25,10 @@ public class QueryAddressInfoCommand : ICommand
         var addressClient = BackendGateway.GetBackendClient<IAddressClient>(networkType);
         try
         {
-            var addressInfo = (await addressClient.GetAddressInformation(address.ToString()).ConfigureAwait(false));
+            var addressInfo = (await addressClient
+                .GetAddressInformation(new AddressBulkRequest() 
+                    { Addresses = new List<string>(){ address.ToString() }})
+                .ConfigureAwait(false));
             if (!addressInfo.IsSuccessStatusCode || addressInfo.Content is null)
                 return CommandResult.FailureBackend($"Koios backend response was unsuccessful");
 

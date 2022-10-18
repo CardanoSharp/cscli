@@ -13,7 +13,7 @@ public static class TxUtils
     public static Balance Sum(this IEnumerable<Balance> values)
     {
         var lovelaces = 0UL;
-        var nativeAssets = new Dictionary<(string PolicyId, string AssetNameHex), ulong>();
+        var nativeAssets = new Dictionary<(string PolicyId, string AssetNameHex), long>();
         foreach (var value in values)
         {
             lovelaces += value.Lovelaces;

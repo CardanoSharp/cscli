@@ -1,6 +1,6 @@
 ﻿namespace Cscli.ConsoleTool;
 
-public record struct NativeAssetValue(string PolicyId, string AssetName, ulong Quantity);
+public record struct NativeAssetValue(string PolicyId, string AssetName, long Quantity);
 
 public record struct Balance(ulong Lovelaces, NativeAssetValue[] NativeAssets);
 
