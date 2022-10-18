@@ -1,5 +1,5 @@
-﻿using CardanoSharp.Koios.Sdk;
-using CardanoSharp.Koios.Sdk.Contracts;
+﻿using CardanoSharp.Koios.Client;
+using CardanoSharp.Koios.Client.Contracts;
 using CardanoSharp.Wallet.Encoding;
 using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions;
@@ -42,7 +42,8 @@ public class BuildSimplePaymentTransactionCommand : ICommand
         var protocolParams = (await epochClient.GetProtocolParameters(tip.Epoch.ToString())).Content?.FirstOrDefault();
         if (protocolParams is null) 
             return CommandResult.FailureBackend("Unable to get protocol parameters");
-        var sourceAddressInfo = (await addressClient.GetAddressInformation(From)).Content?.FirstOrDefault();
+        var sourceAddressInfo = (await addressClient.GetAddressInformation(
+            new AddressBulkRequest(){ Addresses = new List<string>(){ From } })).Content?.FirstOrDefault();
         if (sourceAddressInfo is null) 
             return CommandResult.FailureBackend($"Unable to get address info for --from address ${From}");
         if (sourceAddressInfo.UtxoSets is null || !sourceAddressInfo.UtxoSets.Any())
@@ -248,7 +249,7 @@ public class BuildSimplePaymentTransactionCommand : ICommand
                         a => new NativeAssetValue(
                             a.PolicyId ?? "n/a",
                             a.AssetName ?? "n/a",
-                            ulong.Parse(a.Quantity ?? "0")))
+                            long.Parse(a.Quantity ?? "0")))
                     .ToArray())))
             .ToArray();
     }
